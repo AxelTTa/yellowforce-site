@@ -143,10 +143,13 @@
   .head--split { display: flex; flex-direction: column; align-items: flex-start; row-gap: var(--sp-3); }
   .head__text { max-width: none; }
 }
+/* phones: the meta stays on the right of the two-line title (same row), as on the reference; it may wrap
+   its own lines, and only drops under the title (still right-aligned) when there is truly no room */
 @media (max-width: 479px) {
-  .head:not(.head--center) { flex-direction: column; align-items: flex-start; row-gap: 1.25em; }
-  .head__title { max-width: none; }
-  .head:not(.head--center) .head__meta { align-items: flex-start; text-align: left; }
+  .head:not(.head--center):not(.head--split) { flex-wrap: wrap; column-gap: var(--sp-2); row-gap: var(--sp-2); }
+  .head__title { max-width: none; flex: 0 1 auto; }
+  .head:not(.head--center) .head__meta { flex: 0 1 auto; max-width: 52%; margin-left: auto; }
+  .head:not(.head--center) .head__meta > * { white-space: normal; }
 }
 
 /* ===== Buttons: text roll + arrow chip ===== */
@@ -550,26 +553,36 @@
   column-gap: var(--sp-3);
   row-gap: var(--sp-2);
 }
-.hero__title { color: var(--paper); }
+/* 1.02, not the .9 of .t-h0: the "g" of "Fight" sits right above the "W" of "With" and at .9 they
+   overlap by .08em. Measured clearance at 1.02: .04em (5px at 1440, 2px at 390), so they never touch. */
+.hero__title { color: var(--paper); line-height: 1.02; }
 @media (max-width: 767px) {
   .hero { min-height: 40em; }
   .hero__inner { padding-bottom: var(--sp-125); }
 }
 
-/* status card (frosted, with thumbnail) */
+/* status card: the whole card is the "Under attack?" copy-email button (data-copy-email="urgent").
+   Dark frosted chip, label top, line + small address bottom, photo thumbnail right. Hidden <= 767 like
+   the reference (the menu keeps its "Under attack?" row on phones). */
 .status {
   display: flex;
   gap: 1em;
   width: clamp(300px, 25vw, 380px);
   padding: .375em .375em .375em 1.5em;
   border-radius: var(--r-m);
-  background: var(--glass);
+  /* darker than the shared glass: deep navy at 46% so the card reads as a dark chip over the bright hero light */
+  background: rgba(3, 11, 28, .46);
   -webkit-backdrop-filter: var(--blur-chip);
   backdrop-filter: var(--blur-chip);
   color: var(--paper-82);
+  text-align: left;
+  cursor: copy;
+  transition: background-color var(--t-fast) var(--ease);
 }
+.status:hover { background: rgba(3, 11, 28, .6); }
 .status__body {
   flex: 1;
+  min-width: 0;
   min-height: 150px;
   padding: .75em 0;
   display: flex;
@@ -586,12 +599,27 @@
   text-transform: uppercase;
   color: var(--paper-82);
 }
+.status__main { display: flex; flex-direction: column; gap: .625em; }
 .status__text {
   font-size: var(--fs-ml);
   line-height: var(--lh-130);
   color: var(--paper);
   text-wrap: pretty;
 }
+.status__mail {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  font-size: var(--fs-xs);
+  line-height: var(--lh-112);
+  color: var(--slate-light);
+  transition: color var(--t-fast) var(--ease);
+}
+.status__icon { flex: none; width: 1.1em; height: 1.1em; }
+.status__icon--done { display: none; color: var(--amber); }
+.status:hover .status__mail { color: var(--paper); }
+.status.is-copied .status__icon { display: none; }
+.status.is-copied .status__icon--done { display: block; }
 .status__thumb {
   flex: none;
   align-self: stretch;
@@ -630,7 +658,6 @@
 }
 .manifesto__text { color: var(--navy); text-wrap: balance; }
 @media (max-width: 767px) {
-  .manifesto { min-height: 0; padding-block: var(--sp-8); }
   .manifesto__wrap { max-width: none; }
 }
 .ticker { position: relative; width: 70%; overflow: hidden; }
@@ -677,7 +704,12 @@
 @media (prefers-reduced-motion: reduce) { .ticker__track { animation: none; } }
 @media (max-width: 479px) { .ticker { width: 80%; } }
 
-/* ===== Image cards 2x2 with frosted label ===== */
+/* ===== Image cards 2x2 with frosted label =====
+   Shared by Home "What we stop.", Services practice cards and Coverage domain cards.
+   Rest: a compact glass panel, at least half the card wide and 4em tall, name with the two meta lines
+   stacked right next to it. Hover/focus: the panel grows to the full card width and the reveal
+   (line + link) opens under the row. The panel is as wide as its row needs (never under 50%), so long
+   names never wrap; the reveal never widens it (width 0 + min-width 100%). */
 .tiles {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -700,58 +732,63 @@
   position: absolute;
   top: 1.25em;
   left: 1.25em;
-  width: 62%;
+  width: max-content;
+  min-width: 50%;
+  max-width: calc(100% - 2.5em);
   min-height: 4em;
   max-height: calc(100% - 2.5em);
   padding: 1em;
   border-radius: var(--r-xs);
-  /* light tint, not the navy --glass: on our navy imagery the navy glass disappears
-     (Services and Coverage already override it the same way) */
+  /* light tint, not the navy --glass: on our navy imagery a navy glass disappears */
   background: rgba(244, 245, 247, .1);
+  box-shadow: inset 0 0 0 1px var(--paper-07);
   -webkit-backdrop-filter: var(--blur-chip);
   backdrop-filter: var(--blur-chip);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  transition: width var(--t) var(--ease);
+  transition: min-width var(--t) var(--ease), min-height var(--t) var(--ease);
 }
 .tile__row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: .75em;
+  justify-content: flex-start;
+  gap: .625em;
   opacity: .78;
   transition: opacity var(--t) var(--ease);
 }
 .tile__name {
-  font-size: var(--fs-2xl);
+  font-size: var(--fs-3xl);
   font-weight: 500;
-  line-height: 1.05;
+  line-height: 1;
   letter-spacing: var(--tr-1);
+  white-space: nowrap;
 }
 .tile__meta {
   flex: none;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   row-gap: 2px;
   font-size: var(--fs-xs);
   font-weight: 500;
   line-height: var(--lh-112);
   text-transform: uppercase;
-  color: var(--paper-62);
-  text-align: right;
+  color: var(--paper-82);
+  text-align: left;
   white-space: nowrap;
 }
 .tile__reveal {
   display: grid;
   grid-template-rows: 0fr;
+  width: 0;
+  min-width: 100%;
   opacity: 0;
   transform: translateX(-1em);
   transition: grid-template-rows var(--t) var(--ease), opacity var(--t) var(--ease) .12s, transform var(--t) var(--ease) .12s;
 }
-.tile__reveal-inner { min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 1em; }
+.tile__reveal-inner { min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: .875em; }
 .tile__line {
   display: block;
   padding-top: 1em;
@@ -763,7 +800,7 @@
 }
 .tile__more {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
   gap: .5em;
   font-size: var(--fs-s);
@@ -771,34 +808,14 @@
 }
 .tile__more .icon { color: var(--amber); }
 .tile:hover .tile__glass,
-.tile:focus-visible .tile__glass { width: 94%; }
+.tile:focus-visible .tile__glass { min-width: calc(100% - 2.5em); min-height: 8em; }
 .tile:hover .tile__row,
 .tile:focus-visible .tile__row { opacity: 1; }
 .tile:hover .tile__reveal,
 .tile:focus-visible .tile__reveal { grid-template-rows: 1fr; opacity: 1; transform: none; }
 .tile:focus-visible { outline-color: var(--navy); outline-offset: 3px; }
-@media (hover: none) {
-  .tile__glass { width: calc(100% - 2.5em); }
-  .tile__row { opacity: 1; }
-  .tile__reveal { grid-template-rows: 1fr; opacity: 1; transform: none; }
-}
-@media (max-width: 767px) {
-  .tile__glass { top: .75em; left: .75em; width: calc(100% - 1.5em); padding: .875em; min-height: 0; }
-  .tile__name { font-size: var(--fs-l); }
-  .tile__meta { display: none; }
-  .tile:hover .tile__glass { width: calc(100% - 1.5em); }
-  .tile__line { display: none; }
-  .tile__reveal { grid-template-rows: 1fr; opacity: 1; transform: none; }
-  .tile__reveal-inner { padding-top: .5em; }
-  .tile__more { justify-content: flex-start; }
-}
-@media (max-width: 479px) {
-  .tiles { grid-template-columns: 1fr; }
-  .tile__glass { top: 1em; left: 1em; width: calc(100% - 2em); padding: 1em; }
-  .tile__name { font-size: var(--fs-2xl); }
-  .tile__meta { display: flex; }
-  .tile__line { display: block; }
-}
+@media (max-width: 767px) { .tile__line { font-size: var(--fs-l); } }
+@media (max-width: 479px) { .tiles { grid-template-columns: 1fr; } }
 
 /* ===== Coverage table rows with bars ===== */
 .ledger { border-top: 1px solid var(--line); }
@@ -901,6 +918,15 @@ a.ledger__row:hover { padding-inline: .75em; }
   .ledger__end { grid-column: 1; grid-row: 2; justify-self: start; text-align: left; }
   .ledger__gauge { grid-column: 1; grid-row: 3; }
 }
+/* .ledger--compact (home): on phones one line per row like the reference, name left and the gauge
+   (meta over the bar) right; the tag and end label drop out */
+@media (max-width: 767px) {
+  .ledger--compact .ledger__row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--gutter); row-gap: 0; padding: 2em 0; }
+  .ledger--compact .ledger__name { grid-column: 1; grid-row: 1; }
+  .ledger--compact .ledger__gauge { grid-column: 2; grid-row: 1; }
+  .ledger--compact .ledger__tag,
+  .ledger--compact .ledger__end { display: none; }
+}
 
 /* ===== Carousel (practices, reasons) ===== */
 .carousel { position: relative; }
@@ -951,13 +977,8 @@ a.ledger__row:hover { padding-inline: .75em; }
 .carousel.is-start .carousel__btn--prev { opacity: 0; visibility: hidden; transition: opacity var(--t) var(--ease), visibility 0s linear var(--t); }
 .carousel__btn:focus-visible { outline: none; }
 .carousel__btn:focus-visible .carousel__arrow { outline: 2px solid var(--navy); outline-offset: 3px; }
-@media (max-width: 767px) {
-  .carousel__viewport, .carousel--narrow .carousel__viewport { width: calc(100% - 3.5em); }
-  .carousel__btn { width: 56px; }
-  .carousel__btn--prev, .carousel__btn--next { background: none; }
-  .carousel__btn--prev { left: calc(var(--page-x) * -1); }
-  .carousel__btn--next { right: calc(var(--page-x) * -1); }
-}
+/* phones keep the desktop geometry, as on the reference: a 28em slide (298px at 390), the next card
+   peeking under the paper fade, the arrow chip over the gap */
 
 /* numbered practice card */
 .practice {
@@ -982,7 +1003,8 @@ a.ledger__row:hover { padding-inline: .75em; }
   letter-spacing: 0;
   text-transform: uppercase;
 }
-.practice__text { max-width: 80%; font-size: var(--fs-ml); color: var(--text-2); text-wrap: pretty; }
+/* two lines reserved, so titles line up across cards even if one text runs short */
+.practice__text { max-width: 80%; min-height: calc(2em * var(--lh-155)); font-size: var(--fs-ml); color: var(--text-2); text-wrap: pretty; }
 @media (max-width: 767px) {
   .practice { min-height: 35em; }
   .practice__text { max-width: 95%; }
@@ -1035,19 +1057,31 @@ a.ledger__row:hover { padding-inline: .75em; }
 .reason__figure-text { font-family: var(--font-display); font-size: var(--fs-sm); line-height: var(--lh-140); color: var(--paper-82); text-wrap: pretty; }
 .reason__crew { display: flex; align-items: center; gap: .75em; }
 .reason__stack { display: flex; }
+/* overlapping round chips (34px, 2px navy ring), like a row of avatars but without faces: solid light
+   chips with a navy pixel glyph or the mark (--amber, --paper, --slate), closed by a live chip with the
+   pulsing amber dot (--live). Plain .reason__chip = navy chip with an amber glyph. */
 .reason__chip {
+  position: relative;
   display: grid;
   place-items: center;
+  flex: none;
   width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: 50%;
   background: var(--navy-2);
   box-shadow: 0 0 0 2px var(--navy);
   color: var(--amber);
+  overflow: hidden;
 }
 .reason__chip + .reason__chip { margin-left: -10px; }
 .reason__chip svg { width: 16px; height: 16px; }
-.reason__crew-label { font-size: var(--fs-xs); text-transform: uppercase; color: var(--paper-82); line-height: 1.3; }
+.reason__chip--amber { background: var(--amber); color: var(--navy); }
+.reason__chip--paper { background: var(--paper); color: var(--navy); --logo-back: var(--navy); }
+.reason__chip--slate { background: var(--slate-light); color: var(--navy); }
+.reason__chip--live { background: var(--navy-3); }
+.reason__chip .logo__mark { width: 20px; }
+.reason__chip--live .dot { width: 7px; height: 7px; }
+.reason__crew-label { max-width: 14em; font-size: var(--fs-xs); text-transform: uppercase; color: var(--paper-82); line-height: 1.3; }
 @media (max-width: 767px) { .reason { min-height: 32em; } }
 
 /* ===== Reel frame with island control ===== */
@@ -1115,9 +1149,12 @@ a.ledger__row:hover { padding-inline: .75em; }
   column-gap: var(--gutter);
 }
 .faq__head { grid-column: 1 / 7; align-self: start; display: flex; flex-direction: column; row-gap: var(--gutter); }
-.faq__list { grid-column: 7 / 13; min-width: 0; border-top: 1px solid var(--line); }
+/* no top rule on the list: the first row starts clean, every row closes with a hairline */
+.faq__list { grid-column: 7 / 13; min-width: 0; }
 .faq__item { border-bottom: 1px solid var(--line); }
 .faq__h { font: inherit; letter-spacing: inherit; margin: 0; }
+/* the button stays at the body size so its 2em padding is 2em of the base (30px at 1440, row ~85px);
+   only the question text gets the 1.375em display size */
 .faq__q {
   display: flex;
   justify-content: space-between;
@@ -1125,13 +1162,15 @@ a.ledger__row:hover { padding-inline: .75em; }
   gap: 1.5em;
   width: 100%;
   padding: 2em 0;
+  color: var(--text);
+  text-align: left;
+}
+.faq__q > span:first-child {
   font-family: var(--font-display);
   font-size: var(--fs-xl);
   font-weight: 600;
   line-height: var(--lh-120);
   letter-spacing: var(--tr-2);
-  color: var(--text);
-  text-align: left;
 }
 .faq__icon {
   position: relative;
@@ -1230,7 +1269,7 @@ a.ledger__row:hover { padding-inline: .75em; }
 @media (max-width: 479px) {
   .notes, .notes--3 { grid-template-columns: 1fr; }
   .note__body { top: 1.5em; left: 1.5em; }
-  .note__title { max-width: none; font-size: var(--fs-2xl); }
+  .note__title { max-width: 13em; font-size: var(--h4); }
 }
 .index { position: relative; border-bottom: 1px solid var(--line); }
 .notes + .index { margin-top: var(--sp-6); }

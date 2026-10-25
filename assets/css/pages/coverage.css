@@ -9,14 +9,8 @@
 .page-coverage-index .cov-head__title { max-width: var(--col-8); }
 .page-coverage-index .cov-head__text { max-width: 38em; margin-top: -.75em; }
 
-/* domain cards (index + related): the frosted label must read on navy imagery, so the glass is a
-   light tint with a hairline instead of a dark one; name and meta sit together at the top left */
-.page-coverage .tile__glass {
-  background: rgba(244, 245, 247, .09);
-  box-shadow: inset 0 0 0 1px var(--paper-10);
-}
-.page-coverage .tile__row { justify-content: flex-start; align-items: flex-start; gap: .75em; }
-.page-coverage .tile__meta { align-items: flex-start; text-align: left; padding-top: .2em; }
+/* domain cards (index + related) use the shared tile as is: short one-line names ("Apps and APIs"),
+   so the closed label stays a compact half-width panel at every width */
 
 /* floating domain bar: docks at the bottom of the viewport while the grid is on screen, then
    settles under the last row so it never covers the closing band or the footer */
@@ -29,21 +23,26 @@
   margin-top: var(--sp-15);
   pointer-events: none;
 }
-.page-coverage-index .cov-bar__list {
-  display: flex;
-  align-items: center;
-  gap: .25em;
+/* the pill holds the shape; the list inside it scrolls sideways when it does not fit */
+.page-coverage-index .cov-bar__pill {
+  min-width: 0;
   max-width: 100%;
-  padding: .5em;
   border: 1px solid var(--paper-16);
   border-radius: var(--r-m);
   background: var(--pill-glass);
   -webkit-backdrop-filter: var(--blur-bar);
   backdrop-filter: var(--blur-bar);
+  overflow: hidden;
+  pointer-events: auto;
+}
+.page-coverage-index .cov-bar__list {
+  display: flex;
+  align-items: center;
+  gap: .25em;
+  padding: .5em;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  pointer-events: auto;
 }
 .page-coverage-index .cov-bar__list::-webkit-scrollbar { display: none; }
 .page-coverage-index .cov-bar__list > li { flex: none; }
@@ -68,7 +67,14 @@
   .page-coverage-index .cov-head__title { max-width: none; }
   .page-coverage-index .cov-head__text { margin-top: -1em; }
   .page-coverage-index .cov-bar { bottom: 1em; }
-  .page-coverage-index .cov-bar__list { padding: .375em; gap: .125em; }
+  /* more items than width: the last ones fade out at the right edge (like the marquee), and the
+     extra end padding equals the fade so the last item scrolls fully clear of it */
+  .page-coverage-index .cov-bar__list {
+    padding: .375em 4.5em .375em .375em;
+    gap: .125em;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 4.5em), transparent calc(100% - .375em));
+    mask-image: linear-gradient(to right, #000 calc(100% - 4.5em), transparent calc(100% - .375em));
+  }
   .page-coverage-index .cov-bar__link { padding: .75em .875em; font-size: max(.875em, 11px); }
 }
 
@@ -160,19 +166,35 @@
   height: 88svh;
   min-height: 560px;
   margin: 0 var(--inset) var(--sp-5);
-  border-radius: var(--r-m);
+  /* top corners follow the panel (concentric), bottom has no edge: the picture dissolves into
+     the navy panel instead of ending on its own rounded line */
+  border-radius: calc(var(--r-ml) - var(--inset)) calc(var(--r-ml) - var(--inset)) 0 0;
+  background: var(--navy);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2em var(--page-x);
   text-align: center;
 }
-.page-domain .dom-ops__media > img { opacity: .9; }
+.page-domain .dom-ops__media > img { opacity: .92; }
+/* images with a hot core in the middle: crop so the core sits under the title, not behind it */
+.page-domain .dom-ops__media > img[src*="threat-breach"] { object-position: 50% 20%; }
+.page-domain .dom-ops__media > img[src*="threat-swarm"] { object-position: 50% 26%; }
+.page-domain .dom-ops__media > img[src*="/gen/contact"] { object-position: 50% 14%; }
+@media (max-width: 767px) {
+  /* tall phone frame: the whole height shows, so move the core sideways out from under the title */
+  .page-domain .dom-ops__media > img[src*="threat-breach"],
+  .page-domain .dom-ops__media > img[src*="threat-swarm"] { object-position: 100% 50%; }
+  .page-domain .dom-ops__media > img[src*="/gen/contact"] { object-position: 0% 50%; }
+}
 .page-domain .dom-ops__media::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--scrim-media);
+  background:
+    linear-gradient(to bottom, rgba(7, 27, 62, 0) 48%, rgba(7, 27, 62, .55) 72%, rgba(7, 27, 62, .9) 88%, var(--navy) 100%),
+    linear-gradient(to right, var(--navy), rgba(7, 27, 62, 0) 6%, rgba(7, 27, 62, 0) 94%, var(--navy)),
+    linear-gradient(rgba(4, 16, 41, .5), rgba(4, 16, 41, .18) 40%, rgba(4, 16, 41, 0) 60%);
   pointer-events: none;
 }
 .page-domain .dom-ops__title { position: relative; z-index: 1; max-width: var(--col-5); color: var(--paper); }
@@ -324,6 +346,4 @@
   .page-domain .dom-principle__media { width: 100%; }
   .page-domain .dom-principle__quote { font-size: var(--fs-3xl); }
   .page-domain .dom-chip { white-space: normal; text-align: left; }
-  .page-coverage .tile__row { flex-direction: column; gap: .5em; }
-  .page-coverage .tile__meta { flex-direction: row; column-gap: .75em; padding-top: 0; }
 }

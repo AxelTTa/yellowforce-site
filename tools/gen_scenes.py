@@ -405,7 +405,7 @@ def threat_breach(cv):
 
 
 @scene("domain-network", R169, "Coverage: Network security (domain page hero + card)",
-       "Glowing nodes joined by fine links, packets of light racing along them, deep focus falloff.")
+       "Glowing nodes joined by fine links, packets of light racing along them; a second network glows out of focus behind.")
 def domain_network(cv):
     rng = np.random.default_rng(61)
     pts = []
@@ -464,48 +464,58 @@ def domain_network(cv):
     bl = 0.5 + 34 * depth ** 2
     cv.points(pts, e * (1 + (bl / 6) ** 2 * 0.25), ramp(0.03), bl)
     glow(cv, pts, e * 2.5, 8 + bl * 0.6, 0.5, n=800)
+    # round 1: a second, far network out of focus behind the first (depth, midtones)
+    k = 150
+    q = np.c_[rng.uniform(250, 2550, k), rng.uniform(-60, 1300, k)]
+    bq = rng.uniform(12, 60, k)
+    cv.points(q, lognormal_int(rng, k, 0.9, 0.6) * (1 + (bq / 6) ** 2 * 0.25), ramp(rng.uniform(0.2, 0.8, k)), bq)
+    dq = np.hypot(*(q[:, None] - q[None]).transpose(2, 0, 1))
+    np.fill_diagonal(dq, 1e9)
+    nb = dq.argmin(1)
+    tq = np.linspace(0, 1, 60)
+    segs = q[:, None, :] + (q[nb] - q)[:, None, :] * tq[None, :, None]
+    cv.polylines(segs, np.full((k, 60), 0.05), ramp(0.5), bq * 0.8)
+    glow(cv, (1650.0, 560.0), 18000.0, 460, 0.5, n=8000, seed=9)
     motes(cv, 20, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 70), seed=8)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.42)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.42)
 
 
 @scene("domain-endpoint", R169, "Coverage: Endpoint and device security",
-       "A floor of device lights in perspective with shallow focus; one guarded device ringed by an orbit.")
+       "A night floor of device lights in perspective, shallow focus; one guarded device burns hot in the middle and sends a soft column of light into the haze.")
 def domain_endpoint(cv):
-    rng = np.random.default_rng(71)
-    f, cx, cy, h = 1300.0, 1700.0, 300.0, 1.6
-    X, Z = np.meshgrid(np.arange(-18, 19, 1.0), np.geomspace(1.6, 60, 70))
-    X = X.ravel() + rng.normal(0, 0.25, X.size)
+    rng = np.random.default_rng(72)
+    f, cx, cy, h = 1250.0, 1250.0, 330.0, 1.5
+    X, Z = np.meshgrid(np.arange(-40, 41, 0.8), np.geomspace(1.2, 70, 95))
+    X = X.ravel() + rng.normal(0, 0.22, X.size)
     Z = Z.ravel() * np.exp(rng.normal(0, 0.03, Z.size))
     x = cx + f * X / Z
     y = cy + f * h / Z
-    keep = (x > -150) & (x < 2600) & (y < 1500) & (rng.random(X.size) < 0.6 * np.minimum(1, (6 / Z) ** 0.8))
+    keep = (x > -200) & (x < 2600) & (y < 1500) & (rng.random(X.size) < 0.75 * np.minimum(1, (7 / Z) ** 0.7))
     X, Z, x, y = X[keep], Z[keep], x[keep], y[keep]
-    Zf = 3.9
-    blur = 0.5 + 95 * np.abs(1 / Z - 1 / Zf) ** 0.9
-    mask = smoothstep(300, 1250, x) * (1 - 0.5 * smoothstep(1000, 1450, y))
-    E = lognormal_int(rng, len(x), 0.7, 0.7) * mask * (1 + 0.18 * blur ** 2) * np.minimum(1, (Zf / Z) ** 0.9)
-    hue = rng.uniform(0.35, 1.0, len(x))
+    Zf = 4.2
+    blur = 0.5 + 105 * np.abs(1 / Z - 1 / Zf) ** 0.9
+    # headline corner on the domain page stays calmer
+    mask = 1 - 0.6 * (1 - smoothstep(450, 1100, x)) * smoothstep(780, 1150, y)
+    E = lognormal_int(rng, len(x), 0.65, 0.7) * mask * (1 + 0.16 * blur ** 2) * np.minimum(1, (Zf / Z) ** 0.8)
+    hue = rng.uniform(0.3, 1.0, len(x))
     ln = 0.16 * f / Z
     P = np.stack([np.c_[x - ln / 2, y], np.c_[x + ln / 2, y]], 1)
-    cv.polylines(P, (E / ln * 0.55)[:, None] * np.ones((1, 2)), ramp(hue), blur)
+    cv.polylines(P, (E / ln * 0.5)[:, None] * np.ones((1, 2)), ramp(hue), blur)
     cv.points(np.c_[x, y], E * 0.45, ramp(hue), blur)
-    Xg, Zg = 0.55, 3.9
-    gx, gy = cx + f * Xg / Zg, cy + f * h / Zg
-    th = np.linspace(0, 2 * np.pi, 900)
-    for j in range(9):
-        a0 = rng.uniform(0, 2 * np.pi)
-        span = rng.uniform(0.55, 1.0)
-        ss = ((th - a0) % (2 * np.pi)) / (2 * np.pi)
-        g = np.where(ss <= span, envelope(np.clip(ss / span, 0, 1), 0.1, 0.25), 0)
-        rx, ry = 190 * (1 + rng.normal(0, 0.02)), 46 * (1 + rng.normal(0, 0.04))
-        ring = circle_pts((gx, gy - 6), 1.0, th, rx, ry, np.deg2rad(-3))
-        cv.polylines(ring[None], (lognormal_int(rng, 1, 0.16, 0.4)[0] * g)[None], ramp(0.08 + 0.3 * rng.random()), 0.6)
-    ring = circle_pts((gx, gy - 6), 1.0, th, 190, 46, np.deg2rad(-3))
-    cv.polylines(ring[None], np.full((1, len(th)), 0.12), ramp(0.5), 8)
-    cv.points(np.array([[gx, gy]]), 9.0, ramp(0.03), 0.6)
-    glow(cv, (gx, gy), 10.0, 10, 0.5)
-    return dict(exposure=1.25, bloom=0.10, halation=0.07, vignette=0.42)
+    # the guarded device, in focus
+    gx, gy = cx + f * 0.35 / Zf, cy + f * h / Zf
+    cv.points(np.array([[gx, gy]]), 30.0, ramp(0.0), 1.0)
+    glow(cv, (gx, gy), 260.0, 22, 0.1, n=4000)
+    # a soft column of light rises from it into the haze
+    col = np.stack([np.full(300, gx), np.linspace(gy, gy - 700, 300)], -1)
+    tcol = np.linspace(0, 1, 300)
+    for I0, bl, hh in ((0.10, 3.0, 0.1), (0.08, 18.0, 0.3), (0.07, 60.0, 0.5)):
+        cv.polylines(col[None], (I0 * (1 - tcol) ** 1.5)[None], ramp(hh), bl)
+    glow(cv, (gx, gy - 120), 16000.0, 360, 0.45, n=8000, seed=2)
+    glow(cv, (cx, cy + 40), 9000.0, 520, 0.6, n=8000, seed=4)
+    return dict(exposure=1.2, bloom=0.12, halation=0.08, vignette=0.45)
 
+# @@end domain-endpoint
 
 @scene("domain-cloud", R169, "Coverage: Cloud security",
        "Wisps of soft white-gold light drift across the frame like a cloud bank lit from within.")
@@ -626,49 +636,54 @@ def domain_email(cv):
 
 
 @scene("domain-applications", R169, "Coverage: Application and API security",
-       "Lines of code as light on a tilted page, sharp near the focus; one line flares where the flaw is.")
+       "Lines of code written in light on a tilted page, sharp near the focus and melting into bokeh; one line flares where the flaw is.")
 def domain_applications(cv):
-    rng = np.random.default_rng(111)
-    W, Hh = 1700.0, 1250.0
+    rng = np.random.default_rng(112)
+    W, Hh = 1900.0, 1500.0
     Hm = homography([[0, 0], [W, 0], [W, Hh], [0, Hh]],
-                    [[700, -120], [2560, 330], [2560, 960], [700, 1460]])
-    rows = 38
+                    [[380, -260], [2650, 260], [2650, 1100], [380, 1640]])
+    rows = 46
     ind = 0
     segs, Is, hs = [], [], []
-    hot = 19
+    hot = 22
     for r in range(rows):
-        ind = int(np.clip(ind + rng.choice([-1, 0, 0, 1]), 0, 4))
-        if rng.random() < 0.12:
+        ind = int(np.clip(ind + rng.choice([-1, 0, 0, 1]), 0, 5))
+        if rng.random() < 0.1:
             continue
         v = 30 + r * 31.5
         u = 40 + ind * 70
-        for _ in range(rng.integers(2, 7)):
-            ln = rng.uniform(30, 190)
+        for _ in range(rng.integers(3, 9)):
+            ln = rng.uniform(30, 210)
             if u + ln > W - 40:
                 break
             segs.append([[u, v], [u + ln, v]])
-            boost = 7.0 if r == hot else (1.5 if abs(r - hot) == 1 else 1.0)
-            Is.append(lognormal_int(rng, 1, 0.22, 0.45)[0] * boost)
+            boost = 7.0 if r == hot else (1.6 if abs(r - hot) == 1 else 1.0)
+            Is.append(lognormal_int(rng, 1, 0.24, 0.45)[0] * boost)
             hs.append(0.03 if r == hot else rng.uniform(0.3, 0.95))
-            u += ln + rng.uniform(16, 28)
+            u += ln + rng.uniform(14, 26)
     segs = np.array(segs)
     M = 18
     s = np.linspace(0, 1, M)
     Pp = segs[:, :1, :] + (segs[:, 1:, :] - segs[:, :1, :]) * s[None, :, None]
     P, wz = apply_h(Hm, Pp)
-    ufocus = 480.0
-    B = 0.5 + np.maximum(0, np.abs(Pp[..., 0] - ufocus) - 120) * 0.045
+    ufocus, vfocus = 620.0, 30 + hot * 31.5
+    dist = np.sqrt(np.maximum(0, np.abs(Pp[..., 0] - ufocus) - 140) ** 2 + (0.6 * (Pp[..., 1] - vfocus)) ** 2)
+    B = 0.5 + dist * 0.05
     prof = envelope(s, 0.06, 0.06)[None] * np.ones((len(segs), 1))
-    trails(cv, P, np.array(Is), np.array(hs)[:, None] * np.ones((1, M)), B, rng, env=None, speed=0.1, prof=prof)
+    I = np.array(Is) * (1 + B[:, 0] / 8) ** 0.4
+    trails(cv, P, I, np.array(hs)[:, None] * np.ones((1, M)), B, rng, env=None, speed=0.1, prof=prof)
     # glow over the flawed line
-    hp = np.array([[40, 30 + hot * 31.5], [W - 40, 30 + hot * 31.5]])
+    hp = np.array([[40, vfocus], [W - 40, vfocus]])
     q = hp[:1] + (hp[1:] - hp[:1]) * np.linspace(0, 1, 200)[:, None]
     Q, _ = apply_h(Hm, q)
     cv.polylines(Q[None], (0.35 * envelope(np.linspace(0, 1, 200), 0.3, 0.5))[None], ramp(0.4), 14)
-    cv.polylines(Q[None], (0.20 * envelope(np.linspace(0, 1, 200), 0.3, 0.5))[None], ramp(0.6), 40)
-    motes(cv, 14, (1100, 0, 2400, 1350), energy=(0.01, 0.04), blur=(20, 60), seed=12)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.42)
+    cv.polylines(Q[None], (0.22 * envelope(np.linspace(0, 1, 200), 0.3, 0.5))[None], ramp(0.6), 44)
+    fp, _ = apply_h(Hm, np.array([[ufocus + 200, vfocus]]))
+    glow(cv, fp[0], 18000.0, 400, 0.45, n=8000, seed=2)
+    motes(cv, 18, (900, 0, 2400, 1350), energy=(0.02, 0.06), blur=(20, 70), seed=12)
+    return dict(exposure=1.15, bloom=0.12, halation=0.08, vignette=0.45)
 
+# @@end domain-applications
 
 @scene("domain-data", R169, "Coverage: Data protection",
        "Stacked rings of orbiting light, like a database seen in a long exposure, focus on the middle ring.")
@@ -701,8 +716,9 @@ def domain_data(cv):
         y = np.linspace(250, 1110, 300)
         x = cx + side * np.interp(y, [290, 1065], [540, 620])
         cv.polylines(np.c_[x, y][None], (0.05 * envelope(np.linspace(0, 1, 300), 0.3, 0.3))[None], ramp(0.6), 3)
+    glow(cv, (cx, 680.0), 20000.0, 440, 0.5, n=8000, seed=9)
     motes(cv, 20, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=13)
-    return dict(exposure=1.25, bloom=0.11, halation=0.07, vignette=0.42)
+    return dict(exposure=1.3, bloom=0.12, halation=0.08, vignette=0.42)
 
 
 @scene("domain-ai-agents", R169, "Coverage: AI and agent security",
@@ -744,32 +760,36 @@ def domain_ai_agents(cv):
 
 
 @scene("domain-ot-iot", R169, "Coverage: OT and IoT security",
-       "Arcs of rotating machinery traced in light around an off-frame axis, some blinking like sensors.")
+       "Long-exposure arcs of rotating machinery around a glowing axis, dense and layered in depth, some blinking like sensors.")
 def domain_ot_iot(cv):
-    rng = np.random.default_rng(141)
-    c = np.array([2280.0, 1330.0])
-    n = 300
-    r = np.sqrt(rng.uniform(0.004, 1, n)) * 2350
-    th0 = rng.uniform(np.pi * 0.98, np.pi * 1.62, n)
-    span = rng.uniform(0.06, 0.5, n)
-    M = 160
+    rng = np.random.default_rng(142)
+    c = np.array([2050.0, 1250.0])
+    n = 1000
+    r = np.sqrt(rng.uniform(0.003, 1, n)) * 2500
+    th0 = rng.uniform(np.pi * 0.92, np.pi * 1.6, n)
+    span = rng.uniform(0.08, 0.75, n)
+    M = 200
     s = np.linspace(0, 1, M)
     th = th0[:, None] + span[:, None] * s[None]
     P = np.stack([c[0] + r[:, None] * np.cos(th), c[1] + r[:, None] * np.sin(th)], -1)
-    inten = lognormal_int(rng, n, 0.13, 0.75)
-    blur = np.where(rng.random(n) < 0.2, rng.uniform(3, 18, n), rng.uniform(0.5, 1.0, n))
-    hue = rng.uniform(0.05, 1.0, n)
-    prof = np.ones((n, M))
-    dashed = rng.random(n) < 0.18
+    depth = rng.random(n)
+    blur = np.where(depth < 0.25, 4 + 50 * (0.25 - depth) / 0.25, rng.uniform(0.5, 1.0, n))
+    inten = lognormal_int(rng, n, 0.10, 0.75) * (1 + blur / 6) ** 0.5 * (0.6 + 0.8 * np.exp(-r / 900))
+    hue = np.clip(0.15 + 0.8 * (r / 2500) ** 0.7 + rng.normal(0, 0.12, n), 0, 1)
+    dashed = rng.random(n) < 0.2
     L = r[:, None] * span[:, None] * s[None]
     fq = rng.uniform(25, 70, n)[:, None]
     sg = (L / fq) % 1.0
     prof = np.where(dashed[:, None], 0.15 + 0.85 * (sg < 0.4), 1.0)
-    fade = smoothstep(0, 0.25, (P[..., 0] - 300) / 1500)
-    trails(cv, P, inten, hue, blur, rng, env=(0.06, 0.06), prof=prof * fade)
-    motes(cv, 16, (800, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=14)
-    return dict(exposure=1.0, bloom=0.10, halation=0.06, vignette=0.42)
+    # the headline corner (bottom-left) stays calmer
+    calm = 1 - 0.55 * (1 - smoothstep(300, 1000, P[..., 0])) * smoothstep(800, 1200, P[..., 1])
+    trails(cv, P, inten, hue[:, None] * np.ones((1, M)), blur, rng, env=(0.06, 0.06), prof=prof * calm)
+    glow(cv, c, 30000.0, 420, 0.35, n=8000, seed=3)
+    glow(cv, (c[0] - 300, c[1] - 250), 9000.0, 300, 0.5, n=6000, seed=4)
+    motes(cv, 24, (600, 0, 2400, 1350), energy=(0.02, 0.08), blur=(20, 80), seed=14)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
 
+# @@end domain-ot-iot
 
 @scene("domain-governance", R169, "Coverage: Governance, risk and compliance",
        "A ruled floor grid falling away to the horizon, swept by one warm beam that lights the rules it crosses.")
@@ -880,33 +900,37 @@ def service_deploy(cv):
 
 
 @scene("service-2", R43, "Services 002 Detect 24/7",
-       "A calm field of drifting light; one trail moves against the grain and is lit up.")
+       "A deep field of drifting light in every focus plane; one trail moves against the grain and lights up.")
 def service_detect(cv):
-    rng = np.random.default_rng(171)
-    fld = SinField(rng, n=6, wavelength=1400)
-    n = 950
-    x = rng.uniform(-200, 2500, n)
-    y = rng.uniform(-100, 1900, n)
-    ln = rng.uniform(60, 300, n)
+    rng = np.random.default_rng(172)
+    fld = SinField(rng, n=7, wavelength=1300)
+    n = 2600
+    x = rng.uniform(-250, 2650, n)
+    y = 900 + rng.normal(0, 1, n) * 520
+    depth = rng.random(n)                                # 0 near ... 1 far
+    blur = np.where(depth < 0.35, 6 + 70 * (0.35 - depth) / 0.35, 0.5 + 6 * (depth - 0.35) ** 2)
+    ln = rng.uniform(50, 420, n) * (1.6 - depth)
     M = 24
     s = np.linspace(-0.5, 0.5, M)
     vx, vy = fld.curl(x, y)
-    ang = np.deg2rad(-8) + 0.25 * vx
+    ang = np.deg2rad(-9) + 0.3 * vx
     P = np.stack([x[:, None] + np.cos(ang)[:, None] * ln[:, None] * s[None],
                   y[:, None] + np.sin(ang)[:, None] * ln[:, None] * s[None]], -1)
-    blur = np.where(rng.random(n) < 0.3, np.exp(rng.uniform(np.log(3), np.log(30), n)), rng.uniform(0.5, 0.9, n))
-    inten = lognormal_int(rng, n, 0.05, 0.6) * (1 + blur / 6) ** 0.5
-    trails(cv, P, inten, rng.uniform(0.35, 0.9, n), blur, rng, env=(0.3, 0.3))
-    ctrl = np.array([[2250, 1900], [1950, 1350], [1650, 900], [1150, 520]])
-    ribbon(cv, ctrl, n=18, width=4, inten=0.5, isig=0.4, hue=(0.0, 0.2), blur=(0.5, 0.8), tjit=0.02,
-           env=(0.3, 0.02), seed=3, along=lambda t: 0.3 + 0.7 * t ** 1.5)
-    ribbon(cv, ctrl, n=5, width=8, inten=0.2, hue=(0.3, 0.6), blur=(6, 8), tjit=0.02, env=(0.3, 0.02), seed=4,
-           along=lambda t: 0.3 + 0.7 * t ** 1.5)
-    ribbon(cv, ctrl, n=4, width=12, inten=0.18, hue=(0.4, 0.7), blur=(20, 26), tjit=0.02, env=(0.3, 0.02), seed=5)
-    cv.points(np.array([[1150, 520]]), 7.0, ramp(0.0), 0.7)
-    glow(cv, (1150, 520), 8.0, 12, 0.5)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.42)
+    inten = lognormal_int(rng, n, 0.06, 0.65) * (1 + blur / 5) ** 0.55
+    trails(cv, P, inten, np.clip(0.3 + 0.6 * depth + rng.normal(0, 0.1, n), 0, 1), blur, rng, env=(0.3, 0.3))
+    # the anomaly: against the grain, through the middle of the frame
+    ctrl = np.array([[2050.0, 1750.0], [1800.0, 1300.0], [1450.0, 880.0], [950.0, 560.0]])
+    along = lambda t: 0.25 + 0.75 * t ** 1.4
+    ribbon(cv, ctrl, n=40, width=7, inten=0.45, isig=0.4, hue=(0.0, 0.2), blur=(0.5, 0.9), tjit=0.03,
+           env=(0.3, 0.02), seed=3, along=along)
+    ribbon(cv, ctrl, n=8, width=12, inten=0.25, hue=(0.25, 0.55), blur=(8, 14), tjit=0.02, env=(0.3, 0.02), seed=4, along=along)
+    ribbon(cv, ctrl, n=6, width=20, inten=0.2, hue=(0.4, 0.7), blur=(30, 44), tjit=0.02, env=(0.3, 0.02), seed=5)
+    cv.points(np.array([[950.0, 560.0]]), 14.0, ramp(0.0), 1.2)
+    glow(cv, (950.0, 560.0), 400.0, 30, 0.2, n=4000)
+    glow(cv, (1250.0, 760.0), 16000.0, 420, 0.5, n=8000, seed=2)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
 
+# @@end service-2
 
 @scene("service-3", R43, "Services 003 Respond",
        "A fast, hard line of light cuts through an amber cluster and blows it apart.")
@@ -969,62 +993,69 @@ def service_attack(cv):
     return dict(exposure=1.0, bloom=0.11, halation=0.06, vignette=0.42)
 
 
-def rounded_rect(c, hw, hh, rad, rot, M=800):
-    per = 4 * (hw + hh - 2 * rad) + 2 * np.pi * rad
-    t = np.linspace(0, per, M)
-    pts = []
-    corners = [(hw - rad, hh - rad, 0), (-(hw - rad), hh - rad, np.pi / 2),
-               (-(hw - rad), -(hh - rad), np.pi), (hw - rad, -(hh - rad), 1.5 * np.pi)]
-    segs = []
-    # build as a dense polygon then resample by arc length
-    for (cx_, cy_, a0) in corners:
-        a = np.linspace(a0, a0 + np.pi / 2, 40)
-        segs.append(np.c_[cx_ + rad * np.cos(a), cy_ + rad * np.sin(a)])
-    poly = np.vstack(segs + [segs[0][:1]])
-    dl = np.r_[0, np.cumsum(np.linalg.norm(np.diff(poly, axis=0), axis=1))]
-    t = np.linspace(0, dl[-1], M)
-    q = np.c_[np.interp(t, dl, poly[:, 0]), np.interp(t, dl, poly[:, 1])]
-    cr, sr = np.cos(rot), np.sin(rot)
-    return np.c_[c[0] + q[:, 0] * cr - q[:, 1] * sr, c[1] + q[:, 0] * sr + q[:, 1] * cr]
-
-
 @scene("service-5", R43, "Services 005 Harden",
-       "Hand-painted loops of light tighten in perspective towards a bright, closed core.")
+       "Streams of light run into an unseen curved wall and slide along it: the wall shows only as the bright seam where they pile up, the space behind it stays calm.")
 def service_harden(cv):
-    rng = np.random.default_rng(201)
-    c = np.array([1380.0, 900.0])
-    K = 7
-    Hm = homography([[0, 0], [2400, 0], [2400, 1800], [0, 1800]],
-                    [[0, 120], [2400, -260], [2400, 2060], [0, 1680]])
-    for k in range(K):
-        hw = 170 + k ** 1.35 * 110
-        hh = 122 + k ** 1.35 * 80
-        rad = 0.38 * hh
-        loops = 12
-        f = 1 - k / (K - 1)
-        I0 = 0.025 + 0.16 * f ** 1.8
-        bl = 0.5 + (k / (K - 1)) ** 2 * 26
-        for L in range(loops):
-            rot = np.deg2rad(-4 + k * 3.0 + rng.normal(0, 1.4))
-            sc = 1 + rng.normal(0, 0.025)
-            q = rounded_rect(c + rng.normal(0, 6, 2), hw * sc, hh * sc, rad, rot, M=1100)
-            q, _ = apply_h(Hm, q)
-            s = np.linspace(0, 1, len(q))
-            nr = normals(q)
-            q = q + nr * (6.0 * pwobble(rng, 1, s, terms=3, fmin=1, fmax=4)[0])[:, None]
-            a = rng.uniform(0, 1)
-            span = rng.uniform(0.55, 0.95) if k > 0 else 1.0
-            ss = (s - a) % 1.0
-            g = envelope(np.clip(ss / span, 0, 1), 0.1, 0.2) * (ss <= span) if span < 1 else np.ones_like(s)
-            mod = np.clip(1 + 0.5 * pwobble(rng, 1, s, terms=2, fmin=1, fmax=3)[0], 0.2, 2) * g
-            cv.polylines(q[None], (I0 * lognormal_int(rng, 1, 1.0, 0.5)[0] * mod)[None],
-                         ramp(np.clip(0.03 + 0.8 * k / K + rng.normal(0, 0.1), 0, 1)),
-                         bl * rng.uniform(0.7, 1.3))
-    cv.points(c[None], 9.0, ramp(0.0), 2)
-    glow(cv, c, 30.0, 28, 0.5)
-    motes(cv, 14, (0, 0, 2400, 1800), energy=(0.01, 0.04), blur=(20, 70), seed=17)
-    return dict(exposure=1.15, bloom=0.11, halation=0.07, vignette=0.45)
+    rng = np.random.default_rng(202)
+    C = np.array([2750.0, 950.0])
+    R = 1300.0
+    fld = SinField(rng, n=7, wavelength=900)
 
+    def field(x, y):
+        cx_, cy_ = fld.curl(x, y)
+        vx = 1.0 + 0.35 * cx_
+        vy = 0.10 + 0.35 * cy_
+        dx, dy = x - C[0], y - C[1]
+        rr = np.sqrt(dx * dx + dy * dy) + 1e-9
+        nx, ny = dx / rr, dy / rr
+        d = rr - R
+        vn = vx * nx + vy * ny
+        w = 1 - smoothstep(0, 160, d)
+        k = np.where(vn < 0, vn, 0) * w * 1.15
+        vx = vx - k * nx
+        vy = vy - k * ny
+        # slide away from the nearest point of the seam, up or down
+        tx, ty = -ny, nx
+        sgn = np.sign(dy + 1e-6)
+        vx = vx + w * 0.6 * tx * sgn * -1
+        vy = vy + w * 0.6 * ty * sgn * -1
+        return vx, vy
+
+    n = 2400
+    st = np.c_[rng.uniform(-500, 1350, n), rng.normal(950, 650, n)]
+    steps = 200
+    P = flow_trails(cv, field, st, steps, h=6.0)
+    dd = np.linalg.norm(P - C, axis=2) - R
+    lens = rng.integers(25, 110, n)
+    idx = np.arange(steps + 1)[None]
+    tl = idx / lens[:, None]
+    # comets: dim tail, bright head; the head lights up where it meets the wall
+    prof = (tl <= 1) * (0.06 + 0.94 * np.clip(tl, 0, 1) ** 1.6) * (0.35 + 3.2 * np.exp(-np.maximum(dd, 0) / 60))
+    prof = prof * smoothstep(-80, 0, dd)                 # nothing passes the wall
+    depth = rng.random(n)
+    blur = np.where(depth < 0.4, 4 + 60 * (0.4 - depth) / 0.4, rng.uniform(0.5, 0.9, n))
+    hue = np.clip(0.75 - 0.6 * np.exp(-np.maximum(dd, 0) / 110) + rng.normal(0, 0.06, (n, 1)), 0, 1)
+    trails(cv, P, lognormal_int(rng, n, 0.06, 0.65) * (1 + blur / 6) ** 0.5, hue, blur, rng, env=None, speed=0.25, prof=prof)
+    # sparks thrown back off the wall
+    k = 900
+    tt = rng.uniform(np.pi * 0.72, np.pi * 1.28, k)
+    p0 = np.c_[C[0] + R * np.cos(tt), C[1] + R * np.sin(tt)]
+    nrm = -np.c_[np.cos(tt), np.sin(tt)]
+    dirv = nrm + rng.normal(0, 0.5, (k, 2))
+    dist = rng.exponential(90, k)
+    swarm_streaks(cv, p0 + dirv * dist[:, None], dirv, rng.uniform(8, 60, k),
+                  lognormal_int(rng, k, 0.10, 0.6) * np.exp(-((tt - np.pi) / 0.3) ** 2), rng.uniform(0.0, 0.6, k),
+                  np.where(rng.random(k) < 0.3, rng.uniform(3, 14, k), 0.6))
+    # the seam
+    th = np.linspace(np.pi * 0.62, np.pi * 1.38, 900)
+    seam = np.c_[C[0] + R * np.cos(th), C[1] + R * np.sin(th)]
+    fall = np.exp(-((th - np.pi) / 0.33) ** 2)
+    for I0, bl, h in ((0.30, 0.7, 0.0), (0.18, 10, 0.3), (0.12, 40, 0.5)):
+        cv.polylines(seam[None], (I0 * (0.25 + 0.75 * fall))[None], ramp(h), bl)
+    glow(cv, (C[0] - R + 40, C[1]), 14000.0, 360, 0.45, n=7000, seed=3)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
+
+# @@end service-5
 
 @scene("service-6", R43, "Services 006 Govern",
        "Tangled amber lines on the left settle into calm, evenly spaced light on the right.")
@@ -1055,54 +1086,70 @@ def service_govern(cv):
 # BANDS, THUMBS, ABOUT, CONTACT
 
 
-@scene("cta", R169, "Closing CTA band (very dark, light rises from the bottom)",
-       "Embers of light rise from the bottom edge and fade into deep black.")
+@scene("cta", R169, "Closing CTA band, full bleed behind the centred heading",
+       "A wide river of long-exposure light sweeps up through the centre: a hot warm-white core, soft out-of-focus streaks around it, lit haze.")
 def cta(cv):
-    rng = np.random.default_rng(221)
-    fld = SinField(rng, n=7, wavelength=800)
+    rng = np.random.default_rng(223)
+    ctrl = np.array([[-300.0, 1260.0], [650.0, 1080.0], [1150.0, 420.0], [2750.0, 300.0]])
 
-    def field(x, y):
-        vx, vy = fld.curl(x, y)
-        return 0.35 * vx, -1.0 + 0.15 * vy
+    def fan(t):
+        # gathered where it crosses the heading, opening wide towards the right like a flare
+        return 0.45 + 0.5 * (1 - t) ** 2 + 1.9 * t ** 2.4
 
-    n = 1050
-    st = np.c_[rng.normal(1200, 620, n), rng.uniform(1360, 1480, n)]
-    steps = 260
-    P = flow_trails(cv, field, st, steps, h=3.5)
-    lens = (steps * rng.uniform(0.12, 1.0, n) ** 1.8).astype(int) + 20
-    idx = np.arange(steps + 1)[None]
-    tl = idx / lens[:, None]
-    prof = (tl <= 1) * (1 - np.clip(tl, 0, 1)) ** 1.6
-    blur = np.where(rng.random(n) < 0.35, np.exp(rng.uniform(np.log(3), np.log(40), n)), rng.uniform(0.5, 1.0, n))
-    inten = lognormal_int(rng, n, 0.05, 0.6) * (1 + blur / 8) ** 0.4
-    hue = rng.uniform(0.35, 0.9, n)
-    trails(cv, P, inten, hue, blur, rng, env=(0.04, 0.0), prof=prof)
-    motes(cv, 60, (0, 1250, 2400, 1420), energy=(0.04, 0.2), blur=(30, 110), hue=(0.5, 0.9), seed=19)
-    # copy sits over this band: keep the slate depth particles sparse
-    return dict(exposure=1.2, bloom=0.10, halation=0.08, vignette=0.5, slate=0.5)
+    # in-focus core: fine trails, hot towards warm white
+    ribbon(cv, ctrl, n=560, width=170, twist=0.7, twist_phase=0.5, wob=0.22, inten=0.19, isig=0.85,
+           hue=(0.0, 0.5), blur=lambda u, r: 0.5 + 12.0 * np.abs(u) ** 2.2, tjit=0.28, env=(0.22, 0.22),
+           spread_profile=fan, seed=41, speed_mod=0.45)
+    # mid depth: softer, wider
+    ribbon(cv, ctrl + np.array([[0, 70], [0, 50], [0, -30], [0, -70]]), n=200, width=310, twist=0.4, wob=0.35,
+           inten=0.09, isig=0.7, hue=(0.15, 0.85), blur=(5, 24), tjit=0.3, env=(0.25, 0.25), spread_profile=fan, seed=42)
+    # foreground: far out of focus bands, the depth of a real lens
+    ribbon(cv, ctrl + np.array([[0, 160], [0, 190], [0, 110], [0, 30]]), n=28, width=430, twist=0.2, wob=0.4,
+           inten=0.09, isig=0.5, hue=(0.25, 0.9), blur=(45, 120), tjit=0.3, env=(0.3, 0.3), spread_profile=fan, seed=43)
+    # sparks shed along the stream
+    t = rng.uniform(0.15, 0.9, 320)
+    sp = bezier(ctrl, t)
+    tg = bezier_deriv(ctrl, t)
+    tg = tg / np.linalg.norm(tg, axis=1, keepdims=True)
+    nr = np.c_[-tg[:, 1], tg[:, 0]]
+    off = rng.normal(0, 1, (320, 1)) * 200
+    swarm_streaks(cv, sp + nr * off, tg + rng.normal(0, 0.2, (320, 2)), rng.uniform(20, 120, 320),
+                  lognormal_int(rng, 320, 0.08, 0.6), rng.uniform(0.2, 0.9, 320),
+                  np.where(rng.random(320) < 0.4, rng.uniform(4, 24, 320), 0.6))
+    # a second, fainter pass crossing lower: the light was moved twice during the exposure
+    ctrl2 = np.array([[-200.0, 900.0], [700.0, 860.0], [1500.0, 700.0], [2700.0, 760.0]])
+    ribbon(cv, ctrl2, n=160, width=120, twist=0.5, wob=0.3, inten=0.05, isig=0.7, hue=(0.3, 0.9),
+           blur=lambda u, r: 2.0 + 30.0 * np.abs(u) ** 1.5, tjit=0.3, env=(0.3, 0.3), seed=44)
+    # the air lit by the light: midtones behind the heading
+    glow(cv, (1250.0, 640.0), 34000.0, 480, 0.45, n=9000, seed=3)
+    glow(cv, (1250.0, 620.0), 7000.0, 190, 0.2, n=6000, seed=4)
+    motes(cv, 40, (0, 0, 2400, 1350), energy=(0.02, 0.10), blur=(30, 110), hue=(0.4, 0.9), seed=19)
+    return dict(exposure=1.25, bloom=0.13, halation=0.09, vignette=0.55, slate=0.6)
 
+# @@end cta
 
 @scene("status", R11, "Hero status card thumbnail (small, 1:1)",
-       "A bright live point with soft ripple rings, readable at thumbnail size.")
+       "A hot point of light at the head of a long, curving exposure trail, glowing in soft haze. Reads at thumbnail size.")
 def status(cv):
-    rng = np.random.default_rng(231)
-    c = np.array([800.0, 800.0])
-    th = np.linspace(0, 2 * np.pi, 1800)
-    for k, (r, I0, bl) in enumerate(((190, 1.0, 0.8), (420, 0.45, 2.5), (690, 0.18, 8))):
-        for j in range(7):
-            rr = r * (1 + rng.normal(0, 0.008)) + 5 * pwobble(rng, 1, th / (2 * np.pi), terms=2, fmin=2, fmax=4)[0]
-            a = rng.uniform(0, 2 * np.pi)
-            dd = np.abs(np.angle(np.exp(1j * (th - a))))
-            g = 0.3 + 0.7 * smoothstep(0, 2.8, dd)
-            cv.polylines(circle_pts(c, rr, th)[None], (I0 / 3.5 * g)[None], ramp(0.08 + 0.25 * k + 0.08 * j / 7), bl)
-        cv.polylines(circle_pts(c, r, th)[None], np.full((1, len(th)), I0 * 0.25), ramp(0.5), 10 + 6 * k)
-    cv.points(c[None], 160.0, ramp(0.0), 5)
-    glow(cv, c, 500.0, 14, 0.2, n=4000)
-    glow(cv, c, 1800.0, 55, 0.5, n=6000, seed=1)
-    # small thumbnail: almost no slate particles, the live point must read
-    return dict(exposure=1.0, bloom=0.14, halation=0.09, vignette=0.35, slate=0.3)
+    rng = np.random.default_rng(232)
+    head = np.array([1010.0, 700.0])
+    ctrl = np.array([[-300.0, 1500.0], [500.0, 1700.0], [450.0, 900.0], head])
 
+    def taper(t):
+        return 0.06 + 0.94 * (1 - t) ** 1.1
 
+    ribbon(cv, ctrl, n=340, width=180, twist=0.6, wob=0.2, inten=0.20, isig=0.7, hue=(0.0, 0.7),
+           blur=lambda u, r: 0.5 + 16 * np.abs(u) ** 2, tjit=0.25, env=(0.35, 0.03), spread_profile=taper,
+           along=lambda t: 0.25 + 0.75 * t ** 1.6, seed=51)
+    ribbon(cv, ctrl, n=30, width=280, inten=0.07, hue=(0.3, 0.9), blur=(30, 80), tjit=0.3, env=(0.4, 0.05),
+           spread_profile=taper, seed=52)
+    cv.points(head[None], 220.0, ramp(0.0), 10)
+    glow(cv, head, 1500.0, 40, 0.05, n=5000)
+    glow(cv, head, 6000.0, 130, 0.2, n=6000, seed=2)
+    glow(cv, head, 22000.0, 380, 0.45, n=8000, seed=1)
+    return dict(exposure=1.05, bloom=0.14, halation=0.09, vignette=0.4, slate=0.3)
+
+# @@end status
 
 @scene("reel-poster", R169, "Reel frame poster (pill control sits bottom centre)",
        "A light-painted orb: hundreds of orbits traced by a spinning light, sparks flying off, centred.")
@@ -1148,124 +1195,164 @@ def reel_poster(cv):
 
 
 @scene("about-1", R43, "About: AI plus experts, one team",
-       "Two bundles of light, one warm white and one amber, braid around each other in depth.")
+       "Seen from a bridge in a long exposure: a warm-white stream and an amber stream of light run in from either side of a night road and merge into one lane towards a glowing horizon.")
 def about_1(cv):
-    rng = np.random.default_rng(251)
-    M = 1000
-    x = np.linspace(-200, 2600, M)
-    lam = 1700.0
-    u = (x + 200) / 2800
-    for side, hue_rng, n in ((0, (0.0, 0.3), 160), (1, (0.55, 0.95), 160)):
-        ph = np.pi * side
-        Rx = 150 + 160 * u
-        phi = 2 * np.pi * x / lam + ph + 0.6
-        yc = 1050 + Rx * np.sin(phi) - 0.22 * (x - 1200)
-        z = np.cos(phi)
-        width = 10 + 26 * (0.5 + 0.5 * np.cos(2 * phi + 1.0)) * (0.5 + u)
-        off = rng.normal(0, 1, n)[:, None] * width[None]
-        w = wobble(rng, n, u, terms=3) * 6
-        P = np.stack([np.broadcast_to(x, (n, M)), yc[None] + off + w], -1)
-        B = 0.5 + np.maximum(0, z)[None] * 22 * (0.4 + u)[None] * np.ones((n, 1))
-        inten = lognormal_int(rng, n, 0.10, 0.7)
-        prof = (0.55 + 0.45 * (1 - z) / 2)[None]
-        trails(cv, P, inten, np.full((n, M), 1.0) * rng.uniform(*hue_rng, n)[:, None], B, rng,
-               env=(0.15, 0.1), prof=prof)
-    motes(cv, 18, (0, 0, 2400, 1800), energy=(0.01, 0.05), blur=(20, 70), seed=21)
-    return dict(exposure=1.0, bloom=0.10, halation=0.07, vignette=0.45)
+    rng = np.random.default_rng(252)
+    f, cx, hy, Hc = 1000.0, 1250.0, 560.0, 5.5
+    Zf = 11.0
 
-
-@scene("about-2", R43, "About: we go inside your company",
-       "Luminous paths weave through a deep lattice of soft points, lighting the ones they pass.")
-def about_2(cv):
-    rng = np.random.default_rng(261)
-    f, cx, cy = 1300.0, 1250.0, 900.0
-    Zf = 7.0
-    yaw, pitch = np.deg2rad(28), np.deg2rad(-14)
-
-    def cam(P3):
-        X, Y, Z = P3[..., 0], P3[..., 1], P3[..., 2]
-        X1 = X * np.cos(yaw) + Z * np.sin(yaw)
-        Z1 = -X * np.sin(yaw) + Z * np.cos(yaw)
-        Y2 = Y * np.cos(pitch) - Z1 * np.sin(pitch)
-        Z2 = Y * np.sin(pitch) + Z1 * np.cos(pitch) + 8.0
-        return np.stack([cx + f * X1 / Z2, cy - f * Y2 / Z2], -1), Z2
+    def proj(X, Y, Z):
+        bend = 0.0009 * Z ** 2          # the road bends gently to the right
+        return np.stack([cx + f * (X + bend) / Z, hy + f * (Hc - Y) / Z], -1)
 
     def dof(Z):
-        return 0.5 + 110 * np.abs(1 / Z - 1 / Zf)
+        return 0.5 + 80.0 * np.abs(1 / Z - 1 / Zf)
 
-    g = np.arange(-4, 4.01, 1.0)
-    GX, GY, GZ = np.meshgrid(g, g * 0.75, g)
-    L3 = np.stack([GX.ravel(), GY.ravel(), GZ.ravel()], -1) + rng.normal(0, 0.04, (GX.size, 3))
-    # paths: smooth 3D curves weaving through the lattice
-    n = 7
-    M = 700
-    t = np.linspace(0, 1, M)
-    paths3 = []
-    for i in range(n):
-        y0, z0 = rng.uniform(-2.2, 2.2), rng.uniform(-3, 3)
-        a = np.array([[-10.0, y0, z0],
-                      [-3.5, y0 + rng.normal(0, 1.2), z0 + rng.normal(0, 1.5)],
-                      [0.5, y0 + rng.normal(0, 1.2), z0 + rng.normal(0, 1.5)],
-                      [rng.uniform(1.5, 4.0), rng.uniform(-2.2, 2.2), rng.uniform(-3, 3)]])
-        paths3.append(bezier(a[None], t)[0])
-    P3 = np.array(paths3)
-    # lattice points glow brighter near a path
-    dmin = np.min(np.linalg.norm(L3[:, None, None, :] - P3[None, :, ::7, :], axis=3), axis=(1, 2))
-    lp, lz = cam(L3)
-    bl = dof(lz)
-    E = (0.6 + 5.0 * np.exp(-(dmin / 0.45) ** 2)) * (1 + 0.1 * bl ** 2) * (8 / lz) ** 0.6
-    cv.points(lp, E, ramp(np.where(dmin < 0.5, 0.1, 0.75)), bl)
-    pp, pz = cam(P3)
-    prof = (0.15 + 0.85 * t[None] ** 1.2)
-    nn = normals(pp)
-    base = lognormal_int(rng, n, 0.45, 0.5)
-    hue = rng.uniform(0.0, 0.5, n)[:, None] * np.ones((1, M))
-    for off, mul in ((0.0, 1.0), (2.2, 0.35), (-2.4, 0.3)):
-        trails(cv, pp + nn * off, base * mul, hue, dof(pz), rng, env=(0.06, 0.04), prof=prof)
-    trails(cv, pp, base * 0.3, np.clip(hue + 0.3, 0, 1), dof(pz) + 12, rng, env=(0.06, 0.04), prof=prof)
-    ends = pp[:, -1]
-    cv.points(ends, base * 8, ramp(0.0), dof(pz[:, -1]))
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.45)
+    M = 300
+    s = np.linspace(0, 1, M)[None]
+    for (x0, x1), hue_rng, n, (za, zb), i0 in (((-4.2, -0.2), (0.0, 0.3), 300, (3.5, 26.0), 0.10),
+                                               ((4.6, 0.6), (0.5, 0.95), 300, (3.0, 30.0), 0.10)):
+        Z0 = rng.uniform(2.4, 6.0, n)
+        Z1 = Z0 * np.exp(rng.uniform(np.log(4), np.log(40), n))
+        Z = Z0[:, None] * (Z1 / Z0)[:, None] ** s           # log spacing along depth
+        lane = x0 + (x1 - x0) * smoothstep(za, zb, Z)
+        X = lane + rng.normal(0, 0.25, (n, 1)) + rng.choice([-0.55, 0.55], (n, 1))
+        Y = rng.uniform(0.5, 0.9, (n, 1)) * np.ones_like(Z)
+        P = proj(X, Y, Z)
+        B = dof(Z)
+        inten = lognormal_int(rng, n, i0, 0.6)
+        prof = envelope(s, 0.06, 0.3) * np.ones((n, 1))
+        trails(cv, P, inten, rng.uniform(*hue_rng, n)[:, None] * np.ones((1, M)), B, rng, env=None, speed=0.35, prof=prof)
+    # street lamps on both sides
+    Zl = np.arange(3.0, 160, 4.5)
+    for X in (-9.0, 10.0):
+        p = proj(np.full_like(Zl, X), np.full_like(Zl, 9.0), Zl)
+        cv.points(p, 1.2 * (1 + 0.1 * dof(Zl) ** 2) * (8 / Zl) ** 0.6, ramp(0.12), dof(Zl))
+        q = proj(np.full_like(Zl, X * 0.7), np.full_like(Zl, 0.0), Zl)   # their pools of light on the road
+        cv.points(q, 4.0 * (8 / Zl) ** 0.8, ramp(0.55), 20 + 600 / Zl)
+    # city lights on the horizon
+    k = 320
+    hx = rng.normal(cx + 250, 700, k)
+    cv.points(np.c_[hx, hy - np.abs(rng.normal(0, 22, k)) + 6], lognormal_int(rng, k, 0.5, 0.8),
+              ramp(rng.uniform(0.1, 0.9, k)), rng.uniform(2, 10, k))
+    glow(cv, (cx + 250, hy), 26000.0, 420, 0.45, n=8000, seed=5)
+    glow(cv, (cx + 150, hy + 30), 5000.0, 130, 0.2, n=5000, seed=6)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
 
+# @@end about-1
+
+@scene("about-2", R43, "About: we go inside your company",
+       "A long exposure from inside a moving tunnel: ceiling, wall and floor lights stretch into streaks that rush towards a bright opening.")
+def about_2(cv):
+    rng = np.random.default_rng(262)
+    f, vx, vy = 760.0, 1480.0, 800.0
+    Zf = 7.0
+    HW, YT, YB = 2.3, 1.7, -1.3          # half width, ceiling, floor (camera at 0)
+
+    def proj(X, Y, Z):
+        return np.stack([vx + f * (X + 0.004 * Z ** 1.7) / Z, vy - f * (Y - 0.002 * Z ** 1.5) / Z], -1)
+
+    def dof(Z):
+        return 0.5 + 36.0 * np.abs(1 / Z - 1 / Zf)
+
+    def perimeter(u):
+        """u in [0,1) -> (X, Y) on a rounded tunnel section: ceiling, right wall, floor, left wall."""
+        L = np.array([2 * HW, YT - YB, 2 * HW, YT - YB])
+        c = np.cumsum(L) / L.sum()
+        X = np.where(u < c[0], -HW + 2 * HW * u / c[0],
+            np.where(u < c[1], HW, np.where(u < c[2], HW - 2 * HW * (u - c[1]) / (c[2] - c[1]), -HW)))
+        Y = np.where(u < c[0], YT, np.where(u < c[1], YT - (YT - YB) * (u - c[0]) / (c[1] - c[0]),
+            np.where(u < c[2], YB, YB + (YT - YB) * (u - c[2]) / (c[3] - c[2]))))
+        return X, Y
+
+    M = 180
+    s = np.linspace(0, 1, M)[None]
+
+    def streaks(X, Y, inten, hue, zr=(1.2, 110), run=(5, 16), near_z=(0.8, 5.0)):
+        n = len(X)
+        zl = np.exp(rng.uniform(np.log(zr[0]), np.log(zr[1]), n))
+        Z0 = np.maximum(0.6, zl - rng.uniform(*run, n))
+        Z = Z0[:, None] * (zl / Z0)[:, None] ** s
+        P = proj(X[:, None], Y[:, None], Z)
+        near = smoothstep(near_z[0], near_z[1], Z)                    # close to the lens the light smears out and dims
+        trails(cv, P, inten, hue[:, None] * np.ones((1, M)), dof(Z), rng, env=(0.08, 0.08), speed=0.3, prof=near)
+
+    # the surfaces: dim light all round the section, so the tube itself reads
+    n = 12000
+    X, Y = perimeter(rng.random(n))
+    streaks(X, Y, lognormal_int(rng, n, 0.009, 0.8), rng.uniform(0.3, 1.0, n), zr=(0.9, 80), run=(2, 20), near_z=(0.5, 1.4))
+    # the four long edges of the tube catch the most light
+    n = 900
+    cx_ = rng.choice([-HW, HW], n) * 0.985
+    cy_ = rng.choice([YT, YB], n) * 0.985
+    streaks(cx_, cy_, lognormal_int(rng, n, 0.018, 0.5), rng.uniform(0.2, 0.7, n), zr=(0.9, 100), run=(6, 30), near_z=(0.5, 1.6))
+    # fixtures: ceiling strips (warm white), wall lamps (amber), floor lane lines
+    n = 700
+    X = rng.choice([-0.7, 0.0, 0.7], n) + rng.normal(0, 0.04, n)
+    streaks(X, np.full(n, YT - 0.02), lognormal_int(rng, n, 0.045, 0.5), rng.uniform(0.0, 0.25, n))
+    n = 600
+    streaks(rng.choice([-HW, HW], n) * 0.99, rng.choice([0.2, 0.9], n) + rng.normal(0, 0.03, n),
+            lognormal_int(rng, n, 0.032, 0.5), rng.uniform(0.45, 0.9, n))
+    n = 300
+    streaks(rng.choice([-1.0, 1.0], n), np.full(n, YB + 0.01), lognormal_int(rng, n, 0.025, 0.5), rng.uniform(0.5, 1.0, n))
+    # the opening at the far end and the light it throws into the haze
+    end = proj(np.array([0.0]), np.array([0.2]), np.array([160.0]))[0]
+    cv.points(end[None], 30.0, ramp(0.0), 12)
+    glow(cv, end, 3000.0, 80, 0.05, n=5000, seed=2)
+    glow(cv, end, 26000.0, 420, 0.4, n=8000, seed=3)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.5)
+
+# @@end about-2
 
 @scene("about-3", R43, "About: 24/7, always on",
-       "An infinity loop light-painted over and over in one continuous, never-ending pass.")
+       "A beacon sweeps through night haze over dark water; the long exposure turns its beam into a soft fan of light with glints on the sea.")
 def about_3(cv):
-    rng = np.random.default_rng(271)
-    c = np.array([1260.0, 900.0])
-    n = 140
-    M = 1400
-    t = np.linspace(0, 2 * np.pi, M)
-    A = 820.0
-    tilt = np.deg2rad(-8)
-    paths, B, I = [], [], []
-    for i in range(n):
-        a = A * (1 + rng.normal(0, 0.035))
-        ph = rng.uniform(0, 2 * np.pi)
-        tt = t + ph
-        den = 1 + np.sin(tt) ** 2
-        x = a * np.cos(tt) / den
-        y = a * np.sin(tt) * np.cos(tt) / den * 1.25
-        z = a * 0.35 * np.sin(tt) / den
-        x += rng.normal(0, 6) + 8 * wobble(rng, 1, t / (2 * np.pi), terms=2, fmin=1, fmax=3)[0]
-        y += rng.normal(0, 6) + 8 * wobble(rng, 1, t / (2 * np.pi), terms=2, fmin=1, fmax=3)[0]
-        cr, sr = np.cos(tilt), np.sin(tilt)
-        X = c[0] + x * cr - y * sr
-        Y = c[1] + x * sr + y * cr
-        paths.append(np.c_[X, Y])
-        B.append(0.5 + np.maximum(0, z) / A * 30)
-        span = rng.uniform(0.5, 1.0)
-        s = np.linspace(0, 1, M)
-        I.append(np.where(s <= span, envelope(np.clip(s / span, 0, 1), 0.08, 0.15), 0)
-                 * (0.6 + 0.4 * (1 - z / (0.35 * A))) / 1.4)
-    P = np.array(paths)
-    trails(cv, P, lognormal_int(rng, n, 0.06, 0.7), rng.uniform(0.0, 0.8, n)[:, None] * np.ones((1, M)),
-           np.array(B), rng, env=None, speed=0.4, prof=np.array(I))
-    cv.points(c[None], 3.0, ramp(0.0), 3)
-    motes(cv, 18, (0, 0, 2400, 1800), energy=(0.01, 0.05), blur=(20, 70), seed=26)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.45)
+    rng = np.random.default_rng(272)
+    src = np.array([640.0, 820.0])
+    hz = 1180.0
+    # beam: radial rays, denser where the beam lingered
+    n = 1500
+    a = np.deg2rad(-12) + rng.normal(0, 1, n) * np.deg2rad(13)
+    dwell = 0.35 + 0.65 * (0.5 + 0.5 * np.sin(a * 9.0 + 1.3)) * (0.6 + 0.4 * np.sin(a * 3.1 + 0.4))
+    keep = rng.random(n) < dwell
+    a = a[keep]
+    n = len(a)
+    M = 220
+    r = np.geomspace(40, 3200, M)[None]
+    d = np.c_[np.cos(a), np.sin(a)]
+    P = src[None, None, :] + r[..., None] * d[:, None, :]
+    prof = smoothstep(40, 260, r) * (r / 260) ** -0.55
+    B = 0.5 + r * 0.010 * rng.uniform(0.6, 1.6, (n, 1))
+    hue = np.clip(0.05 + 0.75 * (r / 3200) ** 0.6 + rng.normal(0, 0.05, (n, 1)), 0, 1)
+    trails(cv, P, lognormal_int(rng, n, 0.05, 0.6), hue, B, rng, env=(0.0, 0.25), speed=0.2, prof=prof)
+    # a few wide, soft rays: the volume of the beam
+    k = 60
+    a2 = np.deg2rad(-12) + rng.normal(0, 1, k) * np.deg2rad(16)
+    P2 = src[None, None, :] + r[..., None] * np.c_[np.cos(a2), np.sin(a2)][:, None, :]
+    trails(cv, P2, lognormal_int(rng, k, 0.10, 0.4), 0.45 * np.ones((k, M)), rng.uniform(30, 90, k), rng,
+           env=(0.0, 0.3), speed=0.0, prof=smoothstep(60, 500, r) * (r / 500) ** -0.4)
+    # the lamp
+    cv.points(src[None], 120.0, ramp(0.0), 4)
+    glow(cv, src, 1500.0, 40, 0.05, n=4000)
+    glow(cv, src, 16000.0, 300, 0.4, n=7000, seed=1)
+    # the beam lights the haze it passes through
+    for j, (dist, e, sg) in enumerate(((500, 9000.0, 260), (1050, 14000.0, 380), (1700, 16000.0, 520))):
+        glow(cv, src + dist * np.array([np.cos(np.deg2rad(-12)), np.sin(np.deg2rad(-12))]), e, sg, 0.5, n=6000, seed=10 + j)
+    # glints on the water below the horizon, strongest under the beam
+    g = 1400
+    gx = src[0] + rng.normal(0, 1, g) * np.abs(rng.normal(450, 250, g)) + 600 * rng.random(g)
+    gy = hz + 20 + rng.exponential(220, g)
+    ln = rng.uniform(15, 120, g) * (1 + (gy - hz) / 300)
+    w = np.exp(-np.abs(gx - src[0] - 350) / 700) * np.exp(-(gy - hz) / 420)
+    swarm_streaks(cv, np.c_[gx, gy], np.c_[np.ones(g), rng.normal(0, 0.04, g)], ln,
+                  lognormal_int(rng, g, 0.10, 0.7) * w, rng.uniform(0.1, 0.8, g),
+                  np.where(rng.random(g) < 0.3, rng.uniform(3, 12, g), 0.6))
+    # faint horizon glow
+    cv.polylines(np.stack([np.linspace(-100, 2500, 400), np.full(400, hz)], -1)[None],
+                 (0.05 * np.exp(-((np.linspace(-100, 2500, 400) - 900) / 900) ** 2))[None], ramp(0.6), 18)
+    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.48)
 
-
+# @@end about-3
 
 @scene("contact", R45, "Contact page image (4:5)",
        "A single calm ribbon of light rises through the frame in an S curve, trailing fine sparks.")

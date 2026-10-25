@@ -40,8 +40,13 @@ def _norm(c):
 
 
 # Brand (official logo kit): navy #071B3E, amber #FFBF00, slate #777F98.
-NAVY = (7, 27, 62)          # #071B3E, large dark fields
-NAVY_DEEP = (3, 11, 28)     # #030B1C, shadows and corners
+NAVY = (7, 27, 62)          # #071B3E, brand navy (reference)
+NAVY_DEEP = (3, 11, 28)     # #030B1C, brand shadow (reference)
+# Image fields (round 1, 2026-10-26): darker and moodier than flat brand
+# navy, same hue, so the imagery reads like a premium night photograph.
+# The open dark averages about #040C1E; light lifts it back towards navy.
+FIELD = (5, 16, 38)         # #051026, open dark field
+FIELD_DEEP = (2, 7, 18)     # #020712, corners and deep shadow
 HOT = (255, 243, 209)       # #FFF3D1, warm-white hot cores
 SLATE = (119, 127, 152)     # #777F98, faint secondary particles
 
@@ -379,13 +384,14 @@ class Canvas:
         return out
 
     def develop(self, exposure=1.0, bloom=0.10, halation=0.06, crosstalk=0.10,
-                bg=NAVY, bg_edge=NAVY_DEEP, bg_top=None, bg_level=0.7, vignette=0.35, grain=1.0,
+                bg=FIELD, bg_edge=FIELD_DEEP, bg_top=None, bg_level=0.7, vignette=0.35, grain=1.15,
                 haze=None, contrast=1.0, sat_low=0.7, occlude=0.85, occ_k=0.02, hot=HOT, air=60.0, far_warm=0.35, hue_keep=0.6, vibrance=0.35,
-                warm_mid=1.0, seed=7):
+                warm_mid=1.0, atmos=0.0, seed=7):
         """Return the finished 8-bit sRGB image (out_h, out_w, 3) uint8.
 
         Brand grade: amber light with warm-white (#FFF3D1) cores over a deep
-        navy field (#071B3E in the open dark, #030B1C in the corners).
+        navy field (FIELD #051026 in the open dark, FIELD_DEEP #020712 in the
+        corners, lifted towards brand navy #071B3E around the light).
         bg_level: how close the open field gets to full navy (0 = all deep).
         occlude: how much bright light replaces the navy under it instead of
         adding to it (keeps glows amber/bronze, not grey-mauve).
@@ -413,6 +419,13 @@ class Canvas:
         hal_l = (hal @ LUMA.astype(np.float32))[..., None]
         hal_c = hal_l * ramp(0.75).astype(np.float32)
         glow = bloom * bl + halation * hal_c
+        if atmos:
+            # lit air: a very wide, warm scatter of all the light in the frame,
+            # so the dark between the trails carries soft midtones like a photo
+            # taken in a hazy room (round 1: fewer flat, empty navy areas)
+            at = self._blur_big(small, 300 * rq) * 0.6 + self._blur_big(small, 640 * rq) * 0.4
+            at_l = (at @ LUMA.astype(np.float32))[..., None]
+            glow += atmos * at_l * ramp(0.45).astype(np.float32)
         if haze is not None:
             glow += haze(self).astype(np.float32)
         hdr += cv2.resize(glow, (self.W, self.H), interpolation=cv2.INTER_LINEAR)

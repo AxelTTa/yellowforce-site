@@ -6,7 +6,8 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 ## Conventions
 
 - `Label` lines are the small uppercase bracket labels. Write them exactly as given, spaces inside the brackets: `( 24/7 )`. CSS uppercases them.
-- `H0` = giant hero type (Title Case, beats separated by periods; `/` marks the intended line break). `H1`, `H2`, `H3` = normal heading levels.
+- `H0` = giant hero type (beats separated by periods; `/` marks the intended line break). `H1`, `H2`, `H3` = normal heading levels.
+- Case: Title Case only for the Home hero beats ("Fight AI. / With AI."). Every other heading on the site, inner H1s included, is sentence case ("Your security. / Run by us."), as on the reference.
 - `Meta L` / `Meta R` = the two short meta lines to the right of a section H2 (left one is the bracket label, right one the short fact).
 - `[copy-email]` = a `<button>` that copies `info@yellow-force.com` and shows the toast (see Global). Never a mailto link, never a form.
 - `-> /path/` = link target.
@@ -16,12 +17,13 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ---
 
-## Core claim (Axel, 2026-10-25: every page says this the same way)
+## Core claim (Axel, 2026-10-26: every page says this the same way)
 
-- In Axel's words: we stop all cyber threats, especially AI swarms, by fighting AI with AI plus our cyber experts. Fully managed, A to Z, 24/7.
-- Site wording (use these, do not paraphrase): "We stop every cyber threat, especially AI swarms." / "We fight AI with AI, plus our cyber experts." / "Fully managed, A to Z, 24/7."
-- Allowed variants: "every threat", "stop cyber threats across every domain", "AI agents and cyber experts", "one team".
-- Order matters: the threat we stop (all of them, AI swarms first), how (AI against AI, with experts), the deal (fully managed, A to Z, 24/7).
+- Site wording (use exactly, do not paraphrase): "We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7."
+- Axel, 2026-10-26: the older long claim ("We stop every cyber threat, especially AI swarms. We fight AI with AI, plus our cyber experts. Fully managed, A to Z: ...") is too long, unclear and unpleasant to read. Do not bring it back, on Home or anywhere else.
+- Short sentences, one idea each. No long claim sentences stacked with commas and colons.
+- Allowed short variants: "Fight AI with AI" (hero, tagline), "Fully managed, A to Z", "every threat", "AI agents and cyber experts", "one team", "24/7".
+- Order matters: what we do (run all of it), who does it (our AI and our experts) and what they stop (every threat, AI swarms included), when (24/7).
 
 ## Global
 
@@ -71,9 +73,9 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Button 2 (dark): How we work -> /services/
 
 ### Footer
-- Blurb: YellowForce is a fully managed cybersecurity company. We stop every cyber threat, especially AI swarms, by fighting AI with AI, plus our cyber experts. We go inside your company, connect to everything you run and defend it 24/7. From A to Z.
+- Blurb: YellowForce is a fully managed cybersecurity company. We run your entire security, A to Z. Our AI and our experts stop every threat, AI swarms included. 24/7.
 - Email line: info@yellow-force.com [copy-email]
-- Big links (lowercase): home, services, coverage, about, insights, contact
+- Big links: Home, Services, Coverage, About, Insights, Contact
 - Small links: Privacy -> /privacy/ · Security -> /security/ · security.txt -> /.well-known/security.txt
 - Bottom bar left: © 2026 YellowForce
 - Bottom bar right: San Francisco, CA
@@ -85,20 +87,22 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 - URL: /
 - Meta title: YellowForce | Fully managed cybersecurity, 24/7
-- Meta description: We stop every cyber threat, especially AI swarms, by fighting AI with AI plus our cyber experts. Fully managed, A to Z, 24/7.
+- Meta description: We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. Fully managed, 24/7.
 - Nav tagline: Fight AI with AI
 
 ### 01 Hero (inset dark card)
 - Label (small, above or below the H0; keep it on mobile, the status card hides there): ( Fully managed cybersecurity · 24/7 )
 - H0: Fight AI. / With AI.
-- Status card (-> /contact/):
-  - Label (with yellow live dot): Status: live
-  - Value: On watch 24/7. Every domain covered.
-  - Thumb: light-streak image
-  - aria-label: Status: on watch 24/7, every domain covered. Talk to us.
+- Status card (Axel, 2026-10-26: the whole card is a [copy-email] button with the Under attack toast; no "Status: live", no graphic):
+  - Label (with amber live dot): Under attack?
+  - Line: Write to us now. We answer 24/7.
+  - Small: info@yellow-force.com (+ copy icon)
+  - Thumb: real photo, photo/about-strip-1 (hand on a backlit keyboard)
+  - aria-label: Under attack? Copy email address info@yellow-force.com. We answer 24/7.
+  - Hidden on phones (<= 767) like the reference; the menu's "Under attack?" row covers phones.
 
 ### 02 Statement (scroll-filled) + marquee
-- Statement: We stop every cyber threat, especially AI swarms. We fight AI with AI, plus our cyber experts. Fully managed, A to Z: we go inside your company, connect to everything you run and defend all of it, 24/7.
+- Statement (Axel, 2026-10-26, exact): We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.
 - Marquee (text only, no logos; repeat the set for the loop): Network · Endpoint · Cloud · Identity · Email · Apps and APIs · Data · AI agents · OT and IoT · Governance
 
 ### 03 What we stop. (2x2 cards)
@@ -109,7 +113,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Cards (name / meta line 1 / meta line 2 / one line / target):
   1. AI swarms / Threat 01 / AI and agents / Many AI agents hitting you at once, sharing what they find. We meet them with our own. / -> /insights/ai-swarms/
   2. Hijacked agents / Threat 02 / AI and agents / Your own AI turned against you through prompt injection and poisoned tools. / -> /coverage/ai-agents/
-  3. Phishing and deepfakes / Threat 03 / Email and identity / Flawless emails, cloned voices, fake executives on video. Caught before anyone acts. / -> /coverage/email/
+  3. Deepfakes / Threat 03 / Email and identity / Flawless emails, cloned voices, fake executives on video. Caught before anyone acts. / -> /coverage/email/
   4. Ransomware / Threat 04 / Data and devices / Steal, encrypt, extort. We cut it off at the first move and keep your backups out of reach. / -> /coverage/data/
 
 ### 04 Coverage table (replaces the live projects table)
@@ -117,29 +121,25 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Meta L: ( 10 / 10 domains )
 - Meta R: Watched 24/7
 - Row layout: domain (H3) / what it covers / bar (full, all live) with meta "Watched 24/7" and "AI + experts" / what we do (3 words)
+- Five rows, like the reference table: four domains, then one row for the other six (all ten stay named; the marquee above lists them too). On phones a row is just domain | bar.
 - Rows (domain / covers / what we do / target):
-  1. Network / Firewalls, VPNs, traffic / Watch every connection / -> /coverage/network/
-  2. Endpoint and devices / Laptops, servers, phones / Isolate infected devices / -> /coverage/endpoint/
-  3. Cloud / Accounts, workloads, storage / Fix risky configs / -> /coverage/cloud/
-  4. Identity and access / Accounts, sessions, permissions / Stop account takeovers / -> /coverage/identity/
-  5. Email / Phishing, invoice fraud, deepfakes / Stop impersonation attacks / -> /coverage/email/
-  6. Apps and APIs / Web apps, APIs, code / Attack, fix, retest / -> /coverage/applications/
-  7. Data / Files, databases, backups / Stop ransomware, leaks / -> /coverage/data/
-  8. AI and agents / Swarms, agents, models / Stop swarms, hijacks / -> /coverage/ai-agents/
-  9. OT and IoT / Sensors, cameras, controllers / Protect physical operations / -> /coverage/ot-iot/
-  10. Governance and risk / Policies, vendors, audits / Keep compliance current / -> /coverage/governance/
+  1. AI and agents / Swarms, agents, models / Stop swarms, hijacks / -> /coverage/ai-agents/
+  2. Identity and access / Accounts, sessions, permissions / Stop account takeovers / -> /coverage/identity/
+  3. Email / Phishing, invoice fraud, deepfakes / Stop impersonation / -> /coverage/email/
+  4. Cloud / Accounts, workloads, storage / Fix risky configs / -> /coverage/cloud/
+  5. Six more domains / Network, devices, apps, data, OT, governance / See all 10 domains / -> /coverage/
 
 ### 05 What we do. (numbered slider)
 - H2: What we do.
 - Meta L: ( Six practices )
 - Meta R: One team, A to Z
 - Slider arrows aria-label: Previous practice / Next practice
-- Cards (number / title / line / target):
-  - ( 001 ) / Deploy and connect / We go in, place our tech inside your environment and connect every tool you run. / -> /services/#deploy
+- Cards (number / title / line / target). Each line fits two lines on the card at 1440 so the titles line up:
+  - ( 001 ) / Deploy and connect / We go in and connect our tech to every tool you already run. / -> /services/#deploy
   - ( 002 ) / Detect 24/7 / AI agents watch every signal across every domain, day and night. / -> /services/#detect
   - ( 003 ) / Respond / We shut attacks down in real time and run the incident end to end. / -> /services/#respond
   - ( 004 ) / Attack / AI and human red teamers attack you first to find every way in. / -> /services/#attack
-  - ( 005 ) / Harden / We fix what we find, patch, reconfigure, then retest until it's closed. / -> /services/#harden
+  - ( 005 ) / Harden / We fix what we find, then retest until every gap is closed. / -> /services/#harden
   - ( 006 ) / Govern / Policies, risk and compliance, kept current as you change. / -> /services/#govern
 
 ### 06 Reel
@@ -155,7 +155,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Dark card (first slide):
   - Big figure: 24/7
   - Line next to it: AI agents on every signal. Experts on every call. Day and night, in every domain.
-  - Bottom (with yellow live dot instead of faces): On watch now
+  - Bottom: AI agents and experts, on watch now, next to a row of 4 overlapping round chips in place of faces (amber chip with a pixel glyph, paper chip with the mark, slate chip with a glyph, navy chip with the pulsing amber live dot)
 - Cards (text / label 1 / label 2). Alternate top and bottom like the original layout:
   1. You don't get software to manage. You get a team that runs your security from A to Z. / ( 01 ) / Fully managed
   2. Attackers use AI to move at machine speed. Our agents match it. Our experts make the call. / ( 02 ) / AI + experts
@@ -165,6 +165,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ### 08 FAQ
 - H2: Before you let us in.
+- Six questions (the reference has five; "Who does the work?" and "What does it cost?" were cut, the statement and the reasons cards answer the first).
 - Q/A:
   1. Q: Is this software?
      A: No. We're a team, not a tool. We bring our own AI, run your security for you and answer 24/7.
@@ -174,13 +175,9 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
      A: No. We connect to what you already run and work on top of your workflows, your chat and your tickets.
   4. Q: How fast can you start?
      A: Right away. We go in, connect your systems and start defending from day one.
-  5. Q: Who does the work?
-     A: AI agents and cyber experts, together. The agents move at machine speed. The experts make the calls that need judgment.
-  6. Q: Where does our data stay?
+  5. Q: Where does our data stay?
      A: In your environment wherever possible. We take only the access the job needs and log every action we take.
-  7. Q: What does it cost?
-     A: It depends on what you run. Tell us, and we'll come back fast with one clear price for everything.
-  8. Q: We're under attack right now.
+  6. Q: We're under attack right now.
      A: Write to us now. Copy our email, put URGENT in the subject and send. We answer 24/7, nights and weekends included.
      Button: Copy email [copy-email, Under attack toast]
 
@@ -209,7 +206,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ### 01 Hero
 - Label: ( Services )
-- H1: Your Security. / Run by Us.
+- H1: Your security. / Run by us.
 - Intro (optional line under H1): We don't sell you a tool. We run your cybersecurity for you, from A to Z, 24/7.
 
 ### 02 Problem
@@ -326,24 +323,25 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ### 01 Hero
 - Label: ( Coverage )
-- H1: Every Domain. / Every Hour.
+- H1: Every domain. / Every hour.
 
 ### 02 Intro
 - Text: Attackers don't pick one door, and AI lets them try all of them at once. So we cover all ten domains of cybersecurity with one team, 24/7.
 
 ### 03 Domain cards (10, each -> its page)
 - Card link text: See the domain
+- Card titles are the short one-line names (same as the domain bar). The long name stays on the domain page (hero chip, principle meta, meta title).
 - Cards (number / title / line):
-  - 01 / Network security / Every connection watched, every intruder cut off.
-  - 02 / Endpoint and device security / Laptops, servers and phones, isolated the moment they turn.
-  - 03 / Cloud security / Misconfigurations fixed, leaked keys revoked, every change watched.
-  - 04 / Identity and access / Account takeovers stopped, sessions killed, access kept tight.
-  - 05 / Email security / Phishing, invoice fraud and deepfakes, caught before anyone acts.
-  - 06 / Application and API security / Attacked by us first, fixed, then watched 24/7.
-  - 07 / Data protection / Ransomware stopped, leaks blocked, backups kept safe.
-  - 08 / AI and agent security / Swarms stopped, and your own agents kept on a leash.
-  - 09 / OT and IoT security / Sensors, cameras and control systems, found and protected.
-  - 10 / Governance, risk and compliance / Policies, risk and compliance, run and kept current.
+  - 01 / Network / Every connection watched, every intruder cut off.
+  - 02 / Endpoint / Laptops, servers and phones, isolated the moment they turn.
+  - 03 / Cloud / Misconfigurations fixed, leaked keys revoked, every change watched.
+  - 04 / Identity / Account takeovers stopped, sessions killed, access kept tight.
+  - 05 / Email / Phishing, invoice fraud and deepfakes, caught before anyone acts.
+  - 06 / Apps and APIs / Attacked by us first, fixed, then watched 24/7.
+  - 07 / Data / Ransomware stopped, leaks blocked, backups kept safe.
+  - 08 / AI agents / Swarms stopped, and your own agents kept on a leash.
+  - 09 / OT and IoT / Sensors, cameras and control systems, found and protected.
+  - 10 / Governance / Policies, risk and compliance, run and kept current.
 
 ### 04 CTA band + footer
 - Global.
@@ -358,6 +356,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Principle block meta: ( Our principle ) / the domain name
 - Related heading: Related domains.
 - Related card link text: See the domain
+- Related card titles: the short names from the Coverage cards. Pairs are set so every domain is linked from exactly two pages.
 
 ---
 
@@ -388,8 +387,8 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Quote: If it touches your network, we see it.
 
 ### Related
-- Endpoint and devices -> /coverage/endpoint/
-- Cloud -> /coverage/cloud/
+- Endpoint -> /coverage/endpoint/
+- OT and IoT -> /coverage/ot-iot/
 
 ---
 
@@ -421,7 +420,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Related
 - Network -> /coverage/network/
-- Identity and access -> /coverage/identity/
+- Data -> /coverage/data/
 
 ---
 
@@ -452,7 +451,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Quote: Nothing in your cloud goes unwatched.
 
 ### Related
-- Identity and access -> /coverage/identity/
+- Identity -> /coverage/identity/
 - Apps and APIs -> /coverage/applications/
 
 ---
@@ -484,8 +483,8 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Quote: Every account is a key. We know where all of them are.
 
 ### Related
-- Email -> /coverage/email/
 - Cloud -> /coverage/cloud/
+- Email -> /coverage/email/
 
 ---
 
@@ -516,8 +515,8 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Quote: If it sounds like your boss and asks for money, we check twice.
 
 ### Related
-- Identity and access -> /coverage/identity/
-- Data -> /coverage/data/
+- Identity -> /coverage/identity/
+- AI agents -> /coverage/ai-agents/
 
 ---
 
@@ -549,7 +548,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Related
 - Cloud -> /coverage/cloud/
-- AI and agents -> /coverage/ai-agents/
+- AI agents -> /coverage/ai-agents/
 
 ---
 
@@ -580,8 +579,8 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Quote: If they can't take it or lock it, they have nothing.
 
 ### Related
-- Endpoint and devices -> /coverage/endpoint/
-- Governance and risk -> /coverage/governance/
+- Governance -> /coverage/governance/
+- Email -> /coverage/email/
 
 ---
 
@@ -594,7 +593,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Hero
 - Label: Coverage 08 · AI and agent security · 24/7
-- H1: AI Agents.
+- H1: AI agents.
 - Intro: AI is now the attacker and the target. We stop AI swarms and keep your own AI agents from being turned against you.
 
 ### The threat.
@@ -613,7 +612,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Related
 - Apps and APIs -> /coverage/applications/
-- Identity and access -> /coverage/identity/
+- Governance -> /coverage/governance/
 
 ---
 
@@ -645,7 +644,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Related
 - Network -> /coverage/network/
-- Endpoint and devices -> /coverage/endpoint/
+- Endpoint -> /coverage/endpoint/
 
 ---
 
@@ -677,7 +676,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### Related
 - Data -> /coverage/data/
-- Identity and access -> /coverage/identity/
+- OT and IoT -> /coverage/ot-iot/
 
 ---
 
@@ -690,7 +689,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### 01 Hero
 - Label: ( The company )
-- H1: We Go In. / We Stay On.
+- H1: We go in. / We stay on.
 
 ### 02 Our approach. (+ 3 vertical images)
 - H2: Our approach.
@@ -746,7 +745,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### 01 Header
 - Label: ( Insights )
-- H1: Notes From / the Front.
+- H1: Notes from / the front.
 
 ### 02 Featured (2 big cards)
 - ai-swarms
@@ -927,7 +926,7 @@ Doing this yourself means hiring specialists across ten areas and staffing them 
 
 ### 01 Hero
 - Label: ( Contact )
-- H1: Tell Us / What You Run.
+- H1: Tell us / what you run.
 - Direct strip (2 cells):
   - Cell 1 label: Email / value: info@yellow-force.com [copy-email]
   - Cell 2 label: Hours / value: 24/7, every day
@@ -1033,7 +1032,7 @@ If we change this policy, we'll update it here and change the effective date at 
 
 ### Hero
 - Label: ( Responsible disclosure )
-- H1: Found a / Way In?
+- H1: Found a / way in?
 - Intro: We fight attackers for a living, so we take reports about our own security seriously. If you found a vulnerability in yellow-force.com, thank you. Here's how to tell us.
 
 ### Body
@@ -1093,7 +1092,7 @@ Our contact details are also published at /.well-known/security.txt.
 
 ### Hero (inset dark card)
 - Label: ( Error / 404 )
-- H1: Nothing Here / to Defend.
+- H1: Nothing here / to defend.
 - Text: This page doesn't exist, moved, or never did. Everything we protect is still exactly where it should be.
 - Button 1 (light): Back to home -> /
 - Button 2 (ghost): See coverage -> /coverage/

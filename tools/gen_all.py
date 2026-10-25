@@ -22,6 +22,7 @@ SITE = HERE.parent
 OUT = SITE / "assets" / "img" / "gen"
 QA = SITE / "qa"
 Q = 82
+MAX_KB = 300
 
 
 def aspect_label(w, h):
@@ -38,6 +39,13 @@ def render_one(name, ss=2):
     w, h = img.size
     opts = dict(quality=Q, method=6)
     img.save(OUT / f"{name}.webp", **opts)
+    # keep page weight in line with the rest of the set: very detailed frames
+    # (dense fields of fine trails) step the quality down until the main file fits
+    q = Q
+    while (OUT / f"{name}.webp").stat().st_size > MAX_KB * 1024 and q > 70:
+        q -= 3
+        opts = dict(quality=q, method=6)
+        img.save(OUT / f"{name}.webp", **opts)
     for tw in (1600, 800):
         p = OUT / f"{name}-{tw}.webp"
         if tw >= w:
@@ -145,8 +153,10 @@ def manifest(names):
         "Made by `tools/gen_all.py` (engine `tools/gen_core.py`, compositions `tools/gen_scenes.py`).",
         "Our own work, rendered from code: no third-party images, no licence limits. Seeded, so a re-run gives the same files.",
         "",
-        "Look (brand kit, 2026-10-26): long-exposure light trails in amber #FFBF00 with warm-white hot cores (#FFF3D1)",
-        "on deep navy: open dark fields about #071B3E, corners and shadows down to #030B1C, never neutral black.",
+        "Look (brand kit, 2026-10-26, round 1): long-exposure light trails in amber #FFBF00 with warm-white hot cores (#FFF3D1)",
+        "on deep, moody navy: open dark fields about #051026 (averaging #040C1E), corners down to #020712, lifted back towards",
+        "brand navy #071B3E where light scatters into the air; never neutral black. Photographic compositions (roads, tunnels,",
+        "beams in haze, fields in every focus plane) rather than diagrams; lit haze gives the dark soft midtones.",
         "Very faint slate-blue (#777F98) out-of-focus particles add depth. HDR accumulation, hue-keeping filmic tone map,",
         "bloom (the wide part lifts the navy instead of tinting it), amber halation, film grain, vignette.",
         "Check: `qa/brand-swatch-check.jpg` (images between flat #071B3E and #FFBF00 swatches, measured colours).",

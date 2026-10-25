@@ -30,7 +30,8 @@ sitemap: false                          (optional)
 - URLs: `services.html` -> `/services/`, `coverage/network.html` -> `/coverage/network/`, `404.html` -> `/404.html`. Files or folders starting with `_` are skipped.
 - Directives: `<!-- include:NAME -->` (src/partials), `<!-- inline:assets/logo/mark.svg -->` (inline SVG, decorative), `{{email}}`, `{{site_url}}`, `{{canonical}}`, `{{year}}`, any front-matter key.
 - Always root-relative URLs: `/assets/...`, `/coverage/`.
-- Partials (foundation lane owns them): `head`, `nav`, `cta`, `footer`, `toast`. The logo is referenced only in `nav.html` and `footer.html` via `<!-- inline:assets/logo/mark.svg -->` / `wordmark.svg`: swapping those two files swaps the logo everywhere. After a logo swap run `../.venv/bin/python tools/make_icons.py` (favicons, manifest icons, OG image).
+- Partials (shared-ui lane owns them): `head`, `nav`, `cta`, `footer`, `toast`, `logo`, `logo-mark`.
+- Logo: `<!-- include:logo -->` = the full lockup (inline SVG mark + live-text wordmark "**Yellow**Force" in our Inter, `.logo > .logo__mark + .logo__word > .logo__yellow + .logo__force`). `<!-- include:logo-mark -->` = the mark only (`.logo__mark`, inlines `assets/logo/mark.svg`). Never put the wordmark in an `<img>` (SVG text cannot load our font). Colors come from tokens, so the same markup works everywhere: on paper amber front + navy back, "Yellow" navy, "Force" slate; inside `.on-dark` and the nav pill the back turns white, "Yellow" white, "Force" slate-light. Size it with `font-size` on the parent (the mark is 3.17em wide). After a mark swap run `../.venv/bin/python tools/make_icons.py` (favicons, manifest icons, OG image).
 - Bracket labels: write `( 24/7 )` with single spaces; the build widens the inner spacing automatically.
 
 ## 2. Images
@@ -52,7 +53,7 @@ sitemap: false                          (optional)
 | `.frame` | max 1920 container |
 | `.stack` | column gap 5em (header to content). `.stack--m` 3em, `.stack--s` 1.5em |
 | `.grid-12` + `.span-4/6/12` | 12 col grid, 1.5em gutter |
-| `.on-dark` | flips text/line tokens for dark surfaces (focus ring becomes yellow) |
+| `.on-dark` | flips text/line/logo tokens for navy surfaces (text paper, meta slate-light, focus ring amber) |
 | `.t-h0` `.t-h1` ... `.t-h6`, `h1-h6` | Inter display headings (h0 8.75em/700) |
 | `.t-statement` | 2.875em statement paragraph |
 | `.t-lead` (`--s`) | 2em intro text next to an h2 |
@@ -72,6 +73,7 @@ Headings: 2 to 5 words, end with a period, two lines with `<br>`: `<h2 data-reve
 </div>
 ```
 Variants: `.head--center` (label `<p class="t-label">` above an h1/h2), `.head--split` (h2 left + `<p class="head__text t-lead">` right).
+On phones the meta stays on the right of the two-line title, same row, like the reference (it wraps its own lines; keep both meta lines short, about 30 characters max).
 
 **Buttons** (text roll + arrow chip). Variants: `btn--dark` (default), `btn--light` (on dark/photo), `btn--ghost` (on paper), `btn--glass` (on dark), `btn--block`. Row: `.btn-row` (`--center`).
 ```html
@@ -80,13 +82,15 @@ Variants: `.head--center` (label `<p class="t-label">` above an h1/h2), `.head--
   <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" ...same...></svg></span>
 </a>
 ```
-Copy-email button: a `<button type="button" data-copy-email>` (use `data-copy-email="urgent"` for the Under attack toast line). Chip: two copy icons + a third `btn__icon btn__icon--done` check icon (shown after copying). Second roll line may read the address. Exact markup: FAQ "under attack" item in `src/pages/index.html`.
+Copy-email button: a `<button type="button" data-copy-email>` (use `data-copy-email="urgent"` for the Under attack toast line). Chip: two copy icons + a third `btn__icon btn__icon--done` check icon (shown after copying). Second roll line may read the address. Exact markup: FAQ "under attack" item in `src/pages/index.html`. JS adds `.is-copied` to any copy button for 2.4s.
 
 **Copy email (text style)**: `<button class="mail" type="button" data-copy-email aria-label="Copy email address info@yellow-force.com"><span data-email-text>info@yellow-force.com</span><svg class="icon">copy</svg></button>`. Big contact version: add `mail--xl`. Never `mailto:`, never a form. The toast lives in the layout; JS falls back to selecting `[data-email-text]` if the clipboard is blocked.
 
-**Image cards 2x2** `.tiles > .tiles__cell > a.tile` with `.tile__media.media > img`, `.tile__glass > .tile__row (.tile__name + .tile__meta > span x2) + .tile__reveal > .tile__reveal-inner > .tile__line + .tile__more`. Panel grows on hover/focus. Add `data-reveal="stagger"` on `.tiles`.
+**Image cards 2x2** `.tiles > .tiles__cell > a.tile` with `.tile__media.media > img`, `.tile__glass > .tile__row (.tile__name + .tile__meta > span x2) + .tile__reveal > .tile__reveal-inner > .tile__line + .tile__more`. Add `data-reveal="stagger"` on `.tiles`.
+One look on Home, Services and Coverage (all in components.css, no page overrides needed): at rest a light frosted panel at least 50% wide x 4em, name (1.75em, 500, one line) with the two meta lines stacked right next to it; hover/focus grows it to the full card width x 8em and opens the line + link. Keep names short (one to three words) so the rest panel stays near half the card. On phones the line and link stay hidden (the whole card is the link), like the reference.
 
-**Coverage table** `ul.ledger[data-reveal=stagger][data-bars] > li > a.ledger__row` with `h3.ledger__name`, `.ledger__tag`, `.ledger__gauge > .ledger__gauge-meta (2 spans) + .ledger__track > .ledger__fill`, `.ledger__end`. Bars fill on scroll (`--fill` custom property for partial width; we only use full bars).
+**Coverage table** `ul.ledger[data-reveal=stagger][data-bars] > li > a.ledger__row` with `h3.ledger__name`, `.ledger__tag`, `.ledger__gauge > .ledger__gauge-meta (2 spans) + .ledger__track > .ledger__fill`, `.ledger__end`. Bars fill on scroll (`--fill` custom property for partial width, e.g. `style="--fill: 60%"` on `.ledger__fill`).
+`.ledger--compact` (Home, 5 rows like the reference): on phones each row is one line, name left and gauge (meta over the bar) right; tag and end label drop out. Without it, rows stack (name/end, tag/gauge) on phones.
 
 **Carousel** (practices, reasons, any card row)
 ```html
@@ -99,8 +103,8 @@ Copy-email button: a `<button type="button" data-copy-email>` (use `data-copy-em
   <button class="carousel__btn carousel__btn--next" type="button" data-carousel-next aria-label="Next"><span class="carousel__arrow">svg</span></button>
 </div>
 ```
-Slide width 28em (`.carousel--narrow` 23.9em). Buttons, drag/swipe, arrow keys; wraps at the ends.
-Cards: `.practice` (`.practice__num`, `svg.glyph.practice__glyph`, `.practice__body > .practice__title + .practice__text`; can be an `<a>`), `.reason` (`.reason__who > .reason__icon + .reason__id > .reason__title + .reason__meta`, `.reason__text`; odd slides flip automatically), `.reason--feature on-dark` (`.reason__score > .reason__figure(24<small>/7</small>) + .reason__figure-text`, `.reason__crew > .reason__stack > .reason__chip`, `.reason__crew-label`).
+Slide width 28em (`.carousel--narrow` 23.9em), same on phones (298px at 390: the next card peeks under the paper fade, the arrow chip sits over the gap, like the reference). Buttons, drag/swipe, arrow keys; wraps at the ends.
+Cards: `.practice` (`.practice__num`, `svg.glyph.practice__glyph`, `.practice__body > .practice__title + .practice__text`; can be an `<a>`; the text reserves two lines so titles align, keep it to two lines at 1440, about 60 characters), `.reason` (`.reason__who > .reason__icon + .reason__id > .reason__title + .reason__meta`, `.reason__text`; odd slides flip automatically), `.reason--feature on-dark` (`.reason__score > .reason__figure(24<small>/7</small>) + .reason__figure-text`, `.reason__crew > .reason__stack > .reason__chip` x4 + `.reason__crew-label`). Chips are 34px circles in place of faces: `--amber` (navy glyph), `--paper` (put `<!-- include:logo-mark -->` inside), `--slate`, `--live` (`<span class="dot dot--live">`); plain `.reason__chip` = navy with an amber glyph.
 Pixel glyphs: inline SVG, 30px cells on a 180 grid, `<rect width="24" height="24" rx="5">` LED blocks, `fill: currentColor` via `.glyph`. Examples in `src/pages/index.html`.
 
 **Reel** (live canvas)
@@ -113,11 +117,12 @@ Pixel glyphs: inline SVG, 30px cells on a 180 grid, `<rect width="24" height="24
 ```
 `data-streaks="accent"` = transparent, softer version to lay over a hero/cover image (`<canvas class="hero__streaks">` or `.cover__streaks`). Optional `data-seed="7"` changes the layout. `[data-clock]` shows live San Francisco time.
 
-**FAQ** `.faq` (12-col: `.faq__head` left, `.faq__list[data-faq]` right) > `.faq__item > h3.faq__h > button.faq__q#id[aria-expanded][aria-controls] (span + .faq__icon)` and `div.faq__a#id[role=region][aria-labelledby] > .faq__a-inner > p`. Answers are open without JS. Add `is-open` on an item to start it open.
+**FAQ** `.faq` (12-col: `.faq__head` left, `.faq__list[data-faq]` right) > `.faq__item > h3.faq__h > button.faq__q#id[aria-expanded][aria-controls] (span + .faq__icon)` and `div.faq__a#id[role=region][aria-labelledby] > .faq__a-inner > p`. Answers are open without JS. Add `is-open` on an item to start it open. The question text must be the button's first `<span>` (it carries the 1.375em display size; the button keeps the base size so rows are 2em of the base, about 85px at 1440). No rule above the first row, a hairline under every row. Keep it to 5 or 6 questions.
 
-**Insights** `.notes` (2 cols, `.notes--3`) > `a.note` (`.note__media.media > img`, `.note__scrim`, `.note__body > .note__meta (spans) + .note__title`, `.note__more` arrow chip). Index list: `ul.index > li > a.index__row` (`.index__content > .index__label + .index__title`, `.index__meta > .index__peek.media > img` hover preview + `.index__date` + `svg.icon.index__arrow`). `.notes + .index` spacing is automatic. `.notes__foot` for a button below.
+**Insights** `.notes` (2 cols, `.notes--3`) > `a.note` (`.note__media.media > img`, `.note__scrim`, `.note__body > .note__meta (spans) + .note__title`, `.note__more` arrow chip). Index list: `ul.index > li > a.index__row` (`.index__content > .index__label + .index__title`, `.index__meta > .index__peek.media > img` hover preview + `.index__date` + `svg.icon.index__arrow`). `.notes + .index` spacing is automatic. `.notes__foot` for a button below. Card titles keep the h4 size on phones (two lines, max 13em).
 
-**Hero (home)** `.hero.on-dark > .hero__media.media > img` + optional `canvas.hero__streaks[data-streaks=accent]` + `.hero__inner.gutter > .hero__row.frame > .hero__copy (p.hero__label.t-label + h1.hero__title.t-h0) + a.status` (`.status__body > .status__label (.dot) + .status__text`, `.status__thumb.media > img`). Status card hides <= 767.
+**Hero (home)** `.hero.on-dark > .hero__media.media > img` + optional `canvas.hero__streaks[data-streaks=accent]` + `.hero__inner.gutter > .hero__row.frame > .hero__copy (p.hero__label.t-label + h1.hero__title.t-h0) + button.status`. `.hero__title` uses line-height 1.02 (not .9): at .9 the "g" of "Fight" overlaps the "W" below; 1.02 leaves .03 to .04em at every width.
+Status card = the "Under attack?" copy-email button: `<button class="status" type="button" data-copy-email="urgent" aria-label="...">` > `.status__body > .status__label (.dot--live + "Under attack?") + .status__main > .status__text + .status__mail ([data-email-text] address + svg.status__icon copy + svg.status__icon.status__icon--done check)`, then `.status__thumb.media > img` (a real photo, not a graphic). Dark chip (deep navy 46%), hides <= 767 like the reference.
 
 **Inner page heroes**
 - `.page-head` (centered, 12em top padding): `p.t-label` + `h1.page-head__title` + `p.page-head__text`. `.page-head--left` variant.
@@ -154,9 +159,13 @@ Elements with `data-reveal` are hidden until JS runs (`html.motion`); a 3.5s fai
 
 ## 6. Tokens and rules
 
-- Fluid base: body font-size = clamp(768px, 100vw, 1920px) / (1440 / unit). Unit 17 (992-1439), 15 (>= 1440), 24 at <= 767 (12.8px, so labels are >= 10px; all small sizes also have a 10px floor).
-- Colors: `--paper #f5f4f0`, `--ink #0a0a0a`, alpha steps `--ink-05/08/11/16/22/40/48/68/72/78`, `--paper-82/62/48/16/14/07`. Semantic: `--text`, `--text-2`, `--text-meta`, `--line`, `--card`.
-- Accent: `--signal #ffcc00` (+ `--signal-amber #ffad1f` for glow/imagery). Use only on dark surfaces, dots, focus on dark, selection, logo, imagery. Never yellow text on paper.
+- Fluid base: body font-size = clamp(768px, 100vw, 1920px) / (1440 / unit). Unit 17 (768-1439), 15 (>= 1440, 15px at 1440), 20 at <= 767 (10.67px, same as the reference). Every small size has a 10px floor (`--fs-4xs` to `--fs-s` use `max(..., 10px)`, `--fs-sm` is exactly 10px on phones), so no label is under 10px. Phones (<= 479): gutters 1em, nav pill 34.5em (368px at 390).
+- Brand colors (Axel's kit, `brand/`): `--navy #071B3E` is the ink everywhere (text on paper, nav pill, hero, dark cards, footer). Alpha steps `--navy-05/08/11/16/22/40/48/68/72/78/90`. Deeper navy for big image surfaces and shadows: `--navy-deep #041029`, `--navy-abyss #030B1C`; raised navy `--navy-2 #0C2350`, `--navy-3`.
+- `--amber #FFBF00` is the only accent (`--amber-warm` for glow, `--amber-hot` for white-hot cores, `--amber-55/24/12/00`). Use it like light: the mark, live dots, hover/active on dark, focus on dark, selection, imagery. Never amber text on paper.
+- Slate: `--slate #777F98` (large secondary text, "Force" on paper), `--slate-ink #5A627A` (small secondary text on paper, AA), `--slate-light #A3AABF` (secondary text on navy, "Force" on dark).
+- Paper: `--paper #F4F5F7` (cool off-white) with `--paper-82/62/48/16/14/10/07/00`; `--white` for raised cards.
+- Semantic (flip inside `.on-dark`): `--text`, `--text-2`, `--text-meta`, `--text-4`, `--line`, `--card`. Logo: `--logo-front`, `--logo-back`, `--logo-yellow`, `--logo-force`.
+- Legacy Vantra names (`--ink*`, `--signal*`, `--black`) still exist as aliases of the brand values; prefer the brand names in new code.
 - Radii: 12px (nav, buttons), 16px (image cards), 20px (content cards, hero), 24px (CTA band top).
 - Easing: `--ease` power2.inOut, `--ease-strong` power4.inOut (buttons), `--t .45s`, `--t-fast .24s`.
 - Accessibility: every interactive thing is a real `<a>` or `<button>`, visible focus, Esc closes the menu, reduced motion turns off Lenis, reveals, marquee and the reel loop (static frame).

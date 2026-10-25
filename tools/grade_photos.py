@@ -39,47 +39,50 @@ OUT = SITE / "assets" / "img" / "photo"
 QA = SITE / "qa"
 
 # Brand colours (sRGB 0..255).
-NAVY_FLOOR = (3, 11, 28)     # #030B1C, the darkest any pixel goes
+NAVY_FLOOR = (2, 7, 18)      # #020712, the darkest any pixel goes (round 1: darker, same navy hue)
 NAVY = (7, 27, 62)           # #071B3E, brand navy
 SLATE = (119, 127, 152)      # #777F98, brand slate
 AMBER = (255, 191, 0)        # #FFBF00, brand amber
-WARM_WHITE = (255, 243, 222)
+WARM_WHITE = (255, 244, 226)
 
 # Three ramps, luminance -> sRGB.
-# MONO: the photo itself. Navy floor, navy shadows, slate-blue desaturated
-# mids (#777F98 at 0.64), then a neutral-warm climb to warm white (cool-to-warm
-# through neutral, so a blend with the amber ramps never passes through olive).
+# MONO: the photo itself. Navy floor, deep navy shadows (open dark about
+# #040C1E like the generated family), slate-blue desaturated mids (#777F98 at
+# 0.66), then a neutral-warm climb to warm white (cool-to-warm through neutral,
+# so a blend with the amber ramps never passes through olive).
 MONO = [
     (0.00, NAVY_FLOOR),
-    (0.09, (5, 17, 43)),
-    (0.20, (10, 28, 62)),
-    (0.34, (36, 46, 72)),
-    (0.50, (84, 90, 112)),
-    (0.64, SLATE),
-    (0.80, (180, 178, 184)),
+    (0.10, (4, 12, 30)),
+    (0.22, (8, 22, 50)),
+    (0.36, (32, 42, 68)),
+    (0.52, (80, 87, 110)),
+    (0.66, SLATE),
+    (0.81, (180, 178, 184)),
     (0.92, (228, 220, 208)),
     (1.00, (248, 241, 228)),
 ]
 # LIGHT: what light sources turn into. Deep amber -> brand amber #FFBF00 -> warm-white core.
 # Below the amber it runs through burnt orange, not olive: dim amber light must read warm.
+# Above the amber it rolls into warm white early, so hot light glows instead of sitting flat.
 LIGHT = [
     (0.00, NAVY_FLOOR),
-    (0.35, (66, 42, 22)),
-    (0.55, (156, 98, 12)),
-    (0.70, (230, 152, 0)),
-    (0.82, AMBER),
-    (0.92, (255, 216, 112)),
+    (0.35, (60, 38, 20)),
+    (0.55, (150, 94, 12)),
+    (0.70, (228, 150, 0)),
+    (0.80, AMBER),
+    (0.89, (255, 214, 120)),
+    (0.95, (255, 234, 190)),
     (1.00, WARM_WHITE),
 ]
-# WASH: broad lit surfaces (a floor, a sky, a wall). Slate-grey into a soft
-# amber-caramel and warm white, never khaki and never a flat amber field.
+# WASH: broad lit surfaces (a floor, a sky, a wall). Slate-grey into a soft,
+# low-chroma caramel and then cream: lit, warm, never a flat amber field.
 WASH = [
     (0.00, NAVY_FLOOR),
-    (0.40, (62, 58, 66)),
-    (0.60, (154, 114, 74)),
-    (0.76, (218, 156, 74)),
-    (0.88, (246, 194, 108)),
-    (1.00, (253, 234, 198)),
+    (0.40, (56, 54, 64)),
+    (0.60, (128, 104, 80)),
+    (0.76, (192, 158, 114)),
+    (0.88, (234, 212, 176)),
+    (1.00, (252, 244, 230)),
 ]
 GLOW = np.array([1.0, 0.70, 0.10])  # halation tint (amber, a touch warmer than #FFBF00 so it never reads olive on navy)
 # Grain tint: in the shadows grain follows the navy hue so blacks never turn grey;
@@ -96,20 +99,21 @@ PHOTOS: list[dict] = [
     dict(name="insight-2", src="IGiut6NQmxc.jpg", aspect=(4, 3), max=2000, focus=(0.55, 0.5)),
     dict(name="insight-3", src="PSpf_XgOM5w.jpg", aspect=(4, 3), max=2000, focus=(0.5, 0.5)),
     # About
-    dict(name="about-team", src="UYsx3SfIopg.jpg", aspect=(16, 9), max=2400, focus=(0.62, 0.45), zoom=1.3, spread=0.7),
+    # round 1: no head silhouettes. A motion-blurred figure seen from behind, riding into the night.
+    dict(name="about-team", src="7-pMe1g4CwE.jpg", aspect=(16, 9), max=2308, focus=(0.587, 0.5), zoom=1.15, spread=0.9, exposure=0.95, soften=0.8),
     dict(name="about-strip-1", src="Vr0uBwEBWIg.jpg", aspect=(4, 3), max=2000, focus=(0.5, 0.5)),
     dict(name="about-strip-2", src="Ye19Jm4tA8g.jpg", aspect=(4, 3), max=2000, focus=(0.5, 0.45), exposure=0.85),
     dict(name="about-strip-3", src="VHmBX7FnXw0.jpg", aspect=(4, 3), max=2000, focus=(0.55, 0.5)),
     # Contact (4:5)
-    dict(name="contact-photo", src="h54xsHoAj8k.jpg", aspect=(4, 5), max=1800, focus=(0.5, 0.5)),
+    dict(name="contact-photo", src="7oAnFA7NXgM.jpg", aspect=(4, 5), max=1800, focus=(0.5, 0.55), spread=0.5, soften=1.6, exposure=0.92),
     # Page heroes (16:9)
-    dict(name="services-hero", src="s0XabTAKvak.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5), exposure=1.15),
+    dict(name="services-hero", src="s0XabTAKvak.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5), exposure=1.3, bottom=0.4),
     dict(name="coverage-hero", src="AwkDru_0tQw.jpg", aspect=(16, 9), max=2400, focus=(0.6, 0.5)),
     # Spares
-    dict(name="photo-spare-1", src="kbtIiCzK4lQ.jpg", aspect=(4, 3), max=2000, focus=(0.363, 0.576), zoom=1.69),
+    dict(name="photo-spare-1", src="kbtIiCzK4lQ.jpg", aspect=(4, 3), max=2000, focus=(0.363, 0.576), zoom=1.69, exposure=1.1, gain=0.84),
     dict(name="photo-spare-2", src="KN66Tjx8Zzs.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5)),
     dict(name="photo-spare-3", src="i2M4JeyBIV8.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5)),
-    dict(name="photo-spare-4", src="ztijhVkK7ZI.jpg", aspect=(4, 5), max=1800, focus=(0.45, 0.5), spread=0.3, exposure=1.2),
+    dict(name="photo-spare-4", src="jcRi2yH6OhE.jpg", aspect=(4, 5), max=1600, focus=(0.6, 0.62), zoom=1.25, spread=0.6),
 ]
 
 
@@ -147,13 +151,16 @@ def smoothstep(a, b, x):
 
 
 def grade(rgb: np.ndarray, exposure=1.0, glow=0.22, keep_chroma=0.04, lift=0.0, warm=1.0, spread=0.8,
-          vignette=0.26) -> np.ndarray:
+          vignette=0.30, bloom=0.35, bottom=0.0, gain=1.0) -> np.ndarray:
     """rgb float32 0..1 (sRGB) -> graded float32 0..1, without grain.
 
     warm:     how strongly light sources go amber (0 = pure navy/slate mono).
     spread:   how much broad bright areas (walls, floors, sky) are held back to a
               soft caramel wash so only light itself turns amber (0 = everything bright goes amber).
     vignette: darkening at the corners, in tone space so corners fall to navy, not black.
+    bloom:    soft highlight glow in linear light (shared look with assets/img/gen/).
+    gain:     scales the tone range before the curve (below 1 pulls a blown wall or sky back from white).
+    bottom:   light falloff towards the bottom edge (a lit floor fades into the dark instead of sitting flat).
     """
     h, w, _ = rgb.shape
     # Luminance with a red-leaning mix so tail lights and warm lamps read as light.
@@ -162,12 +169,14 @@ def grade(rgb: np.ndarray, exposure=1.0, glow=0.22, keep_chroma=0.04, lift=0.0, 
     lo, hi = np.percentile(lum, [0.4, 99.85])
     hi = max(hi, lo + 0.05)
     L = np.clip((lum - lo) / (hi - lo), 0, 1)
-    L = np.clip(L + lift, 0, 1) ** exposure
+    L = np.clip(L + lift, 0, 1) ** exposure * gain
     # Subtle elliptical vignette (applied in tone space so blacks stay at the floor).
     yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
     nx, ny = (xx / w - 0.5) * 2, (yy / h - 0.5) * 2
     r = np.sqrt(nx * nx * 0.85 + ny * ny * 1.0)
     L = L * (1 - vignette * smoothstep(0.55, 1.45, r))
+    if bottom:
+        L = L * (1 - bottom * smoothstep(0.55, 1.0, yy / h))
     # Gentle S-curve around 0.42.
     L = np.clip(L, 0, 1)
     s = 1 / (1 + np.exp(-(L - 0.42) * 6.0))
@@ -195,27 +204,63 @@ def grade(rgb: np.ndarray, exposure=1.0, glow=0.22, keep_chroma=0.04, lift=0.0, 
     sig = max(w, h) * 0.010
     halo = ndimage.gaussian_filter(hl, sig) * 0.6 + ndimage.gaussian_filter(hl, sig * 4) * 0.4
     out = out + glow * warm * halo[..., None] * GLOW[None, None, :]
+    # Bloom, in linear light like the generated family: highlights spread a
+    # soft multi-scale glow (lens + mist filter), so photos share the same
+    # luminous, slightly dreamy light instead of hard duotone edges.
+    out = add_bloom(np.clip(out, 0, None), bloom, warm)
     # Hue-preserving shoulder: a per-channel clip would cap red first and turn
-    # hot amber lemon-yellow. Scale back into range, then burn towards white.
+    # hot amber lemon-yellow. Scale back into range, then burn towards warm white.
     peak = np.maximum(out.max(axis=-1, keepdims=True), 1.0)
     out = out / peak
-    out = out + (1 - out) * np.clip((peak - 1) * 0.8, 0, 0.5)
+    out = out + (np.asarray(WARM_WHITE, np.float32) / 255.0 - out) * np.clip((peak - 1) * 0.9, 0, 0.6)
     return np.clip(out, FLOOR[None, None, :], 1)
 
 
-def add_grain(img: np.ndarray, amount=0.022, seed=7) -> np.ndarray:
+# Bloom tint: the glow keeps the colour of the light that makes it, pulled a
+# little towards warm white (amber light glows golden, white light glows cream).
+BLOOM_WARM = np.array([1.0, 0.86, 0.62], dtype=np.float32)
+
+
+def add_bloom(img: np.ndarray, strength=0.35, warm=1.0) -> np.ndarray:
+    """img: graded sRGB-ish 0..1 floats. Returns sRGB-ish with highlight bloom
+    (values may exceed 1; the caller applies the shoulder)."""
+    if strength <= 0:
+        return img
+    import cv2
+    h, w, _ = img.shape
+    lin = np.power(img, 2.2).astype(np.float32)
+    Y = lin @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32)
+    # soft-knee highlight extraction
+    k = np.clip((Y - 0.18) / 0.82, 0, 1) ** 1.6
+    src = lin * (k / np.maximum(Y, 1e-4))[..., None] * Y[..., None] ** 0.5
+    q = 4
+    small = cv2.resize(src, (max(8, w // q), max(8, h // q)), interpolation=cv2.INTER_AREA)
+    m = max(w, h) / q
+    b = np.zeros_like(small)
+    for frac, wt in ((0.004, 0.35), (0.014, 0.35), (0.045, 0.30)):
+        b += wt * cv2.GaussianBlur(small, (0, 0), max(0.8, frac * m))
+    b = cv2.resize(b, (w, h), interpolation=cv2.INTER_LINEAR)
+    bl = (b @ np.array([0.2126, 0.7152, 0.0722], dtype=np.float32))[..., None]
+    tint = 0.5 * b + 0.5 * bl * (BLOOM_WARM * warm + (1 - warm))
+    lin = lin + strength * tint
+    return np.power(np.maximum(lin, 0), 1 / 2.2)
+
+
+def add_grain(img: np.ndarray, amount=1.15, seed=7) -> np.ndarray:
+    """Film grain matched to the generated family (tools/gen_core.py develop):
+    luminance-shaped (strongest in the mids), slightly clumped, mostly
+    monochrome, navy-tinted in the shadows so the floor never turns grey."""
     h, w, _ = img.shape
     rng = np.random.default_rng(seed)
     n = rng.standard_normal((h, w)).astype(np.float32)
     n = ndimage.gaussian_filter(n, 0.65)
     n /= n.std() + 1e-6
-    lum = img[..., 0] * 0.2126 + img[..., 1] * 0.7152 + img[..., 2] * 0.0722
-    # Film grain is strongest in the mids, lighter in deep shadows and hot highlights.
-    weight = 0.30 + 1.25 * lum * (1 - lum) * 2
-    # Navy-tinted in the shadows (so the floor never goes grey), neutral-warm above.
+    lum = np.clip(img[..., 0] * 0.2126 + img[..., 1] * 0.7152 + img[..., 2] * 0.0722, 0, 1)
+    amp = (0.9 + 4.5 * np.sqrt(lum) * (1 - lum) ** 1.2) / 255.0 * amount
     sh = (1 - smoothstep(0.0, 0.30, lum)).astype(np.float32)[..., None]
     tint = sh * GRAIN_SHADOW + (1 - sh) * GRAIN_LIGHT
-    out = img + (n * amount * weight)[..., None] * tint
+    out = img + (n * amp)[..., None] * tint
+    out = out + rng.standard_normal((h, w, 3)).astype(np.float32) * (0.35 / 255.0) * amount
     return np.clip(out, FLOOR[None, None, :] * 0.85, 1)
 
 
@@ -231,6 +276,10 @@ def process(spec: dict, quality=82) -> list[Path]:
     im = crop_to_aspect(im, spec["aspect"], spec.get("focus", (0.5, 0.5)), spec.get("zoom", 1.0))
     maxw = min(spec.get("max", 2400), im.width)
     big = im.resize((maxw, round(maxw * spec["aspect"][1] / spec["aspect"][0])), Image.LANCZOS)
+    if spec.get("soften"):
+        # noisy night sources: calm the sensor noise before the tone map amplifies it
+        from PIL import ImageFilter
+        big = big.filter(ImageFilter.GaussianBlur(spec["soften"]))
     base = grade(
         np.asarray(big, dtype=np.float32) / 255.0,
         exposure=spec.get("exposure", 1.0),
@@ -239,7 +288,10 @@ def process(spec: dict, quality=82) -> list[Path]:
         lift=spec.get("lift", 0.0),
         warm=spec.get("warm", 1.0),
         spread=spec.get("spread", 0.8),
-        vignette=spec.get("vignette", 0.26),
+        vignette=spec.get("vignette", 0.30),
+        bloom=spec.get("bloom", 0.35),
+        bottom=spec.get("bottom", 0.0),
+        gain=spec.get("gain", 1.0),
     )
     base_img = to_img(base)
     written = []
@@ -250,7 +302,7 @@ def process(spec: dict, quality=82) -> list[Path]:
         sized = base_img if width == maxw else base_img.resize((width, hgt), Image.LANCZOS)
         arr = np.asarray(sized, dtype=np.float32) / 255.0
         # Grain sized for each output so it reads the same at every width.
-        arr = add_grain(arr, amount=spec.get("grain", 0.022) * (0.85 if width <= 800 else 1.0), seed=zlib.crc32(spec["name"].encode()))
+        arr = add_grain(arr, amount=spec.get("grain", 1.15) * (0.85 if width <= 800 else 1.0), seed=zlib.crc32(spec["name"].encode()))
         p = OUT / f"{spec['name']}{suffix}.webp"
         to_img(arr).save(p, "WEBP", quality=quality, method=6)
         written.append(p)

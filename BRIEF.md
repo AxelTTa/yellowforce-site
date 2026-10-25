@@ -10,6 +10,12 @@ Every agent working on this site reads this file first. When it conflicts with a
 - We cover **every cyber domain** (list below).
 - The company is very early. Some vagueness is fine. It must still look like a serious, premium, established-feeling firm.
 
+## Axel's direct decisions on the live site (2026-10-26, do not undo)
+- Home statement is exactly: "We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7." Long claim sentences read badly: keep every claim short and plain.
+- Hero status card: no "Status: live", no "On watch 24/7. Every domain covered.", no radar graphic (feels AI-written). It is an "Under attack?" card: "Write to us now. We answer 24/7." + info@yellow-force.com, whole card copies the email, real photo thumbnail.
+- Hero title "Fight AI. / With AI." must never have overlapping lines (descender of "g" vs "W").
+- Axel likes the rest of the site as it is ("website is great"). Refine, do not redesign.
+
 ## Hard rules for copy
 - Clear above all. A visitor must understand in 3 seconds: fully managed cybersecurity, AI vs AI, 24/7, everything covered.
 - Never imply slowness: no "30 days", "weeks", "phases", "pilot", "design partners", "first customers", "Q1 2027", "we are taking...". Speed words are good: now, minutes, instantly, day one.

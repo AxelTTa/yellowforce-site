@@ -91,10 +91,13 @@
 /* inset via padding on main, so the card's margin cannot collapse through body (page = exactly 100vh) */
 .page-404 .main { padding: var(--inset); }
 .page-404 .nf { margin: 0; }
-.page-404 .nf__media > img { opacity: .8; }
+/* one burst of light near the middle of the frame, just right of the text (mirrored so the hot core
+   sits past the title instead of under it); the scrim only darkens the far left for the copy */
+.page-404 .nf__media > img { opacity: .95; transform: scaleX(-1); }
 .page-404 .nf__media::after {
   background:
-    linear-gradient(90deg, rgba(3, 11, 28, .78) 0%, rgba(3, 11, 28, .46) 42%, rgba(3, 11, 28, .08) 72%),
+    linear-gradient(90deg, rgba(3, 11, 28, .66) 0%, rgba(3, 11, 28, .34) 34%, rgba(3, 11, 28, 0) 58%),
+    radial-gradient(60% 70% at 56% 50%, rgba(3, 11, 28, 0) 40%, rgba(3, 11, 28, .45) 100%),
     var(--scrim-hero);
 }
 .page-404 .nf__inner {

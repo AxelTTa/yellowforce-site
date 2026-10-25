@@ -218,7 +218,8 @@
   .page-contact .ct-urgent-block { padding-bottom: var(--sp-6); }
 }
 @media (max-width: 479px) {
-  .page-contact .ct-direct__value { font-size: var(--fs-m); }
+  /* the address fills its half of the strip like the reference values (about 16px at 390), not the 11px body step */
+  .page-contact .ct-direct__value { font-size: min(4.05vw, 16px); letter-spacing: -.01em; }
   .page-contact .ct-direct__value .icon { display: none; }
   .page-contact .ct-direct__cell { padding: var(--sp-2) .5em; }
   .page-contact .ct-big__addr { font-size: var(--fs-2xl); }

@@ -38,32 +38,24 @@
 
 /* ---------- 03 practice cards: 2 columns of square image cards ---------- */
 .page-services .svc-cards { padding-bottom: 0; }
-/* label panel as on the reference: name with the meta stacked right next to it, and a glass that
-   reads on our dark navy imagery (the shared navy glass disappears on it) */
-.page-services .svc-cards .tile__glass { background: rgba(244, 245, 247, .1); }
-@media (min-width: 768px) and (hover: hover) {
-  .page-services .svc-cards .tile__glass { width: 50%; }
-  .page-services .svc-cards .tile:hover .tile__glass,
-  .page-services .svc-cards .tile:focus-visible .tile__glass { width: 94%; }
-}
-.page-services .svc-cards .tile__row { justify-content: flex-start; align-items: center; gap: .625em; }
-.page-services .svc-cards .tile__meta { align-items: flex-start; text-align: left; color: var(--paper-82); }
-.page-services .svc-cards .tile__more { justify-content: flex-start; }
+/* the label panel is the shared tile as is (compact half-width glass, opens on hover) */
 
 /* ---------- 04 practice rows ---------- */
-.page-services .svc-rows { padding-top: var(--sp-105); }
+/* six rows on a tight beat: hairline, meta line, title | text + list, then 4em to the next hairline,
+   so two practices share one screen and the empty band under each list is gone */
+.page-services .svc-rows { padding-top: var(--section-y); }
 .page-services .svc-row {
   border-top: 1px solid var(--line);
-  padding-bottom: var(--sp-6);
+  padding-bottom: var(--sp-4);
   scroll-margin-top: 5.5em;
 }
-.page-services .svc-row:last-child { padding-bottom: var(--sp-3); }
+.page-services .svc-row:last-child { padding-bottom: 0; }
 .page-services .svc-row__top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1em;
-  padding-block: var(--sp-3);
+  padding-block: 1.25em var(--sp-2);
 }
 .page-services .svc-row__grid {
   display: grid;
@@ -79,7 +71,7 @@
   max-width: 32em;
   display: flex;
   flex-direction: column;
-  row-gap: var(--sp-25);
+  row-gap: var(--sp-2);
 }
 .page-services .svc-row__line {
   font-family: var(--font-display);
@@ -254,9 +246,9 @@
   .page-services .svc-row__grid { grid-template-columns: 1fr; }
   .page-services .svc-split__body,
   .page-services .svc-row__body { justify-self: start; max-width: none; }
-  .page-services .svc-rows { padding-top: var(--sp-6); }
-  .page-services .svc-row { padding-bottom: var(--sp-5); }
-  .page-services .svc-row__top { padding-block: var(--sp-2); }
+  .page-services .svc-rows { padding-top: var(--sp-5); }
+  .page-services .svc-row { padding-bottom: var(--sp-3); }
+  .page-services .svc-row__top { padding-block: 1em var(--sp-15); }
   .page-services .svc-row__title { max-width: none; }
   .page-services .svc-row__list > li { grid-template-columns: 2.5em minmax(0, 1fr); }
   .page-services .svc-jump { margin-top: -4.25em; padding-inline: var(--page-x); }
