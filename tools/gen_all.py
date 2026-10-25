@@ -42,7 +42,7 @@ def render_one(name, ss=2):
     # keep page weight in line with the rest of the set: very detailed frames
     # (dense fields of fine trails) step the quality down until the main file fits
     q = Q
-    while (OUT / f"{name}.webp").stat().st_size > MAX_KB * 1024 and q > 70:
+    while (OUT / f"{name}.webp").stat().st_size > MAX_KB * 1024 and q > 58:
         q -= 3
         opts = dict(quality=q, method=6)
         img.save(OUT / f"{name}.webp", **opts)
@@ -160,6 +160,22 @@ def manifest(names):
         "Very faint slate-blue (#777F98) out-of-focus particles add depth. HDR accumulation, hue-keeping filmic tone map,",
         "bloom (the wide part lifts the navy instead of tinting it), amber halation, film grain, vignette.",
         "Check: `qa/brand-swatch-check.jpg` (images between flat #071B3E and #FFBF00 swatches, measured colours).",
+        "",
+        "Round 2 (2026-10-26): the card grids alternate bright and dark like the reference. One card per row is high-key",
+        "(light fills most of the frame, a warm-white core, like `cta`): Services 2, 3, 6 and Coverage endpoint, cloud,",
+        "applications, data, governance, in a checkerboard. The others stay dark but were lifted (service-4, identity,",
+        "ot-iot, network). Domain images keep the domain hero readable: the white title zone keeps at least 3:1 and the",
+        "paragraph zone at least 4.5:1 against the brightest 5% of pixels once the hero scrim is applied.",
+        "Home tiles 03 and 04 are full scenes now: `threat-phishing` (deepfakes, a stream and its copy) and",
+        "`threat-ransomware` (a torrent piling into a bright wall). No icons.",
+        "",
+        "Round 3 (2026-10-26): `domain-ai-agents` is a murmuration of light now (was a faint dust smear, mean 23): a folded",
+        "3D sheet of tiny agents arcing over the upper half and down the right third, dense warm-white folds where the",
+        "sheet turns edge-on, stragglers and two small rogue clusters flying against the flow (mean 44). The centred hero",
+        "title keeps navy behind it (white text at 10:1 or more) and the coverage card's top-left label band stays dark.",
+        "`service-1` gained depth (two soft, out-of-focus deltas behind the sharp one, lit haze; was 91% near-black) and",
+        "`service-5` more light in its stream and air. The photo family was regraded to sit nearer this set (see",
+        "`assets/img/photo/MANIFEST.md`).",
         "",
         "Every image ships in three widths: `NAME.webp` (main), `NAME-1600.webp`, `NAME-800.webp`, WebP q82.",
         "For square and 4:5 images the main file is 1600 wide, so `NAME.webp` and `NAME-1600.webp` are the same picture.",

@@ -433,9 +433,15 @@ function initReveals() {
     });
   });
 
+  // gauges fill one row after the other over their navy-11 track, then each gets a slow light pass (CSS .is-live)
   document.querySelectorAll("[data-bars]").forEach((wrap) => {
-    const bars = wrap.querySelectorAll(".ledger__fill");
-    gsap.fromTo(bars, { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power2.out", stagger: 0.08, delay: 0.3, scrollTrigger: { trigger: wrap, start: "top 85%", once: true } });
+    const bars = [...wrap.querySelectorAll(".ledger__fill")];
+    bars.forEach((b, i) => b.style.setProperty("--i", i));
+    gsap.fromTo(bars, { scaleX: 0 }, {
+      scaleX: 1, duration: 1.2, ease: "power2.inOut", stagger: 0.16, delay: 0.35,
+      scrollTrigger: { trigger: wrap, start: "top 80%", once: true },
+      onComplete: () => bars.forEach((b) => b.classList.add("is-live")),
+    });
   });
 }
 

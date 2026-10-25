@@ -117,7 +117,12 @@
   .page-404 .nf__title { max-width: var(--col-10); }
   .page-404 .nf__text { max-width: var(--col-8); }
 }
+@media (max-width: 767px) {
+  /* phones: same title size as the About cover (the h1 token), text inset like the reference card */
+  .page-404 .nf__inner { padding-inline: 2em; }
+  .page-404 .nf__media::after { background: linear-gradient(rgba(3, 11, 28, .12), rgba(3, 11, 28, .42)), var(--scrim-hero); }
+}
 @media (max-width: 479px) {
-  .page-404 .nf__title { font-size: var(--fs-6xl); max-width: none; }
+  .page-404 .nf__title { max-width: none; }
   .page-404 .nf__text { max-width: none; }
 }

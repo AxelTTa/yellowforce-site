@@ -67,7 +67,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Panel CTA button: Talk to us -> /contact/
 
 ### CTA band (Home, Services, Coverage, every domain page, About, Insights, every article. Not on Contact, Privacy, Security, 404)
-- H0: We'll Take It / From Here.
+- H0: We'll take it / from here. (sentence case, like every heading except the Home hero)
 - Text: Tell us what you run. We go in, connect everything and defend it 24/7, starting today.
 - Button 1 (light): Talk to us -> /contact/
 - Button 2 (dark): How we work -> /services/
@@ -97,7 +97,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - Label (with amber live dot): Under attack?
   - Line: Write to us now. We answer 24/7.
   - Small: info@yellow-force.com (+ copy icon)
-  - Thumb: real photo, photo/about-strip-1 (hand on a backlit keyboard)
+  - Thumb: real photo, photo/insight-2 (lit hand on a keyboard; brighter than about-strip-1 at thumb size)
   - aria-label: Under attack? Copy email address info@yellow-force.com. We answer 24/7.
   - Hidden on phones (<= 767) like the reference; the menu's "Under attack?" row covers phones.
 
@@ -121,13 +121,11 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Meta L: ( 10 / 10 domains )
 - Meta R: Watched 24/7
 - Row layout: domain (H3) / what it covers / bar (full, all live) with meta "Watched 24/7" and "AI + experts" / what we do (3 words)
-- Five rows, like the reference table: four domains, then one row for the other six (all ten stay named; the marquee above lists them too). On phones a row is just domain | bar.
+- Three rows, like the reference table (2026-10-26, round 3: was five): AI first, identity and email (where the deepfakes land), then one row for the other seven (the marquee above names all ten). On phones a row is just domain | bar. Keep each "covers" line on one line at 1440 (about 30 characters).
 - Rows (domain / covers / what we do / target):
   1. AI and agents / Swarms, agents, models / Stop swarms, hijacks / -> /coverage/ai-agents/
-  2. Identity and access / Accounts, sessions, permissions / Stop account takeovers / -> /coverage/identity/
-  3. Email / Phishing, invoice fraud, deepfakes / Stop impersonation / -> /coverage/email/
-  4. Cloud / Accounts, workloads, storage / Fix risky configs / -> /coverage/cloud/
-  5. Six more domains / Network, devices, apps, data, OT, governance / See all 10 domains / -> /coverage/
+  2. Identity and email / Takeovers, phishing, deepfakes / Stop impersonation / -> /coverage/identity/
+  3. Seven more domains / Network, cloud, data and more / See all 10 domains / -> /coverage/
 
 ### 05 What we do. (numbered slider)
 - H2: What we do.
@@ -145,7 +143,8 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 ### 06 Reel
 - Label: ( The reel )
 - H2: Defense at / machine speed.
-- Island pill: dot + "YellowForce reel" + "00:20" (set the time to the real loop length) + play/pause
+- Island pill: dot + "YellowForce reel" + live San Francisco time (SF 12:00:00) + play/pause
+- Picture (live canvas, no video): a filmic long exposure graded like the generated images. Deep navy edges (#030B1C) rising to at most #0B2350 behind the light, a diagonal river of soft amber trails, a warm amber bloom with a white core, grain. No blue-white light, no crisp lines, no comet heads.
 - Play/pause aria-label: Play reel / Pause reel
 
 ### 07 Why YellowForce. (dark quote card + 5 cards, in the client quotes slot)
@@ -155,7 +154,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Dark card (first slide):
   - Big figure: 24/7
   - Line next to it: AI agents on every signal. Experts on every call. Day and night, in every domain.
-  - Bottom: AI agents and experts, on watch now, next to a row of 4 overlapping round chips in place of faces (amber chip with a pixel glyph, paper chip with the mark, slate chip with a glyph, navy chip with the pulsing amber live dot)
+  - Bottom: AI and experts / on watch now (two lines), next to a row of 4 overlapping round chips in place of faces: three close crops of our amber light imagery (gen/about-2 burst, gen/threat-swarm vortex, gen/status trail) and a paper chip with the mark
 - Cards (text / label 1 / label 2). Alternate top and bottom like the original layout:
   1. You don't get software to manage. You get a team that runs your security from A to Z. / ( 01 ) / Fully managed
   2. Attackers use AI to move at machine speed. Our agents match it. Our experts make the call. / ( 02 ) / AI + experts
@@ -209,11 +208,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - H1: Your security. / Run by us.
 - Intro (optional line under H1): We don't sell you a tool. We run your cybersecurity for you, from A to Z, 24/7.
 
-### 02 Problem
-- H2: Too many tools. / Nobody in charge.
-- Text: Most companies buy a tool for every problem. A firewall here, an endpoint agent there, an email filter, a cloud scanner, an AI add-on. Each one sends alerts. Nobody owns all of them, and attackers walk through the gaps in between. We take the whole thing over. One team, every domain, every alert, 24/7.
-
-### 03 Practice cards (2 columns, square cards with frosted label, each -> its row anchor below)
+### 02 Practice cards (right under the H1, no hero image, like the work index; 2 columns, square cards with frosted label, each -> its row anchor below)
 - Card link text: See the practice
 - Cards (number / title / meta):
   - 001 / Deploy and connect / Day one
@@ -223,7 +218,11 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - 005 / Harden / Fixed and retested
   - 006 / Govern / Kept current
 
-### 04 Practice rows (anchors: #deploy #detect #respond #attack #harden #govern)
+### 03 Problem (below the cards, before the practice rows)
+- H2: Too many tools. / Nobody in charge.
+- Text: Most companies buy a tool for every problem. A firewall here, an endpoint agent there, an email filter, a cloud scanner, an AI add-on. Each one sends alerts. Nobody owns all of them, and attackers walk through the gaps in between. We take the whole thing over. One team, every domain, every alert, 24/7.
+
+### 04 Practice rows (anchors: #deploy #detect #respond #attack #harden #govern; two per row on desktop, one per row on phones)
 - ( 001 ) Deploy and connect. (#deploy)
   - Line: We go in, put our technology inside your environment and connect every tool you already run.
   - Includes:
@@ -271,7 +270,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - H2: How we work.
 - Meta L: ( Four steps )
 - Meta R: Instant, then continuous
-- Rows (step / title / text / meta L / meta R):
+- Rows (step / title / text / bar label / end label; the bar label is only "Step 0N", no "of 04"):
   - 01 / Deploy. / We go inside your company and place our technology in your environment. Nothing to rip out. / Step 01 / Day one
   - 02 / Connect. / We plug into every system you run: cloud, devices, identity, email, code, logs and chat. Your workflows stay. / Step 02 / Day one
   - 03 / Defend. / Our AI agents and experts watch, hunt and respond across every domain. Attacks get shut down as they start. / Step 03 / 24/7

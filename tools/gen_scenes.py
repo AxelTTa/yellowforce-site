@@ -246,114 +246,127 @@ def threat_swarm(cv):
 
 
 @scene("threat-ransomware", R11, "Threat card: ransomware",
-       "Streams of light slam into a hard, locked square and pile up along its edges.")
+       "A torrent of light streaks rushes in from the left and piles up against a bright wall: heads stack and burn warm white along its face, sparks splash back, the space behind it stays locked and dim.")
 def threat_ransomware(cv):
-    rng = np.random.default_rng(31)
-    c = np.array([960.0, 820.0])
-    hs = 250.0
-    x0, y0, x1, y1 = c[0] - hs, c[1] - hs, c[0] + hs, c[1] + hs
-    n = 700
-    ang = np.deg2rad(rng.normal(8, 9, n))
-    d = np.c_[np.cos(ang), np.sin(ang)]
-    aim = np.c_[np.full(n, x0), np.clip(rng.normal(c[1] - 30, 180, n), y0 - 130, y1 + 70)]
-    start = aim - d * rng.uniform(450, 1700, n)[:, None]
-    with np.errstate(divide="ignore", invalid="ignore"):
-        tx0 = (x0 - start[:, 0]) / d[:, 0]
-        tx1 = (x1 - start[:, 0]) / d[:, 0]
-        ty0 = (y0 - start[:, 1]) / d[:, 1]
-        ty1 = (y1 - start[:, 1]) / d[:, 1]
-    tmin = np.maximum(np.minimum(tx0, tx1), np.minimum(ty0, ty1))
-    tmax = np.minimum(np.maximum(tx0, tx1), np.maximum(ty0, ty1))
-    hit = (tmax >= tmin) & (tmin > 0)
-    tend = np.where(hit, tmin, rng.uniform(1700, 2600, n))
-    M = 100
+    """Round 2: a full long-exposure scene (no box). The wall is never drawn as a line: it is the
+    bright face where thousands of streak heads stop, stack and glow."""
+    rng = np.random.default_rng(33)
+    W = 1600.0
+
+    def wall_x(y):
+        # a slightly tilted wall (the top leans away), so the pile-up reads in depth
+        return 1130.0 + 0.10 * (y - 800.0)
+
+    # 1) the torrent: long streaks from the left, every focus plane, converging a little towards the wall
+    n = 2600
+    # bundles (lanes) of traffic, like the breach and swarm cards: density varies, it is not a curtain
+    lanes = np.r_[rng.normal(820, 300, 11)]
+    lw = rng.uniform(0.4, 1.6, len(lanes)) * np.exp(-((lanes - 820) / 520) ** 2)
+    li = rng.choice(len(lanes), n, p=lw / lw.sum())
+    y_end = np.clip(lanes[li] + rng.normal(0, 1, n) * rng.uniform(18, 90, len(lanes))[li], -120, 1720)
+    xw = wall_x(y_end)
+    stop = rng.exponential(55, n) * (1 + 0.6 * rng.random(n))          # heads stack in front of the wall
+    x_end = xw - 6 - stop
+    ln = rng.uniform(420, 1700, n)
+    # perspective: the torrent comes from a wide mouth near the lens (left) and narrows into the wall
+    y_start = y_end + rng.normal(0, 1, n) * 160 + (y_end - 820) * rng.uniform(0.9, 2.4, n)
+    x_start = x_end - ln
+    M = 120
     s = np.linspace(0, 1, M)
-    P = start[:, None, :] + d[:, None, :] * (tend[:, None] * s[None])[..., None]
-    nrm = np.c_[-d[:, 1], d[:, 0]]
-    P += nrm[:, None, :] * (rng.normal(0, 8, n)[:, None] * np.sin(np.pi * s)[None])[..., None]
-    lenpx = tend[:, None] * (1 - s[None])
-    prof = np.where(hit[:, None], (0.15 + 0.85 * s[None] ** 2) * (1 + 3.0 * np.exp(-lenpx / 45)),
-                    0.4 * (1 - smoothstep(0.6, 1.0, s[None])))
-    hue = np.where(hit[:, None], 0.85 - 0.65 * s[None] ** 3, 0.85)
-    inten = lognormal_int(rng, n, 0.07, 0.7)
-    trails(cv, P, inten, hue, np.where(rng.random(n) < 0.12, rng.uniform(3, 14, n), rng.uniform(0.5, 0.9, n)),
-           rng, env=(0.35, 0.02), prof=prof)
-    hp = start[hit] + d[hit] * tend[hit][:, None]
-    onleft = np.abs(hp[:, 0] - x0) < 1.0
-    for (a, b) in (((x0, y0), (x0, y1)), ((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)), ((x0, y1), (x1, y1))):
-        a, b = np.array(a), np.array(b)
-        m = 500
-        s = np.linspace(0, 1, m)
-        pts = a + (b - a) * s[:, None]
-        dd = np.linalg.norm(pts[:, None, :] - hp[None, :, :], axis=2)
-        dens = np.exp(-(dd / 24.0) ** 2).sum(1)
-        I = 0.12 + 0.09 * dens
-        for inset, mul, bl in ((0, 1.0, 0.5), (0, 0.35, 6), (14, 0.25, 0.5)):
-            q = pts.copy()
-            q += np.sign(c - q) * inset * (np.abs(q - c) > hs - 1)
-            cv.polylines(q[None], (I * mul)[None], ramp(0.2), bl)
-    cv.points(hp, lognormal_int(rng, len(hp), 0.5, 0.6), ramp(rng.uniform(0, 0.4, len(hp))), 0.8)
-    k = len(hp)
-    sg = rng.choice([-1.0, 1.0], k)
-    dirv = np.where(onleft[:, None], np.c_[0 * sg, sg], np.c_[sg, 0 * sg])
-    swarm_streaks(cv, hp + dirv * 16, dirv, rng.uniform(16, 80, k), lognormal_int(rng, k, 0.10, 0.6),
-                  rng.uniform(0.2, 0.6, k), 0.6)
-    motes(cv, 12, (0, 0, 1600, 1600), energy=(0.01, 0.04), blur=(20, 60), seed=5)
-    return dict(exposure=1.0, bloom=0.11, halation=0.06, vignette=0.42)
+    sag = rng.normal(0, 14, n)
+    P = np.stack([x_start[:, None] + (x_end - x_start)[:, None] * s[None],
+                  y_start[:, None] + (y_end - y_start)[:, None] * (s[None] ** 0.8)
+                  + sag[:, None] * np.sin(np.pi * s)[None]], -1)
+    depth = rng.random(n)
+    blur = np.where(depth < 0.30, 3 + 46 * (0.30 - depth) / 0.30, rng.uniform(0.5, 0.9, n))
+    near = np.exp(-stop / 70)                                           # heads right at the wall burn hottest
+    prof = (0.10 + 0.90 * s[None] ** 2.2) * (1 + 2.6 * near[:, None] * s[None] ** 8)
+    inten = lognormal_int(rng, n, 0.026, 0.75) * (1 + blur / 6) ** 0.5
+    hue = np.clip(0.9 - 0.75 * s[None] ** 3 * (0.4 + 0.6 * near[:, None]) + rng.normal(0, 0.05, (n, 1)), 0, 1)
+    trails(cv, P, inten, hue, blur, rng, env=(0.25, 0.0), speed=0.25, prof=prof)
+    # 2) the pile-up on the wall face: a dense, hot band of short vertical smears where the heads hit
+    k = 3200
+    yy = np.clip(rng.normal(820, 380, k), -100, 1700)
+    xx = wall_x(yy) - np.abs(rng.normal(0, 14, k))
+    dens = np.exp(-((yy - 820) / 420) ** 2)
+    swarm_streaks(cv, np.c_[xx, yy], np.c_[rng.normal(0, 0.12, k), rng.choice([-1.0, 1.0], k)],
+                  rng.uniform(10, 70, k), lognormal_int(rng, k, 0.06, 0.6) * (0.15 + 0.85 * dens),
+                  rng.uniform(0.0, 0.35, k), np.where(rng.random(k) < 0.3, rng.uniform(3, 12, k), 0.6))
+    # the face itself glows: a soft vertical sheet of light, hottest in the middle
+    yv = np.linspace(-120, 1720, 600)
+    face = np.c_[wall_x(yv), yv]
+    fall = np.exp(-((yv - 820) / 380) ** 2)
+    for I0, bl, h in ((0.20, 1.0, 0.0), (0.18, 9, 0.15), (0.16, 34, 0.35), (0.06, 90, 0.5)):
+        cv.polylines(face[None], (I0 * fall ** 1.3)[None], ramp(h), bl)
+    glow(cv, (wall_x(820.0) - 120, 820.0), 6000.0, 80, 0.05, n=8000, seed=7)
+    # 3) sparks splashing back off the wall
+    k = 1100
+    yy = np.clip(rng.normal(820, 360, k), 0, 1600)
+    p0 = np.c_[wall_x(yy) - 4, yy]
+    dirv = np.c_[-np.abs(rng.normal(0.8, 0.35, k)), rng.normal(0, 0.9, k)]
+    dist = rng.exponential(120, k)
+    swarm_streaks(cv, p0 + dirv / np.linalg.norm(dirv, axis=1, keepdims=True) * dist[:, None], dirv,
+                  rng.uniform(10, 80, k), lognormal_int(rng, k, 0.08, 0.6) * np.exp(-((yy - 820) / 520) ** 2),
+                  rng.uniform(0.1, 0.7, k), np.where(rng.random(k) < 0.35, rng.uniform(3, 16, k), 0.6))
+    # 4) behind the wall: locked and dim, a faint warm leak only
+    k = 160
+    q = np.c_[rng.uniform(1250, 1650, k), rng.uniform(0, 1600, k)]
+    cv.points(q, lognormal_int(rng, k, 0.25, 0.6), ramp(rng.uniform(0.5, 0.95, k)), rng.uniform(12, 50, k))
+    # lit air in front of the wall
+    glow(cv, (930.0, 820.0), 14000.0, 300, 0.3, n=9000, seed=3)
+    glow(cv, (700.0, 820.0), 12000.0, 520, 0.55, n=8000, seed=4)
+    motes(cv, 18, (0, 0, 1100, 1600), energy=(0.02, 0.08), blur=(20, 80), seed=5)
+    return dict(exposure=0.82, bloom=0.12, halation=0.08, vignette=0.45, atmos=0.02)
 
 
-@scene("threat-phishing", R11, "Threat card: phishing and impersonation",
-       "One bright lure line hooks down through the frame; many faint followers drift towards its tip.")
+@scene("threat-phishing", R11, "Threat card: deepfakes and impersonation",
+       "A wide stream of light sweeps up through the frame and so does its copy, a twin stream offset beside it with the same twists: a double exposure, the real one warm white, the fake amber, a fainter third echo behind.")
 def threat_phishing(cv):
-    rng = np.random.default_rng(41)
-    top = bezier(np.array([[1120, -90], [1090, 250], [1010, 560], [1030, 860]]), np.linspace(0, 1, 320))
-    R = 118.0
-    th = np.linspace(0, np.deg2rad(212), 220)[1:]
-    b = np.c_[1030 - R + R * np.cos(th), 860 + R * np.sin(th)]
-    hook = np.vstack([top, b])
-    bait = hook[-1]
-    M = len(hook)
-    s = np.linspace(0, 1, M)
-    nr = normals(hook)
-    prof = envelope(s, 0.001, 0.03) * (0.55 + 0.45 * s)
-    k = 16
-    offs = rng.normal(0, 3.6, k)
-    for o in offs:
-        cv.polylines((hook + nr * o)[None], (lognormal_int(rng, 1, 0.12, 0.4)[0] * prof
-                                             * (1 + 0.25 * wobble(rng, 1, s, terms=2)[0]))[None], ramp(0.06), 0.5)
-    cv.polylines(hook[None], (0.5 * prof)[None], ramp(0.0), 0.5)
-    cv.polylines(hook[None], (0.5 * prof)[None], ramp(0.35), 6)
-    cv.polylines(hook[None], (0.3 * prof)[None], ramp(0.6), 18)
-    cv.points(bait[None], 8.0, ramp(0.0), 0.8)
-    glow(cv, bait, 10.0, 11, 0.5)
-    fld = SinField(rng, n=8, wavelength=600)
+    """Round 2: no hook. The deepfake is a copy: the same ribbon drawn twice with the same seed,
+    offset across the stream, plus a soft third echo far out of focus."""
+    rng = np.random.default_rng(43)
+    ctrl = np.array([[-260.0, 1560.0], [420.0, 1380.0], [760.0, 560.0], [1880.0, 120.0]])
 
-    def field(px, py):
-        dx, dy = bait[0] - px, bait[1] - py
-        dn = np.hypot(dx, dy) + 1e-6
-        vx, vy = fld.curl(px, py)
-        return dx / dn + 0.9 * vx, dy / dn + 0.9 * vy
+    def fan(t):
+        return 0.5 + 0.3 * (1 - t) ** 2 + 0.85 * t ** 2.2
 
-    n = 460
-    ang = rng.uniform(np.deg2rad(95), np.deg2rad(265), n)
-    rad = rng.uniform(450, 1500, n)
-    st = bait + np.c_[np.cos(ang), np.sin(ang)] * rad[:, None]
-    steps = 340
-    paths = flow_trails(cv, field, st, steps, h=3.5)
-    dist = np.linalg.norm(paths - bait, axis=2)
-    stop = rng.uniform(80, 460, n)
-    alive = np.cumprod(dist > stop[:, None], axis=1).astype(float)
-    first = alive.sum(1).astype(int)
-    lens = rng.integers(60, 280, n)
-    idx = np.arange(steps + 1)[None]
-    on = (idx >= (first - lens)[:, None]) & (idx < first[:, None])
-    tl = np.clip((idx - (first - lens)[:, None]) / lens[:, None], 0, 1)
-    prof = on * (0.12 + 0.88 * tl ** 1.8)
-    inten = lognormal_int(rng, n, 0.06, 0.75)
-    blur = np.where(rng.random(n) < 0.2, rng.uniform(3, 20, n), rng.uniform(0.5, 0.9, n))
-    trails(cv, paths, inten, rng.uniform(0.45, 0.95, n), blur, rng, env=None, prof=prof)
-    motes(cv, 14, (0, 0, 1600, 1600), energy=(0.01, 0.05), blur=(20, 70), seed=6)
-    return dict(exposure=1.0, bloom=0.11, halation=0.06, vignette=0.42)
+    # the perpendicular of the stream's mid direction: the copy is shifted across it
+    d = ctrl[3] - ctrl[0]
+    d /= np.linalg.norm(d)
+    nrm = np.array([-d[1], d[0]])
+    if nrm[1] < 0:
+        nrm = -nrm                                                      # copy sits below-right
+    shift = nrm * 300 + d * 40
+    common = dict(n=420, width=105, twist=1.1, twist_phase=0.6, wob=0.18, isig=0.8, tjit=0.16,
+                  env=(0.2, 0.12), spread_profile=fan, speed_mod=0.4)
+    # the real stream: warm white core
+    ribbon(cv, ctrl, inten=0.09, hue=(0.0, 0.45), blur=lambda u, r: 0.5 + 6.0 * np.abs(u) ** 2.4, seed=61, **common)
+    # the copy: the same trails (same seed), shifted, a little softer and amber
+    ribbon(cv, ctrl + shift, inten=0.07, hue=(0.35, 0.85), blur=lambda u, r: 0.8 + 9.0 * np.abs(u) ** 2.0,
+           seed=61, **common)
+    # a third echo, far out of focus, behind both
+    ribbon(cv, ctrl + 2.1 * shift, n=60, width=170, twist=1.1, twist_phase=0.6, wob=0.2, inten=0.07, isig=0.5,
+           hue=(0.4, 0.9), blur=(28, 70), tjit=0.2, env=(0.2, 0.15), spread_profile=fan, seed=62)
+    ribbon(cv, ctrl - 0.9 * shift, n=50, width=160, twist=0.8, wob=0.25, inten=0.06, isig=0.5,
+           hue=(0.3, 0.9), blur=(36, 90), tjit=0.25, env=(0.25, 0.2), spread_profile=fan, seed=63)
+    # sparks shed by both streams
+    for off, sd in ((np.zeros(2), 64), (shift, 65)):
+        r2 = np.random.default_rng(sd)
+        k = 520
+        t = r2.uniform(0.1, 0.95, k)
+        sp = bezier(ctrl + off, t)
+        tg = bezier_deriv(ctrl + off, t)
+        tg /= np.linalg.norm(tg, axis=1, keepdims=True)
+        nr = np.c_[-tg[:, 1], tg[:, 0]]
+        swarm_streaks(cv, sp + nr * r2.normal(0, 1, (k, 1)) * 230 * fan(t)[:, None], tg + r2.normal(0, 0.25, (k, 2)),
+                      r2.uniform(14, 90, k), lognormal_int(r2, k, 0.05, 0.6), r2.uniform(0.15, 0.85, k),
+                      np.where(r2.random(k) < 0.35, r2.uniform(4, 22, k), 0.6))
+    # lit air between and around the twins
+    mid = bezier(ctrl + 0.5 * shift, np.array([0.55]))[0]
+    glow(cv, mid, 11000.0, 420, 0.4, n=9000, seed=3)
+    glow(cv, mid + np.array([260.0, -180.0]), 7000.0, 300, 0.2, n=7000, seed=4)
+    motes(cv, 22, (0, 0, 1600, 1600), energy=(0.02, 0.08), blur=(20, 90), hue=(0.4, 0.95), seed=6)
+    return dict(exposure=0.8, bloom=0.12, halation=0.08, vignette=0.45, atmos=0.04)
 
 
 @scene("threat-breach", R11, "Threat card: breach and data theft",
@@ -397,7 +410,7 @@ def threat_breach(cv):
         cv.polylines(np.c_[np.full(600, g[0] + 1), y][None], I[None], ramp(0.3), 0.5)
     cv.points(np.array([[g[0] + 4, g[1]]]), 5.0, ramp(0.05), 1.5)
     motes(cv, 14, (900, 0, 1600, 1600), energy=(0.01, 0.05), blur=(20, 70), seed=7)
-    return dict(exposure=1.0, bloom=0.11, halation=0.06, vignette=0.42)
+    return dict(exposure=1.12, bloom=0.12, halation=0.07, vignette=0.42)
 
 
 # ---------------------------------------------------------------------------
@@ -447,7 +460,7 @@ def domain_network(cv):
         nn = normals(sp)
         # the fibre: a few faint parallel strands
         for off in (-1.5, 0.0, 1.6):
-            cv.polylines((sp + nn * off)[None], np.full((1, M), 0.11 * dim), ramp(0.5), bl)
+            cv.polylines((sp + nn * off)[None], np.full((1, M), 0.15 * dim), ramp(0.5), bl)
         # packets: comets travelling along the link
         for _ in range(rng.integers(2, 5)):
             a0 = rng.uniform(0.05, 0.75)
@@ -475,13 +488,14 @@ def domain_network(cv):
     tq = np.linspace(0, 1, 60)
     segs = q[:, None, :] + (q[nb] - q)[:, None, :] * tq[None, :, None]
     cv.polylines(segs, np.full((k, 60), 0.05), ramp(0.5), bq * 0.8)
-    glow(cv, (1650.0, 560.0), 18000.0, 460, 0.5, n=8000, seed=9)
+    glow(cv, (1650.0, 560.0), 22000.0, 460, 0.5, n=8000, seed=9)
+    glow(cv, (1000.0, 420.0), 9000.0, 360, 0.55, n=7000, seed=10)
     motes(cv, 20, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 70), seed=8)
-    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.42)
+    return dict(exposure=1.2, bloom=0.13, halation=0.08, vignette=0.42)
 
 
-@scene("domain-endpoint", R169, "Coverage: Endpoint and device security",
-       "A night floor of device lights in perspective, shallow focus; one guarded device burns hot in the middle and sends a soft column of light into the haze.")
+@scene("domain-endpoint", R169, "Coverage: Endpoint and device security (high-key card)",
+       "A dense night floor of device lights in perspective, shallow focus, under a glowing horizon; one guarded device burns hot in the middle.")
 def domain_endpoint(cv):
     rng = np.random.default_rng(72)
     f, cx, cy, h = 1250.0, 1250.0, 330.0, 1.5
@@ -490,14 +504,15 @@ def domain_endpoint(cv):
     Z = Z.ravel() * np.exp(rng.normal(0, 0.03, Z.size))
     x = cx + f * X / Z
     y = cy + f * h / Z
-    keep = (x > -200) & (x < 2600) & (y < 1500) & (rng.random(X.size) < 0.75 * np.minimum(1, (7 / Z) ** 0.7))
+    # round 2: high-key card: a denser, brighter floor of device light under a glowing horizon
+    keep = (x > -200) & (x < 2600) & (y < 1500) & (rng.random(X.size) < 0.95 * np.minimum(1, (7 / Z) ** 0.7))
     X, Z, x, y = X[keep], Z[keep], x[keep], y[keep]
     Zf = 4.2
     blur = 0.5 + 105 * np.abs(1 / Z - 1 / Zf) ** 0.9
     # headline corner on the domain page stays calmer
     mask = 1 - 0.6 * (1 - smoothstep(450, 1100, x)) * smoothstep(780, 1150, y)
-    E = lognormal_int(rng, len(x), 0.65, 0.7) * mask * (1 + 0.16 * blur ** 2) * np.minimum(1, (Zf / Z) ** 0.8)
-    hue = rng.uniform(0.3, 1.0, len(x))
+    E = lognormal_int(rng, len(x), 0.95, 0.7) * mask * (1 + 0.16 * blur ** 2) * np.minimum(1, (Zf / Z) ** 0.8)
+    hue = np.clip(rng.uniform(0.15, 1.0, len(x)) - 0.25 * np.exp(-Z / 30), 0, 1)
     ln = 0.16 * f / Z
     P = np.stack([np.c_[x - ln / 2, y], np.c_[x + ln / 2, y]], 1)
     cv.polylines(P, (E / ln * 0.5)[:, None] * np.ones((1, 2)), ramp(hue), blur)
@@ -511,14 +526,16 @@ def domain_endpoint(cv):
     tcol = np.linspace(0, 1, 300)
     for I0, bl, hh in ((0.10, 3.0, 0.1), (0.08, 18.0, 0.3), (0.07, 60.0, 0.5)):
         cv.polylines(col[None], (I0 * (1 - tcol) ** 1.5)[None], ramp(hh), bl)
-    glow(cv, (gx, gy - 120), 16000.0, 360, 0.45, n=8000, seed=2)
-    glow(cv, (cx, cy + 40), 9000.0, 520, 0.6, n=8000, seed=4)
-    return dict(exposure=1.2, bloom=0.12, halation=0.08, vignette=0.45)
+    glow(cv, (gx, gy - 120), 22000.0, 360, 0.35, n=8000, seed=2)
+    # the horizon glows: the far floor of devices lights the haze above it, edge to edge
+    for k, hx in enumerate(np.linspace(150.0, 2250.0, 8)):
+        glow(cv, (hx, cy - 10), 3600.0 * (0.8 + 0.4 * np.sin(k * 2.3) ** 2), 170, 0.4, n=6000, seed=10 + k)
+    glow(cv, (cx, cy + 40), 14000.0, 520, 0.5, n=8000, seed=4)
+    return dict(exposure=1.25, bloom=0.14, halation=0.09, vignette=0.42, atmos=0.02)
 
-# @@end domain-endpoint
 
-@scene("domain-cloud", R169, "Coverage: Cloud security",
-       "Wisps of soft white-gold light drift across the frame like a cloud bank lit from within.")
+@scene("domain-cloud", R169, "Coverage: Cloud security (high-key card)",
+       "Wisps of white-gold light drift across the frame like a cloud bank, with a bright river of light running through it that burns warm white at its core; a softer bank lower down.")
 def domain_cloud(cv):
     rng = np.random.default_rng(81)
     fld = SinField(rng, n=8, wavelength=1000)
@@ -528,15 +545,18 @@ def domain_cloud(cv):
         vx, vy = fld.curl(x, y)
         return 1.0 + 0.3 * vx, 0.8 * vy
 
-    n = 1100
-    y0 = rng.normal(470, 260, n)
-    st = np.c_[rng.uniform(-500, 700, n), y0]
-    P = flow_trails(cv, field, st, 300, h=8.0)
+    # round 2: high-key card (bright one of its row). The round 1 wisps, now across the whole width,
+    # with a broad river of soft light running through the bank: its core burns warm white, so the
+    # cloud reads as lit from within. The lower middle (the domain hero's text) stays mid-dark.
+    n = 1500
+    y0 = rng.normal(480, 270, n)
+    st = np.c_[rng.uniform(-600, 900, n), y0]
+    P = flow_trails(cv, field, st, 320, h=8.0)
     x, y = P[..., 0], P[..., 1]
-    yc = 460 + 110 * np.sin(x / 600 + 0.5)
-    thick = 260 + 120 * shape.scalar(x * 0.7, 0 * x)
+    yc = 470 + 110 * np.sin(x / 600 + 0.5)
+    thick = 280 + 120 * shape.scalar(x * 0.7, 0 * x)
     dens = smoothstep(0.1, 0.7, 1 - np.abs(y - yc) / thick + 0.8 * shape.scalar(x, y)) ** 1.5
-    dens *= smoothstep(450, 1300, x)
+    dens *= smoothstep(-200, 500, x)
     blur = np.exp(rng.uniform(np.log(0.5), np.log(40), n))
     inten = lognormal_int(rng, n, 0.011, 0.6) * (1 + blur / 4) ** 0.6
     crisp = rng.random(n) < 0.14
@@ -544,23 +564,46 @@ def domain_cloud(cv):
     blur[crisp] = 0.6
     hue = np.where(crisp, rng.uniform(0.0, 0.45, n), rng.uniform(0.05, 0.6, n))
     trails(cv, P, inten, hue, blur, rng, env=(0.05, 0.05), prof=dens, speed=0.6)
-    motes(cv, 26, (1100, 100, 2400, 900), energy=(0.01, 0.05), blur=(15, 60), seed=10)
-    return dict(exposure=1.35, bloom=0.10, halation=0.05, vignette=0.42)
+    # the river of light inside the bank (follows the bank's centre line)
+    xs = np.linspace(-300, 2700, 4)
+    ctrl = np.c_[xs, 470 + 110 * np.sin(xs / 600 + 0.5) - np.array([0, 60, -40, 0])]
+    W2 = lambda t: 0.7 + 0.6 * np.sin(np.pi * t) ** 2
+    ribbon(cv, ctrl, n=380, width=120, twist=0.6, wob=0.3, inten=0.10, isig=0.8, hue=(0.0, 0.45),
+           blur=lambda u, r: 0.5 + 18.0 * np.abs(u) ** 2, tjit=0.3, env=(0.2, 0.2), spread_profile=W2, seed=12, speed_mod=0.5)
+    ribbon(cv, ctrl + np.array([[0, 40], [0, 20], [0, -20], [0, 30]]), n=120, width=260, twist=0.3, wob=0.4,
+           inten=0.06, isig=0.6, hue=(0.2, 0.75), blur=(20, 80), tjit=0.3, env=(0.25, 0.25), spread_profile=W2, seed=13)
+    # a lower, fainter bank under the hero text: light reaches the bottom of the card too
+    r = np.random.default_rng(84)
+    n = 700
+    st = np.c_[r.uniform(-600, 900, n), r.normal(1170, 110, n)]
+    P = flow_trails(cv, field, st, 320, h=8.0)
+    x, y = P[..., 0], P[..., 1]
+    yc = 1170 + 60 * np.sin(x / 500 + 2.0)
+    dens = smoothstep(0.1, 0.7, 1 - np.abs(y - yc) / (150 + 60 * shape.scalar(x * 0.7, 0 * x + 400))
+                      + 0.8 * shape.scalar(x, y + 700)) ** 1.5 * smoothstep(-200, 500, x)
+    blur = np.exp(r.uniform(np.log(4), np.log(70), n))
+    trails(cv, P, lognormal_int(r, n, 0.0042, 0.6) * (1 + blur / 4) ** 0.6, r.uniform(0.3, 0.85, n), blur, r,
+           env=(0.05, 0.05), prof=dens, speed=0.6)
+    glow(cv, (1350.0, 470.0), 16000.0, 300, 0.35, n=9000, seed=9)
+    glow(cv, (1500.0, 1170.0), 3500.0, 260, 0.5, n=7000, seed=11)
+    motes(cv, 26, (0, 0, 2400, 1350), energy=(0.01, 0.06), blur=(15, 70), seed=10)
+    return dict(exposure=1.25, bloom=0.14, halation=0.08, vignette=0.42)
 
 
 @scene("domain-identity", R169, "Coverage: Identity and access",
-       "Fingerprint-like ridges drawn in light on a tilted plane, sharp in the middle and falling out of focus.")
+       "Fingerprint-like ridges drawn in light on a tilted plane, centred in the frame, sharp in the middle and falling out of focus, in lit haze.")
 def domain_identity(cv):
     rng = np.random.default_rng(91)
-    c = np.array([1700.0, 640.0])
+    # round 2: moved into the middle of the card (the tile crop showed only half of it), bigger, brighter
+    c = np.array([1420.0, 700.0])
     rot = np.deg2rad(22)
     th = np.linspace(-np.pi, np.pi, 1100)
     ph = rng.uniform(0, 2 * np.pi, 4)
     mod = 1 + 0.11 * np.sin(2 * th + ph[0]) + 0.05 * np.sin(3 * th + ph[1]) + 0.025 * np.sin(5 * th + ph[2])
     paths, Is, hues = [], [], []
-    K = 38
+    K = 46
     for k in range(K):
-        Lk = 28 + k * 20.5
+        Lk = 28 + k * 21.5
         per = 0.018 * pwobble(rng, 1, (th + np.pi) / (2 * np.pi), terms=2, fmin=2, fmax=5)[0]
         r = Lk / mod * (1 + per)
         cc = c + k * np.array([2.5, -1.8])
@@ -572,17 +615,20 @@ def domain_identity(cv):
             dd = np.angle(np.exp(1j * (th - a)))
             g *= smoothstep(w * 0.5, w, np.abs(dd))
         paths.append(p)
-        Is.append(g * (0.6 - 0.011 * k) * (0.7 + 0.3 * np.sin(th * 3 + k)))
+        Is.append(g * (0.66 - 0.010 * k) * (0.7 + 0.3 * np.sin(th * 3 + k)))
         hues.append(np.full_like(th, 0.08 + 0.55 * k / K))
     P = np.array(paths)
     I = np.array(Is)
     nrm = np.array([np.sin(rot + 0.5), -np.cos(rot + 0.5)])
     dist = (P - c) @ nrm
-    B = 0.5 + np.maximum(0, np.abs(dist) - 140) * 0.05
+    B = 0.5 + np.maximum(0, np.abs(dist) - 180) * 0.045
     trails(cv, P, np.ones(K), np.array(hues), B, rng, env=None, speed=0.15, prof=I, periodic=True)
     cv.points(c[None], 3.0, ramp(0.0), 4)
-    motes(cv, 16, (1000, 0, 2400, 1350), energy=(0.01, 0.04), blur=(20, 60), seed=11)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.42)
+    # a scanning light lifts the haze around the print (midtones, depth)
+    glow(cv, c, 12000.0, 420, 0.5, n=8000, seed=12)
+    glow(cv, c + np.array([380.0, -260.0]), 9000.0, 300, 0.5, n=7000, seed=13)
+    motes(cv, 20, (300, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=11)
+    return dict(exposure=1.15, bloom=0.13, halation=0.08, vignette=0.42)
 
 
 @scene("domain-email", R169, "Coverage: Email security",
@@ -631,12 +677,14 @@ def domain_email(cv):
     Ig = (0.12 + 0.7 * dens) * envelope(np.linspace(0, 1, 1000), 0.2, 0.2)
     for off, mul, bl, hh in ((0, 1.0, 0.5, 0.04), (2.0, 0.35, 0.5, 0.1), (0, 0.45, 9, 0.5)):
         cv.polylines(np.c_[np.full(1000, gate_x + off), ys][None], (Ig * mul)[None], ramp(hh), bl)
+    # round 1: the gate lights the haze around it (midtones, less empty navy)
+    glow(cv, (gate_x, float(vp[1])), 18000.0, 380, 0.45, n=8000, seed=9)
     motes(cv, 18, (1000, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=23)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.42)
+    return dict(exposure=1.15, bloom=0.12, halation=0.08, vignette=0.42)
 
 
-@scene("domain-applications", R169, "Coverage: Application and API security",
-       "Lines of code written in light on a tilted page, sharp near the focus and melting into bokeh; one line flares where the flaw is.")
+@scene("domain-applications", R169, "Coverage: Application and API security (high-key card)",
+       "Lines of code written in light on a tilted, backlit page, sharp near the focus and melting into bokeh; the lines around the flaw burn hotter and one line flares where the flaw is.")
 def domain_applications(cv):
     rng = np.random.default_rng(112)
     W, Hh = 1900.0, 1500.0
@@ -658,8 +706,9 @@ def domain_applications(cv):
                 break
             segs.append([[u, v], [u + ln, v]])
             boost = 7.0 if r == hot else (1.6 if abs(r - hot) == 1 else 1.0)
-            Is.append(lognormal_int(rng, 1, 0.24, 0.45)[0] * boost)
-            hs.append(0.03 if r == hot else rng.uniform(0.3, 0.95))
+            # round 2: high-key card: the whole page is lit, brighter towards the flawed line
+            Is.append(lognormal_int(rng, 1, 0.46, 0.45)[0] * boost * (0.7 + 1.6 * np.exp(-abs(r - hot) / 6)))
+            hs.append(0.03 if r == hot else rng.uniform(0.4, 0.95) - 0.3 * np.exp(-abs(r - hot) / 5))
             u += ln + rng.uniform(14, 26)
     segs = np.array(segs)
     M = 18
@@ -668,7 +717,7 @@ def domain_applications(cv):
     P, wz = apply_h(Hm, Pp)
     ufocus, vfocus = 620.0, 30 + hot * 31.5
     dist = np.sqrt(np.maximum(0, np.abs(Pp[..., 0] - ufocus) - 140) ** 2 + (0.6 * (Pp[..., 1] - vfocus)) ** 2)
-    B = 0.5 + dist * 0.05
+    B = 0.5 + dist * 0.03
     prof = envelope(s, 0.06, 0.06)[None] * np.ones((len(segs), 1))
     I = np.array(Is) * (1 + B[:, 0] / 8) ** 0.4
     trails(cv, P, I, np.array(hs)[:, None] * np.ones((1, M)), B, rng, env=None, speed=0.1, prof=prof)
@@ -679,94 +728,161 @@ def domain_applications(cv):
     cv.polylines(Q[None], (0.35 * envelope(np.linspace(0, 1, 200), 0.3, 0.5))[None], ramp(0.4), 14)
     cv.polylines(Q[None], (0.22 * envelope(np.linspace(0, 1, 200), 0.3, 0.5))[None], ramp(0.6), 44)
     fp, _ = apply_h(Hm, np.array([[ufocus + 200, vfocus]]))
-    glow(cv, fp[0], 18000.0, 400, 0.45, n=8000, seed=2)
+    glow(cv, fp[0], 26000.0, 420, 0.35, n=8000, seed=2)
+    # light from behind the page washes over it (lit air in front of a bright screen)
+    for k, (uu, vv, e) in enumerate(((900.0, 300.0, 30000.0), (1500.0, 1100.0, 26000.0), (500.0, 1200.0, 18000.0),
+                                     (1300.0, 700.0, 30000.0))):
+        q, _ = apply_h(Hm, np.array([[uu, vv]]))
+        glow(cv, q[0], e, 420, 0.55, n=7000, seed=5 + k)
     motes(cv, 18, (900, 0, 2400, 1350), energy=(0.02, 0.06), blur=(20, 70), seed=12)
-    return dict(exposure=1.15, bloom=0.12, halation=0.08, vignette=0.45)
+    return dict(exposure=1.3, bloom=0.15, halation=0.09, vignette=0.42, atmos=0.04)
 
-# @@end domain-applications
 
-@scene("domain-data", R169, "Coverage: Data protection",
-       "Stacked rings of orbiting light, like a database seen in a long exposure, focus on the middle ring.")
+@scene("domain-data", R169, "Coverage: Data protection (high-key card)",
+       "A bright stream of light crosses the frame above a dark, glossy floor that holds its copy: a softer reflection broken into ripples. Every byte has a backup.")
 def domain_data(cv):
     rng = np.random.default_rng(121)
-    cx = 1700.0
-    rings = [(290.0, 540.0), (480.0, 560.0), (675.0, 580.0), (870.0, 600.0), (1065.0, 620.0)]
-    tilt = 0.21
-    for ri, (cy, rx) in enumerate(rings):
-        dfoc = abs(ri - 2)
-        k = 46
-        r = rx * (1 + rng.normal(0, 0.014, k))
-        th0 = rng.uniform(0, 2 * np.pi, k)
-        span = rng.uniform(0.3, 1.9, k)
-        M = 200
-        s = np.linspace(0, 1, M)
-        th = th0[:, None] + span[:, None] * s[None]
-        x = cx + r[:, None] * np.cos(th)
-        y = cy + r[:, None] * np.sin(th) * tilt + rng.normal(0, 2.5, (k, 1))
-        z = np.sin(th)
-        B = 0.5 + dfoc * 5 + np.maximum(0, z) * (6 + dfoc * 6)
-        prof = (0.08 + 0.92 * s ** 2)[None] * (0.6 + 0.4 * (1 - z) / 2)
-        bright = (1.7, 1.2, 1.0, 1.2, 1.7)[ri] * (1.5 if ri == 2 else 1.0)
-        trails(cv, np.stack([x, y], -1), lognormal_int(rng, k, 0.13 * bright, 0.7),
-               rng.uniform(0.0 if ri == 2 else 0.25, 0.9, k)[:, None] * np.ones((1, M)), B, rng,
-               env=(0.05, 0.02), prof=prof)
-        heads = np.stack([x[:, -1], y[:, -1]], -1)
-        cv.points(heads, lognormal_int(rng, k, 0.25, 0.6) * bright, ramp(0.1), B[:, -1])
-    for side in (-1, 1):
-        y = np.linspace(250, 1110, 300)
-        x = cx + side * np.interp(y, [290, 1065], [540, 620])
-        cv.polylines(np.c_[x, y][None], (0.05 * envelope(np.linspace(0, 1, 300), 0.3, 0.3))[None], ramp(0.6), 3)
-    glow(cv, (cx, 680.0), 20000.0, 440, 0.5, n=8000, seed=9)
-    motes(cv, 20, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=13)
-    return dict(exposure=1.3, bloom=0.12, halation=0.08, vignette=0.42)
+    # round 2: high-key card. Backups as a photograph: a bright stream of light crosses the frame above
+    # a dark, glossy floor, and the floor holds its copy, a softer reflection broken into ripples.
+    # The horizon between the two stays darker (the domain hero's title sits there).
+    hz = 650.0
+    ctrl = np.array([[-300.0, 560.0], [600.0, 260.0], [1500.0, 660.0], [2700.0, 360.0]])
+    W2 = lambda t: 0.65 + 0.7 * np.sin(np.pi * t) ** 1.5
+    sp = ribbon(cv, ctrl, n=480, width=95, twist=1.4, twist_phase=0.3, wob=0.2, inten=0.085, isig=0.8,
+                hue=(0.0, 0.5), blur=lambda u, r: 0.5 + 10.0 * np.abs(u) ** 2.2, tjit=0.2, env=(0.15, 0.15),
+                spread_profile=W2, seed=31, speed_mod=0.45)
+    ribbon(cv, ctrl + np.array([[0, -40], [0, -60], [0, -30], [0, -50]]), n=120, width=220, twist=0.4, wob=0.35,
+           inten=0.05, isig=0.6, hue=(0.25, 0.8), blur=(18, 60), tjit=0.3, env=(0.2, 0.2), spread_profile=W2, seed=32)
+    # the reflection: the same stream mirrored in the floor, softer, broken into horizontal ripples
+    spine = sp["spine"]
+    k = 9000
+    j = rng.integers(0, len(spine), k)
+    tj = j / (len(spine) - 1)
+    nrm = normals(spine)[j]
+    off = rng.normal(0, 1, (k, 1)) * 95 * W2(tj)[:, None] * 0.8
+    src = spine[j] + nrm * off
+    ry = 2 * hz - src[:, 1] + rng.normal(0, 18, k) + (2 * hz - src[:, 1] - hz) * rng.uniform(0.0, 0.5, k)
+    rx = src[:, 0] + rng.normal(0, 10, k)
+    fade = np.exp(-(ry - hz) / 520) * envelope(np.clip(tj, 0, 1), 0.15, 0.15)
+    swarm_streaks(cv, np.c_[rx, ry], np.c_[np.ones(k), rng.normal(0, 0.02, k)], rng.uniform(20, 160, k),
+                  lognormal_int(rng, k, 0.045, 0.6) * fade, np.clip(rng.uniform(0.15, 0.85, k), 0, 1),
+                  np.where(rng.random(k) < 0.5, rng.uniform(4, 30, k), rng.uniform(0.6, 2.0, k)))
+    # long soft vertical smears under the brightest part (light on a wet floor)
+    k = 160
+    xs = rng.uniform(300, 2300, k)
+    tt = np.clip((xs + 300) / 3000, 0, 1)
+    top = hz + rng.uniform(10, 60, k)
+    P = np.stack([np.c_[xs, top], np.c_[xs + rng.normal(0, 6, k), top + rng.uniform(150, 520, k)]], 1)
+    cv.polylines(P, (lognormal_int(rng, k, 0.035, 0.5) * np.exp(-((tt - 0.5) / 0.3) ** 2))[:, None] * np.array([[1.0, 0.0]]),
+                 ramp(rng.uniform(0.3, 0.8, k)), rng.uniform(10, 40, k))
+    # the floor edge and the lit air
+    xs = np.linspace(-100, 2500, 400)
+    cv.polylines(np.c_[xs, np.full(400, hz)][None], (0.03 * np.exp(-((xs - 1300) / 900) ** 2))[None], ramp(0.5), 6)
+    glow(cv, (1300.0, 470.0), 18000.0, 360, 0.35, n=9000, seed=9)
+    glow(cv, (1300.0, 860.0), 12000.0, 420, 0.5, n=8000, seed=10)
+    motes(cv, 22, (0, 0, 2400, 1350), energy=(0.01, 0.06), blur=(20, 70), seed=13)
+    return dict(exposure=1.2, bloom=0.14, halation=0.09, vignette=0.42, atmos=0.03)
 
 
 @scene("domain-ai-agents", R169, "Coverage: AI and agent security",
-       "A murmuration of tiny agent lights flowing as one, with a few rogue agents cutting across.")
+       "A murmuration of light: tens of thousands of tiny agents fly as one folded sheet arcing over the upper half of the frame and down its right side, burning warm white where the sheet turns edge-on; two small rogue clusters fly against the flow. The title area and the top-left corner stay dark navy.")
 def domain_ai_agents(cv):
-    rng = np.random.default_rng(131)
-    fld = SinField(rng, n=8, wavelength=900)
-    depth_f = SinField(rng, n=5, wavelength=900)
-    sheets = [np.array([[760, 980], [1250, 180], [1900, 1100], [2600, 330]]),
-              np.array([[1150, 1250], [1550, 760], [2050, 380], [2600, 640]])]
-    xs, vs = [], []
-    for si, ctrl in enumerate(sheets):
-        n = (30000, 16000)[si]
-        t = rng.uniform(0, 1, n) ** 0.85
-        sp = bezier(ctrl, t)
-        tg = bezier_deriv(ctrl, t)
+    # Round 3: the old frame was a faint dust smear (mean 23). A starling murmuration is a thin 3D
+    # sheet of birds: where the sheet turns edge-on to the camera its birds pile up into dense,
+    # bright folds, where it faces the camera it thins to a veil. Sampling a twisted sheet evenly
+    # and projecting it gives exactly that, so the swarm reads as one legible, living shape
+    # (distinct from threat-swarm's vortex). The mass arcs over the upper half and down the right third;
+    # the title (centre), the bottom-left and the card's top-left label band stay on dim navy.
+    rng = np.random.default_rng(1310)
+    fld = SinField(rng, n=9, wavelength=520, spread=0.5)
+    holes = SinField(rng, n=7, wavelength=380, spread=0.5)
+
+    def sheet(ctrl, n, width, twist, phase, inten, bend, zscale, hue_hot=(0.0, 0.25), hue_lo=(0.5, 0.95),
+              length=(7, 16), seed=0, blur_far=10.0, wtaper=lambda u: 0.55 + 0.45 * np.sin(np.pi * u) ** 0.7,
+              veil=None):
+        r = np.random.default_rng(seed)
+        u = r.uniform(0, 1, n)
+        v = np.tanh(r.normal(0, 0.9, n))                      # soft edges, denser in the middle
+        stray = r.uniform(0, 1, n) < 0.07                     # stragglers scattered around the edges
+        v = np.where(stray, r.uniform(-1.7, 1.7, n), v)
+        sp = bezier(ctrl, u)
+        tg = bezier_deriv(ctrl, u)
         tg /= np.linalg.norm(tg, axis=-1, keepdims=True)
         nr = np.stack([-tg[..., 1], tg[..., 0]], -1)
-        width = (150, 95)[si] * (0.25 + np.sin(np.pi * t) ** 0.8) * (1 + 0.45 * fld.scalar(sp[..., 0], sp[..., 1]))
-        off = rng.normal(0, 1, n) * width
-        p = sp + nr * off[:, None]
-        xs.append(p)
-        vs.append(tg)
-    p = np.concatenate(xs)
-    v = np.concatenate(vs)
-    m = len(p)
-    cx_, cy_ = fld.curl(p[:, 0], p[:, 1])
-    v = v + 0.08 * np.c_[cx_, cy_]
-    rogue = np.zeros(m, bool)
-    v[rogue] = v[rogue] @ np.array([[0, 1], [-1, 0]]) * rng.choice([-1, 1], (rogue.sum(), 1))
-    z = depth_f.scalar(p[:, 0], p[:, 1])
-    blur = 0.5 + np.maximum(0, z - 0.2) * 26
-    length = rng.uniform(26, 70, m) * np.where(rogue, 5, 1)
-    inten = lognormal_int(rng, m, 0.024, 0.35) * np.where(rogue, 20, 1)
-    hue = np.where(rogue, 0.03, rng.uniform(0.2, 0.75, m))
-    swarm_streaks(cv, p, v, length, inten, hue, blur, curve=np.where(rogue, 0, rng.normal(0, 0.003, m)))
-    motes(cv, 18, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=24)
-    return dict(exposure=1.3, bloom=0.10, halation=0.07, vignette=0.42)
+        th = np.pi * (phase + twist * u) + 0.35 * np.sin(2 * np.pi * (1.3 * u + 0.2))
+        W = width * wtaper(u) * (1 + 0.25 * fld.scalar(sp[:, 0], sp[:, 1]))
+        c = np.cos(th)
+        off_n = v * W * c + bend * W * (v ** 2 - 0.3)       # the sheet also curls, so folds are curved
+        z = v * W * np.sin(th) * zscale
+        p = sp + nr * off_n[:, None]
+        # turbulence inside the flock: small drifts that keep it from looking drawn
+        dx, dy = fld.curl(p[:, 0], p[:, 1])
+        p = p + 22 * np.c_[dx, dy] / (np.sqrt(dx * dx + dy * dy)[:, None] + 1e-6) * r.normal(0, 1, (n, 1))
+        # density holes and gaps, like the gaps that open and close inside a real murmuration
+        keep = r.uniform(0, 1, n) < np.clip(0.55 + 0.6 * holes.scalar(p[:, 0], p[:, 1]), 0.08, 1)
+        p, tg, z, c, v = p[keep], tg[keep], z[keep], c[keep], v[keep]
+        m = len(p)
+        # each agent flies along the flock, with its own small heading error
+        ang = r.normal(0, 0.18, m)
+        ca, sa = np.cos(ang), np.sin(ang)
+        vel = np.c_[tg[:, 0] * ca - tg[:, 1] * sa, tg[:, 0] * sa + tg[:, 1] * ca]
+        edge_on = 1 - np.abs(c)                                # 1 where the sheet is seen edge-on
+        blur = np.minimum(0.5 + np.abs(z) * 0.03 + np.maximum(z, 0) * 0.02, blur_far)
+        ln = r.uniform(*length, m) * (0.8 + 0.5 * edge_on)
+        it = lognormal_int(r, m, inten, 0.55) * (0.32 + 1.5 * edge_on ** 1.5)
+        if veil is not None:
+            it = it * veil(p)
+        hot = r.uniform(0, 1, m) < 0.25 + 0.5 * edge_on ** 2
+        hue = np.where(hot, r.uniform(*hue_hot, m), r.uniform(*hue_lo, m))
+        swarm_streaks(cv, p, vel, ln, it, hue, blur, curve=r.normal(0, 0.004, m))
+        return p
+
+    # The main flock: in from the upper left, across the top, banking down the right side.
+    # Where it crosses the top left of the card crop (the card's label sits there) the flock thins to a veil.
+    def veil(xy):
+        x, y = xy[:, 0], xy[:, 1]
+        return 1 - 0.8 * np.exp(-((x - 900) / 420) ** 2 - (np.maximum(y, 0) / 190) ** 2)
+    main = np.array([[360, 560], [1250, 170], [2380, 160], [2130, 1230]])
+    sheet(main, 170000, 330, twist=1.85, phase=0.32, inten=0.19, bend=0.35, zscale=1.0, seed=1, veil=veil)
+    # A second, thinner layer just behind it, offset, so the folds overlap in depth.
+    back = np.array([[640, 380], [1520, 170], [2520, 380], [2290, 1100]])
+    sheet(back, 70000, 240, twist=2.4, phase=0.9, inten=0.085, bend=-0.3, zscale=1.4, seed=2,
+          hue_lo=(0.5, 0.95), blur_far=14, veil=veil)
+    # A far, soft flock high on the left: depth, out of focus.
+    far = np.array([[-80, 190], [180, 40], [520, 60], [760, 170]])
+    sheet(far, 14000, 120, twist=1.2, phase=0.6, inten=0.02, bend=0.2, zscale=1.0, seed=3,
+          hue_lo=(0.55, 1.0), length=(6, 12), blur_far=4)
+
+    # Rogue agents: two small hijacked clusters break away and fly against the flow, hotter than the flock.
+    for (cx, cy, hd, nn, sd) in ((1960, 640, np.pi + 0.35, 260, 5), (1500, 250, 0.55, 160, 6)):
+        r = np.random.default_rng(sd)
+        dvec = np.array([np.cos(hd), np.sin(hd)])
+        nvec = np.array([-dvec[1], dvec[0]])
+        a_ = r.normal(0, 1, nn) ** 3 * 18 + r.normal(0, 30, nn)   # strung out along the heading
+        b_ = r.normal(0, 9, nn)
+        xy = np.array([cx, cy]) + a_[:, None] * dvec + b_[:, None] * nvec
+        vel = np.tile(dvec, (nn, 1)) + r.normal(0, 0.08, (nn, 2))
+        swarm_streaks(cv, xy, vel, r.uniform(18, 40, nn), lognormal_int(r, nn, 0.16, 0.5),
+                      r.uniform(0.0, 0.18, nn), 0.5, curve=r.normal(0, 0.003, nn))
+
+    motes(cv, 16, (1300, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=24)
+
+    def calm(xy):
+        # keep the title zone clear of slate dust
+        x, y = xy[:, 0] / 2400, xy[:, 1] / 1350
+        return 1 - 0.85 * np.exp(-((x - 0.5) / 0.22) ** 2 - ((y - 0.55) / 0.2) ** 2)
+    return dict(exposure=1.6, bloom=0.12, halation=0.08, vignette=0.40, atmos=0.05, vibrance=0.7, slate_weight=calm)
 
 
 @scene("domain-ot-iot", R169, "Coverage: OT and IoT security",
-       "Long-exposure arcs of rotating machinery around a glowing axis, dense and layered in depth, some blinking like sensors.")
+       "Long-exposure arcs of rotating machinery around a glowing axis inside the frame, dense and layered in depth, some blinking like sensors.")
 def domain_ot_iot(cv):
     rng = np.random.default_rng(142)
-    c = np.array([2050.0, 1250.0])
-    n = 1000
-    r = np.sqrt(rng.uniform(0.003, 1, n)) * 2500
-    th0 = rng.uniform(np.pi * 0.92, np.pi * 1.6, n)
+    # round 2: the axis moves into the card (the tile crop missed it), more arcs, a lit core
+    c = np.array([1640.0, 1020.0])
+    n = 1500
+    r = np.sqrt(rng.uniform(0.003, 1, n)) * 2300
+    th0 = rng.uniform(np.pi * 0.70, np.pi * 1.75, n)
     span = rng.uniform(0.08, 0.75, n)
     M = 200
     s = np.linspace(0, 1, M)
@@ -784,15 +900,15 @@ def domain_ot_iot(cv):
     # the headline corner (bottom-left) stays calmer
     calm = 1 - 0.55 * (1 - smoothstep(300, 1000, P[..., 0])) * smoothstep(800, 1200, P[..., 1])
     trails(cv, P, inten, hue[:, None] * np.ones((1, M)), blur, rng, env=(0.06, 0.06), prof=prof * calm)
-    glow(cv, c, 30000.0, 420, 0.35, n=8000, seed=3)
-    glow(cv, (c[0] - 300, c[1] - 250), 9000.0, 300, 0.5, n=6000, seed=4)
-    motes(cv, 24, (600, 0, 2400, 1350), energy=(0.02, 0.08), blur=(20, 80), seed=14)
-    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
+    glow(cv, c, 15000.0, 420, 0.4, n=8000, seed=3)
+    glow(cv, c, 900.0, 50, 0.1, n=5000, seed=5)
+    glow(cv, (c[0] - 400, c[1] - 320), 9000.0, 320, 0.5, n=6000, seed=4)
+    motes(cv, 24, (300, 0, 2400, 1350), energy=(0.02, 0.08), blur=(20, 80), seed=14)
+    return dict(exposure=1.1, bloom=0.13, halation=0.08, vignette=0.45)
 
-# @@end domain-ot-iot
 
-@scene("domain-governance", R169, "Coverage: Governance, risk and compliance",
-       "A ruled floor grid falling away to the horizon, swept by one warm beam that lights the rules it crosses.")
+@scene("domain-governance", R169, "Coverage: Governance, risk and compliance (high-key card)",
+       "A ruled floor falling away to the horizon, flooded by one wide, warm beam that lights the rules it crosses and the haze above them.")
 def domain_governance(cv):
     rng = np.random.default_rng(151)
     f, cx, cy, h = 1150.0, 1640.0, 360.0, 1.4
@@ -810,29 +926,33 @@ def domain_governance(cv):
     Zs = np.geomspace(1.0, 120, M)
     Xs = np.arange(-16, 17, 1.0)
     P = proj(Xs[:, None], Zs[None])
-    I = 0.10 * (Zs[None] / 7) ** -0.2 * fade(P) * envelope(np.linspace(0, 1, M), 0.0001, 0.3)[None]
+    I = 0.065 * (Zs[None] / 7) ** -0.2 * fade(P) * envelope(np.linspace(0, 1, M), 0.0001, 0.3)[None]
     trails(cv, P, np.ones(len(Xs)), np.full((len(Xs), M), 0.55), dof(Zs)[None] * np.ones((len(Xs), 1)),
            rng, env=None, speed=0, prof=I)
     Zt = np.r_[np.arange(1.5, 12, 1.0), np.arange(12, 60, 2.0)]
     X = np.linspace(-16, 16, 400)
     P = proj(X[None], Zt[:, None])
-    I = 0.09 * (Zt[:, None] / 7) ** -0.2 * fade(P)
+    I = 0.055 * (Zt[:, None] / 7) ** -0.2 * fade(P)
     trails(cv, P, np.ones(len(Zt)), np.full((len(Zt), 400), 0.55), dof(Zt)[:, None] * np.ones((1, 400)),
            rng, env=None, speed=0, prof=I)
     # sweeping beam: longitudinal rules lit in a band, smeared behind the leading edge
-    k = 140
-    Xb = 0.6 - rng.uniform(0, 1, k) ** 1.3 * 5.0
-    lead = np.exp(-(0.6 - Xb) / 0.9)
+    # round 2: high-key card: a much wider, brighter beam floods the floor
+    k = 300
+    Xb = 0.6 - rng.uniform(0, 1, k) ** 1.2 * 9.0
+    lead = np.exp(-(0.6 - Xb) / 2.2)
     P = proj(Xb[:, None], Zs[None])
-    I = (0.03 + 0.55 * lead)[:, None] * (Zs[None] / 7) ** -0.35 * envelope(np.linspace(0, 1, M), 0.0001, 0.35)[None]
+    I = (0.04 + 0.42 * lead)[:, None] * (Zs[None] / 7) ** -0.35 * envelope(np.linspace(0, 1, M), 0.0001, 0.35)[None]
     trails(cv, P, np.ones(k), (0.05 + 0.8 * (1 - lead))[:, None] * np.ones((1, M)),
            dof(Zs)[None] * np.ones((k, 1)), rng, env=None, speed=0.15, prof=I)
     # crossings light up under the beam
-    XX, ZZ = np.meshgrid(np.arange(-4, 1, 1.0), Zt[Zt < 40])
+    XX, ZZ = np.meshgrid(np.arange(-8, 1, 1.0), Zt[Zt < 40])
     q = proj(XX.ravel(), ZZ.ravel())
-    w = np.exp(-(0.6 - XX.ravel()) / 1.2) * (ZZ.ravel() / 7) ** -0.5
+    w = np.exp(-(0.6 - XX.ravel()) / 2.4) * (ZZ.ravel() / 7) ** -0.5
     cv.points(q, 2.5 * w, ramp(0.1), dof(ZZ.ravel()))
-    return dict(exposure=1.15, bloom=0.11, halation=0.07, vignette=0.42)
+    # the beam lights the haze over the floor, brightest towards the horizon
+    for k2, (X, Z, e, sg) in enumerate(((-1.5, 18.0, 22000.0, 340), (-3.0, 6.0, 20000.0, 480))):
+        glow(cv, proj(X, Z), e, sg, 0.35, n=8000, seed=20 + k2)
+    return dict(exposure=1.2, bloom=0.14, halation=0.09, vignette=0.42, atmos=0.04)
 
 
 
@@ -841,129 +961,164 @@ def domain_governance(cv):
 
 
 @scene("service-1", R43, "Services 001 Deploy and connect",
-       "One beam enters from the left and branches into a delta of fine filaments reaching every corner.")
+       "One beam enters from the left and branches into a delta of fine filaments reaching every corner; two more deltas glow out of focus behind it, so the whole frame is wired.")
 def service_deploy(cv):
-    rng = np.random.default_rng(161)
-    leaves = []
+    # Round 3: the single sharp delta read like a vector tree on an empty field (91% near-black).
+    # Now three deltas in depth: the sharp one in front, two larger, defocused ones behind it (like
+    # out-of-focus fibre bundles), lit haze around the trunks and burning tips where they connect.
+    def delta(seed, origin, d0, length, inten, blur_extra, hue_bias, spread=120.0, tips=0.25, depth_max=6):
+        rng = np.random.default_rng(seed)
+        leaves = []
 
-    def grow(path, d, length, depth):
-        p = path[-1]
-        if depth == 6:
-            leaves.append(np.array(path))
-            return
-        kids = 2 if depth < 1 else int(rng.choice([2, 2, 3]))
-        angs = np.sort(rng.uniform(-0.55, 0.55, kids)) if kids > 1 else [0.0]
-        if kids == 2:
-            angs = np.array([-1, 1]) * rng.uniform(0.18, 0.45)
-        for a in angs:
-            a = a * (0.6 if depth == 0 else 1)
-            nd = np.array([d[0] * np.cos(a) - d[1] * np.sin(a), d[0] * np.sin(a) + d[1] * np.cos(a)])
-            nd[0] = max(nd[0], 0.35)
-            nd /= np.linalg.norm(nd)
-            ln = length * rng.uniform(0.62, 0.82)
-            e = p + nd * ln
-            ctrl = np.array([p, p + d * ln / 3, e - nd * ln / 3, e])
-            seg = bezier(ctrl, np.linspace(0, 1, 40))[1:]
-            grow(path + [q for q in seg], nd, ln, depth + 1)
+        def grow(path, d, length, depth):
+            p = path[-1]
+            if depth == depth_max:
+                leaves.append(np.array(path))
+                return
+            kids = 2 if depth < 1 else int(rng.choice([2, 2, 3]))
+            angs = np.sort(rng.uniform(-0.55, 0.55, kids)) if kids > 1 else [0.0]
+            if kids == 2:
+                angs = np.array([-1, 1]) * rng.uniform(0.18, 0.45)
+            for a in angs:
+                a = a * (0.6 if depth == 0 else 1)
+                nd = np.array([d[0] * np.cos(a) - d[1] * np.sin(a), d[0] * np.sin(a) + d[1] * np.cos(a)])
+                nd[0] = max(nd[0], 0.35)
+                nd /= np.linalg.norm(nd)
+                ln = length * rng.uniform(0.62, 0.82)
+                e = p + nd * ln
+                ctrl = np.array([p, p + d * ln / 3, e - nd * ln / 3, e])
+                seg = bezier(ctrl, np.linspace(0, 1, 40))[1:]
+                grow(path + [q for q in seg], nd, ln, depth + 1)
 
-    grow([np.array([-160.0, 940.0])], np.array([1.0, -0.02]), 900.0, 0)
-    L = max(len(lf) for lf in leaves)
-    nl = len(leaves)
-    leaves.sort(key=lambda a: a[-1, 1])
-    out = []
-    for i, lf in enumerate(leaves):
-        pad = np.vstack([lf, np.repeat(lf[-1:], L - len(lf), 0)])
-        out.append(pad)
-    base = np.array(out)
-    M = L
-    s = np.linspace(0, 1, M)
-    nr = normals(base)
-    lane = (np.arange(nl) / (nl - 1) - 0.5)
-    strands = 4
-    P, I, H, B = [], [], [], []
-    for k in range(strands):
-        off = (lane[:, None] * 120 * (1 - s[None]) ** 2.2 + rng.normal(0, 2.5, (nl, 1)) * (1 - s[None])
-               + rng.normal(0, 1.2, (nl, 1)))
-        P.append(base + nr * off[..., None])
-        I.append(lognormal_int(rng, nl, 0.075, 0.5))
-        H.append(rng.uniform(0.0, 0.8, nl))
-        B.append(np.where(rng.random(nl) < 0.15, rng.uniform(3, 12, nl), rng.uniform(0.5, 1.0, nl)))
-    P = np.concatenate(P)
-    lenmask = np.concatenate([np.array([np.r_[np.ones(len(lf)), np.zeros(L - len(lf))] for lf in leaves])] * strands)
-    prof = lenmask * (1 - smoothstep(0.7, 1.0, np.cumsum(lenmask, 1) / lenmask.sum(1, keepdims=True)))
-    hue = np.concatenate(H)[:, None] * 0.4 + 0.6 * s[None] * np.ones((len(P), 1))
-    trails(cv, P, np.concatenate(I), np.clip(hue, 0, 1), np.concatenate(B), rng, env=(0.06, 0.0), prof=prof)
-    tips = np.array([lf[-1] for lf in leaves])
-    cv.points(tips, lognormal_int(rng, nl, 0.25, 0.5), ramp(rng.uniform(0.3, 0.9, nl)), rng.uniform(0.5, 6, nl))
+        grow([np.array(origin, float)], np.array(d0, float) / np.linalg.norm(d0), length, 0)
+        L = max(len(lf) for lf in leaves)
+        nl = len(leaves)
+        leaves.sort(key=lambda a: a[-1, 1])
+        base = np.array([np.vstack([lf, np.repeat(lf[-1:], L - len(lf), 0)]) for lf in leaves])
+        M = L
+        sv = np.linspace(0, 1, M)
+        nr = normals(base)
+        lane = (np.arange(nl) / (nl - 1) - 0.5)
+        strands = 4
+        P, I, H, B = [], [], [], []
+        for k in range(strands):
+            off = (lane[:, None] * spread * (1 - sv[None]) ** 2.2 + rng.normal(0, 2.5, (nl, 1)) * (1 - sv[None])
+                   + rng.normal(0, 1.2, (nl, 1)))
+            P.append(base + nr * off[..., None])
+            I.append(lognormal_int(rng, nl, inten, 0.5))
+            H.append(rng.uniform(0.0, 0.8, nl))
+            B.append(np.where(rng.random(nl) < 0.15, rng.uniform(3, 12, nl), rng.uniform(0.5, 1.0, nl)) + blur_extra)
+        P = np.concatenate(P)
+        lenmask = np.concatenate([np.array([np.r_[np.ones(len(lf)), np.zeros(L - len(lf))] for lf in leaves])] * strands)
+        prof = lenmask * (1 - smoothstep(0.7, 1.0, np.cumsum(lenmask, 1) / lenmask.sum(1, keepdims=True)))
+        hue = np.concatenate(H)[:, None] * 0.4 + 0.6 * sv[None] * np.ones((len(P), 1))
+        trails(cv, P, np.concatenate(I), np.clip(hue + hue_bias, 0, 1), np.concatenate(B), rng, env=(0.06, 0.0), prof=prof)
+        tp = np.array([lf[-1] for lf in leaves])
+        bt = rng.uniform(0.5, 6, nl) + blur_extra
+        cv.points(tp, lognormal_int(rng, nl, tips, 0.5) * (1 + (bt / 6) ** 2 * 0.25), ramp(rng.uniform(0.2, 0.9, nl)), bt)
+        return base
+
+    # behind: two big, soft deltas (out of focus, dimmer, warmer)
+    delta(171, (-260, 380), (1.0, 0.10), 1150.0, 0.018, 24.0, 0.3, spread=160, tips=0.35)
+    delta(172, (-200, 1500), (1.0, -0.22), 1000.0, 0.014, 40.0, 0.35, spread=150, tips=0.35)
+    # in front: the sharp one, as before
+    delta(161, (-160, 940), (1.0, -0.02), 900.0, 0.080, 0.0, 0.0, spread=120, tips=0.3)
+    # lit haze along the trunk where the beam enters
+    glow(cv, (260.0, 930.0), 9000.0, 300, 0.45, n=6000, seed=31)
+    glow(cv, (900.0, 760.0), 7000.0, 520, 0.6, n=6000, seed=32)
     motes(cv, 18, (600, 0, 2400, 1800), energy=(0.01, 0.05), blur=(20, 70), seed=15)
-    return dict(exposure=1.0, bloom=0.10, halation=0.06, vignette=0.42)
+    return dict(exposure=1.15, bloom=0.12, halation=0.08, vignette=0.42, atmos=0.05)
 
 
-@scene("service-2", R43, "Services 002 Detect 24/7",
-       "A deep field of drifting light in every focus plane; one trail moves against the grain and lights up.")
+@scene("service-2", R43, "Services 002 Detect 24/7 (high-key card)",
+       "A broad river of soft-focus light drifts through the whole frame in every focus plane; one sharp trail moves against the grain and lights up.")
 def service_detect(cv):
     rng = np.random.default_rng(172)
     fld = SinField(rng, n=7, wavelength=1300)
-    n = 2600
+    # round 2: high-key card (the bright one of its row), lit like the CTA band: a broad river of
+    # soft-focus light drifts through the whole frame; one sharp trail moves against the grain.
+    W2 = lambda t: 0.75 + 0.5 * np.sin(np.pi * t)
+    for ctrl, n, wdt, inten, hue, blur, sd in (
+            (np.array([[-300.0, 760.0], [700.0, 620.0], [1600.0, 700.0], [2700.0, 470.0]]), 420, 330, 0.085, (0.0, 0.5), (4, 40), 11),
+            (np.array([[-300.0, 1260.0], [800.0, 1180.0], [1700.0, 1240.0], [2700.0, 1020.0]]), 260, 300, 0.06, (0.3, 0.85), (10, 70), 12),
+            (np.array([[-300.0, 260.0], [900.0, 200.0], [1500.0, 300.0], [2700.0, 120.0]]), 160, 260, 0.05, (0.35, 0.9), (20, 90), 13)):
+        ribbon(cv, ctrl, n=n, width=wdt, twist=0.3, wob=0.35, inten=inten, isig=0.7, hue=hue, blur=blur, tjit=0.35,
+               env=(0.2, 0.2), spread_profile=W2, seed=sd, speed_mod=0.5)
+    # a layer of crisp drifting streaks for texture, every focus plane
+    n = 2200
     x = rng.uniform(-250, 2650, n)
-    y = 900 + rng.normal(0, 1, n) * 520
-    depth = rng.random(n)                                # 0 near ... 1 far
-    blur = np.where(depth < 0.35, 6 + 70 * (0.35 - depth) / 0.35, 0.5 + 6 * (depth - 0.35) ** 2)
+    y = 760 + rng.normal(0, 1, n) * 560
+    depth = rng.random(n)
+    blur = np.where(depth < 0.35, 6 + 60 * (0.35 - depth) / 0.35, 0.5 + 6 * (depth - 0.35) ** 2)
     ln = rng.uniform(50, 420, n) * (1.6 - depth)
     M = 24
     s = np.linspace(-0.5, 0.5, M)
     vx, vy = fld.curl(x, y)
-    ang = np.deg2rad(-9) + 0.3 * vx
+    ang = np.deg2rad(-7) + 0.3 * vx
     P = np.stack([x[:, None] + np.cos(ang)[:, None] * ln[:, None] * s[None],
                   y[:, None] + np.sin(ang)[:, None] * ln[:, None] * s[None]], -1)
-    inten = lognormal_int(rng, n, 0.06, 0.65) * (1 + blur / 5) ** 0.55
-    trails(cv, P, inten, np.clip(0.3 + 0.6 * depth + rng.normal(0, 0.1, n), 0, 1), blur, rng, env=(0.3, 0.3))
+    inten = lognormal_int(rng, n, 0.05, 0.65) * (1 + blur / 5) ** 0.55
+    trails(cv, P, inten, np.clip(0.2 + 0.6 * depth + rng.normal(0, 0.1, n), 0, 1), blur, rng, env=(0.3, 0.3))
     # the anomaly: against the grain, through the middle of the frame
     ctrl = np.array([[2050.0, 1750.0], [1800.0, 1300.0], [1450.0, 880.0], [950.0, 560.0]])
     along = lambda t: 0.25 + 0.75 * t ** 1.4
-    ribbon(cv, ctrl, n=40, width=7, inten=0.45, isig=0.4, hue=(0.0, 0.2), blur=(0.5, 0.9), tjit=0.03,
+    ribbon(cv, ctrl, n=40, width=7, inten=0.5, isig=0.4, hue=(0.0, 0.15), blur=(0.5, 0.9), tjit=0.03,
            env=(0.3, 0.02), seed=3, along=along)
     ribbon(cv, ctrl, n=8, width=12, inten=0.25, hue=(0.25, 0.55), blur=(8, 14), tjit=0.02, env=(0.3, 0.02), seed=4, along=along)
-    ribbon(cv, ctrl, n=6, width=20, inten=0.2, hue=(0.4, 0.7), blur=(30, 44), tjit=0.02, env=(0.3, 0.02), seed=5)
     cv.points(np.array([[950.0, 560.0]]), 14.0, ramp(0.0), 1.2)
     glow(cv, (950.0, 560.0), 400.0, 30, 0.2, n=4000)
-    glow(cv, (1250.0, 760.0), 16000.0, 420, 0.5, n=8000, seed=2)
-    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
+    glow(cv, (1200.0, 700.0), 30000.0, 480, 0.25, n=9000, seed=2)
+    motes(cv, 30, (0, 0, 2400, 1800), energy=(0.02, 0.10), blur=(30, 110), hue=(0.3, 0.9), seed=17)
+    return dict(exposure=1.25, bloom=0.14, halation=0.09, vignette=0.45, atmos=0.06)
 
-# @@end service-2
 
-@scene("service-3", R43, "Services 003 Respond",
-       "A fast, hard line of light cuts through an amber cluster and blows it apart.")
+@scene("service-3", R43, "Services 003 Respond (high-key card)",
+       "A hard line of light cuts across the frame and blows the light around it into two wide fans of sparks flying away from the cut, the air between them lit.")
 def service_respond(cv):
     rng = np.random.default_rng(181)
     A, B = np.array([250.0, 1900.0]), np.array([2500.0, 180.0])
     d = (B - A) / np.linalg.norm(B - A)
     nr = np.array([-d[1], d[0]])
-    n = 3600
-    c = np.array([1520.0, 860.0])
-    p = c + rng.normal(0, 1, (n, 2)) * np.array([380, 300])
-    sd = (p - A) @ nr
-    push = 240 * np.exp(-np.abs(sd) / 120) + rng.uniform(3, 14, n)
-    dirv = np.sign(sd)[:, None] * nr + d * rng.normal(0.3, 0.3, (n, 1)) + rng.normal(0, 0.18, (n, 2))
-    blur = np.where(rng.random(n) < 0.14, rng.uniform(3, 18, n), rng.uniform(0.5, 0.9, n))
-    inten = lognormal_int(rng, n, 0.09, 0.65) * (0.8 + 1.4 * np.exp(-np.abs(sd) / 110))
-    hue = np.clip(0.85 - 0.55 * np.exp(-np.abs(sd) / 100) + rng.normal(0, 0.06, n), 0.2, 0.95)
-    swarm_streaks(cv, p + dirv * push[:, None] * 0.5, dirv, push, inten, hue, blur)
+    # round 2: high-key card. The cut blows the cluster into two big, soft lobes of light, one on each
+    # side of the line (out of focus, so they read as glowing masses, like the CTA band), with sharp
+    # sparks flying out of them. A thin dark lane runs right along the cut.
+    def blast(n, along_sd, off_mu, off_sd, blur, ln, inten, hue, seed):
+        r = np.random.default_rng(seed)
+        side = r.choice([-1.0, 1.0], n)
+        t = r.normal(0.52, along_sd, n)
+        off = side * np.abs(r.normal(off_mu, off_sd, n))
+        p = A + (B - A) * t[:, None] + nr * off[:, None]
+        # a coherent fan: sparks leave the cut perpendicular to it and splay out towards its ends
+        dirv = side[:, None] * nr + d * (2.0 * (t - 0.52) + r.normal(0.15, 0.08, n))[:, None] + r.normal(0, 0.04, (n, 2))
+        ad = np.abs(off)
+        swarm_streaks(cv, p, dirv, r.uniform(*ln, n) * (0.6 + 0.8 * np.exp(-ad / 500)),
+                      lognormal_int(r, n, inten, 0.6) * (0.4 + 1.2 * np.exp(-ad / 420)),
+                      np.clip(hue[0] + (hue[1] - hue[0]) * smoothstep(80, 900, ad) + r.normal(0, 0.08, n), 0, 1),
+                      r.uniform(*blur, n))
+    blast(7000, 0.20, 260, 330, (0.5, 0.9), (40, 260), 0.075, (0.0, 0.85), 2)  # sharp sparks
+    blast(1400, 0.22, 420, 360, (4, 18), (80, 360), 0.07, (0.2, 0.85), 1)       # a softer, nearer layer
+    # the two lobes glow as smooth masses of lit air (no texture), hottest near the cut
+    for k in range(8):
+        t = 0.3 + 0.4 * k / 7
+        for side in (-1, 1):
+            q = A + (B - A) * t + nr * side * (260 + 60 * np.sin(k * 1.7))
+            glow(cv, q, 6000.0 * np.exp(-((t - 0.52) / 0.2) ** 2), 240, 0.42, n=5000, seed=20 + 2 * k + (side > 0))
     ctrl = np.array([A, A + (B - A) / 3, A + 2 * (B - A) / 3, B])
     ribbon(cv, ctrl, n=60, width=4, inten=0.35, isig=0.4, hue=(0.0, 0.2), blur=(0.5, 0.8), tjit=0.02,
            env=(0.06, 0.06), seed=5, wob=0.08)
     ribbon(cv, ctrl, n=8, width=8, inten=0.3, hue=(0.3, 0.6), blur=(8, 12), tjit=0.02, seed=6)
-    ribbon(cv, ctrl, n=8, width=14, inten=0.25, hue=(0.4, 0.7), blur=(26, 34), tjit=0.02, seed=7)
-    motes(cv, 14, (600, 0, 2400, 1800), energy=(0.01, 0.05), blur=(20, 70), seed=16)
-    return dict(exposure=1.0, bloom=0.10, halation=0.06, vignette=0.42)
+    for k, (t, side, e) in enumerate(((0.45, 1, 30000.0), (0.6, -1, 30000.0))):
+        glow(cv, A + (B - A) * t + nr * side * 360, e, 360, 0.5, n=8000, seed=3 + k)
+    motes(cv, 24, (0, 0, 2400, 1800), energy=(0.02, 0.08), blur=(20, 90), seed=16)
+    return dict(exposure=1.15, bloom=0.14, halation=0.09, vignette=0.42, atmos=0.06)
 
 
 @scene("service-4", R43, "Services 004 Attack (red team)",
-       "Curving trails sweep in from every side and converge on one ringed target.")
+       "Hundreds of curving trails sweep in from every side and converge on one ringed target, which glows in the haze.")
 def service_attack(cv):
     rng = np.random.default_rng(191)
-    T = np.array([1580.0, 820.0])
-    n = 340
+    T = np.array([1380.0, 860.0])
+    n = 640
     a = rng.uniform(0, 2 * np.pi, n)
     R = rng.uniform(1400, 2600, n)
     S = T + np.c_[np.cos(a), np.sin(a)] * R[:, None]
@@ -979,7 +1134,7 @@ def service_attack(cv):
     prof = (0.12 + 0.88 * s[None] ** 2.5) * (1 + 1.5 * (240 - rend[:, None]) / 240 * s[None] ** 6)
     blur = np.where(rng.random(n) < 0.2, rng.uniform(3, 20, n), rng.uniform(0.5, 0.9, n))
     hue = np.clip(0.9 - 0.8 * s[None] ** 3 + rng.normal(0, 0.05, (n, 1)), 0, 1)
-    trails(cv, P, lognormal_int(rng, n, 0.07, 0.65), hue, blur, rng, env=(0.25, 0.02), prof=prof)
+    trails(cv, P, lognormal_int(rng, n, 0.09, 0.65), hue, blur, rng, env=(0.25, 0.02), prof=prof)
     th = np.linspace(0, 2 * np.pi, 1600)
     gap = np.ones_like(th)
     for q in range(4):
@@ -989,8 +1144,10 @@ def service_attack(cv):
         cv.polylines(circle_pts(T, r, th)[None], (I0 * gap)[None], ramp(0.1), bl)
     cv.points(T[None], 9.0, ramp(0.0), 0.8)
     glow(cv, T, 8.0, 11, 0.5)
-    motes(cv, 14, (0, 0, 2400, 1800), energy=(0.01, 0.04), blur=(20, 70), seed=25)
-    return dict(exposure=1.0, bloom=0.11, halation=0.06, vignette=0.42)
+    glow(cv, T, 18000.0, 380, 0.45, n=8000, seed=9)
+    glow(cv, T, 1200.0, 60, 0.1, n=5000, seed=10)
+    motes(cv, 20, (0, 0, 2400, 1800), energy=(0.02, 0.06), blur=(20, 80), seed=25)
+    return dict(exposure=1.0, bloom=0.12, halation=0.08, vignette=0.42, atmos=0.02)
 
 
 @scene("service-5", R43, "Services 005 Harden",
@@ -1053,33 +1210,45 @@ def service_harden(cv):
     for I0, bl, h in ((0.30, 0.7, 0.0), (0.18, 10, 0.3), (0.12, 40, 0.5)):
         cv.polylines(seam[None], (I0 * (0.25 + 0.75 * fall))[None], ramp(h), bl)
     glow(cv, (C[0] - R + 40, C[1]), 14000.0, 360, 0.45, n=7000, seed=3)
-    return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
+    # round 3: lifted (it was the darkest card in the set, mean 21): more light in the stream and the air
+    return dict(exposure=1.45, bloom=0.13, halation=0.08, vignette=0.45, atmos=0.06)
 
-# @@end service-5
 
-@scene("service-6", R43, "Services 006 Govern",
-       "Tangled amber lines on the left settle into calm, evenly spaced light on the right.")
+@scene("service-6", R43, "Services 006 Govern (high-key card)",
+       "A broad stream of light, turbulent and out of focus on the left, settles into evenly spaced lanes and gathers into one calm, bright band with a warm-white core on the right.")
 def service_govern(cv):
     rng = np.random.default_rng(211)
-    n = 72
-    M = 800
-    x = np.linspace(-150, 2550, M)
-    yi = 880 + (np.arange(n) - n / 2) * 7.5
-    t = (x + 150) / 2700
-    w = wobble(rng, n, t * 3.0, terms=4, fmin=0.5, fmax=1.5)
-    ynoise = yi[:, None] + 430 * w + 110 * wobble(rng, n, t * 9, terms=2)
-    m = smoothstep(700, 1600, x)[None]
-    y = (1 - m) * ynoise + m * yi[:, None]
+    # round 2: high-key card, lit like the CTA band. A broad stream of light is turbulent and
+    # scattered on the left; towards the right every trail settles into its own lane and the stream
+    # gathers into one calm, bright band (warm-white core) that crosses the frame.
+    n = 520
+    M = 700
+    t = np.linspace(0, 1, M)
+    x = -250 + t * 2950
+    spine_y = 980 - 160 * smoothstep(0.0, 1.0, t)
+    calm = smoothstep(0.30, 0.62, t)                              # 0 chaos ... 1 order
+    u = np.sort(rng.uniform(-1, 1, n))                            # each trail's final lane
+    lane = u * (210 + 90 * np.abs(u))                             # evenly spaced lanes, a little wider at the edges
+    turb = wobble(rng, n, t * 3.2, terms=4, fmin=0.5, fmax=1.5) * 520 + wobble(rng, n, t * 8, terms=2) * 120
+    spread = rng.normal(0, 1, n)[:, None] * 380
+    y = spine_y[None] + (1 - calm)[None] * (turb + spread) + calm[None] * lane[:, None]
     P = np.stack([np.broadcast_to(x, (n, M)), y], -1)
-    inten = lognormal_int(rng, n, 0.12, 0.45)
-    prof = (0.25 + 0.75 * m) * envelope(t, 0.18, 0.05)[None]
-    hue = (0.75 - 0.65 * m) * np.ones((n, 1))
-    blur = np.where(rng.random(n) < 0.15, rng.uniform(3, 12, n), rng.uniform(0.5, 0.9, n))
-    trails(cv, P, inten, hue, blur, rng, env=None, speed=0.25, prof=prof)
-    band = np.stack([x, np.full(M, yi.mean())], -1)
-    cv.polylines(band[None], (0.5 * m[0] * envelope(t, 0.1, 0.05))[None], ramp(0.4), 60)
-    motes(cv, 14, (0, 0, 2400, 1800), energy=(0.01, 0.04), blur=(20, 70), seed=18)
-    return dict(exposure=1.0, bloom=0.10, halation=0.06, vignette=0.42)
+    core = np.exp(-(u / 0.55) ** 2)
+    inten = lognormal_int(rng, n, 0.07, 0.45) * (0.5 + 0.8 * core)
+    prof = (0.35 + 0.65 * calm)[None] * envelope(t, 0.10, 0.02)[None]
+    hue = np.clip(0.72 - calm[None] * (0.15 + 0.55 * core[:, None]) + rng.normal(0, 0.06, (n, 1)), 0, 1)
+    # chaos falls out of focus, order is sharp
+    bl0 = np.where(rng.random(n) < 0.55, rng.uniform(5, 45, n), rng.uniform(0.6, 2.0, n))
+    B = bl0[:, None] * (1 - calm)[None] + 0.6 * calm[None]
+    trails(cv, P, inten, hue, B, rng, env=None, speed=0.15, prof=prof)
+    # a soft out-of-focus copy of the calm band (the glow of the gathered light)
+    ctrl = np.array([[700.0, 860.0], [1300.0, 840.0], [1900.0, 830.0], [2700.0, 820.0]])
+    ribbon(cv, ctrl, n=90, width=290, inten=0.05, isig=0.4, hue=(0.1, 0.6), blur=(24, 70), tjit=0.15,
+           env=(0.35, 0.05), wob=0.05, seed=5)
+    glow(cv, (1800.0, 840.0), 30000.0, 460, 0.25, n=9000, seed=3)
+    glow(cv, (600.0, 950.0), 12000.0, 520, 0.6, n=8000, seed=4)
+    motes(cv, 16, (0, 0, 2400, 1800), energy=(0.02, 0.06), blur=(20, 90), seed=18)
+    return dict(exposure=1.2, bloom=0.14, halation=0.09, vignette=0.42, atmos=0.06)
 
 
 # ---------------------------------------------------------------------------
@@ -1090,15 +1259,15 @@ def service_govern(cv):
        "A wide river of long-exposure light sweeps up through the centre: a hot warm-white core, soft out-of-focus streaks around it, lit haze.")
 def cta(cv):
     rng = np.random.default_rng(223)
-    ctrl = np.array([[-300.0, 1260.0], [650.0, 1080.0], [1150.0, 420.0], [2750.0, 300.0]])
+    ctrl = np.array([[-300.0, 1300.0], [650.0, 1160.0], [1200.0, 520.0], [2750.0, 330.0]])
 
     def fan(t):
         # gathered where it crosses the heading, opening wide towards the right like a flare
         return 0.45 + 0.5 * (1 - t) ** 2 + 1.9 * t ** 2.4
 
     # in-focus core: fine trails, hot towards warm white
-    ribbon(cv, ctrl, n=560, width=170, twist=0.7, twist_phase=0.5, wob=0.22, inten=0.19, isig=0.85,
-           hue=(0.0, 0.5), blur=lambda u, r: 0.5 + 12.0 * np.abs(u) ** 2.2, tjit=0.28, env=(0.22, 0.22),
+    ribbon(cv, ctrl, n=560, width=170, twist=0.7, twist_phase=0.5, wob=0.22, inten=0.22, isig=0.85,
+           hue=(0.0, 0.4), blur=lambda u, r: 0.5 + 12.0 * np.abs(u) ** 2.2, tjit=0.28, env=(0.22, 0.22),
            spread_profile=fan, seed=41, speed_mod=0.45)
     # mid depth: softer, wider
     ribbon(cv, ctrl + np.array([[0, 70], [0, 50], [0, -30], [0, -70]]), n=200, width=310, twist=0.4, wob=0.35,
@@ -1117,16 +1286,17 @@ def cta(cv):
                   lognormal_int(rng, 320, 0.08, 0.6), rng.uniform(0.2, 0.9, 320),
                   np.where(rng.random(320) < 0.4, rng.uniform(4, 24, 320), 0.6))
     # a second, fainter pass crossing lower: the light was moved twice during the exposure
-    ctrl2 = np.array([[-200.0, 900.0], [700.0, 860.0], [1500.0, 700.0], [2700.0, 760.0]])
-    ribbon(cv, ctrl2, n=160, width=120, twist=0.5, wob=0.3, inten=0.05, isig=0.7, hue=(0.3, 0.9),
+    ctrl2 = np.array([[-200.0, 1050.0], [700.0, 1000.0], [1500.0, 900.0], [2700.0, 1050.0]])
+    ribbon(cv, ctrl2, n=200, width=150, twist=0.5, wob=0.3, inten=0.07, isig=0.7, hue=(0.3, 0.9),
            blur=lambda u, r: 2.0 + 30.0 * np.abs(u) ** 1.5, tjit=0.3, env=(0.3, 0.3), seed=44)
     # the air lit by the light: midtones behind the heading
-    glow(cv, (1250.0, 640.0), 34000.0, 480, 0.45, n=9000, seed=3)
-    glow(cv, (1250.0, 620.0), 7000.0, 190, 0.2, n=6000, seed=4)
+    glow(cv, (1250.0, 720.0), 24000.0, 360, 0.35, n=9000, seed=3)
+    glow(cv, (1250.0, 700.0), 9000.0, 200, 0.15, n=6000, seed=4)
+    # light pooling low in the frame, under the buttons
+    glow(cv, (1350.0, 1120.0), 9000.0, 320, 0.4, n=8000, seed=5)
     motes(cv, 40, (0, 0, 2400, 1350), energy=(0.02, 0.10), blur=(30, 110), hue=(0.4, 0.9), seed=19)
-    return dict(exposure=1.25, bloom=0.13, halation=0.09, vignette=0.55, slate=0.6)
+    return dict(exposure=1.35, bloom=0.14, halation=0.09, vignette=0.5, slate=0.6)
 
-# @@end cta
 
 @scene("status", R11, "Hero status card thumbnail (small, 1:1)",
        "A hot point of light at the head of a long, curving exposure trail, glowing in soft haze. Reads at thumbnail size.")
@@ -1149,7 +1319,6 @@ def status(cv):
     glow(cv, head, 22000.0, 380, 0.45, n=8000, seed=1)
     return dict(exposure=1.05, bloom=0.14, halation=0.09, vignette=0.4, slate=0.3)
 
-# @@end status
 
 @scene("reel-poster", R169, "Reel frame poster (pill control sits bottom centre)",
        "A light-painted orb: hundreds of orbits traced by a spinning light, sparks flying off, centred.")
@@ -1239,7 +1408,6 @@ def about_1(cv):
     glow(cv, (cx + 150, hy + 30), 5000.0, 130, 0.2, n=5000, seed=6)
     return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.45)
 
-# @@end about-1
 
 @scene("about-2", R43, "About: we go inside your company",
        "A long exposure from inside a moving tunnel: ceiling, wall and floor lights stretch into streaks that rush towards a bright opening.")
@@ -1302,7 +1470,6 @@ def about_2(cv):
     glow(cv, end, 26000.0, 420, 0.4, n=8000, seed=3)
     return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.5)
 
-# @@end about-2
 
 @scene("about-3", R43, "About: 24/7, always on",
        "A beacon sweeps through night haze over dark water; the long exposure turns its beam into a soft fan of light with glints on the sea.")
@@ -1352,7 +1519,6 @@ def about_3(cv):
                  (0.05 * np.exp(-((np.linspace(-100, 2500, 400) - 900) / 900) ** 2))[None], ramp(0.6), 18)
     return dict(exposure=1.1, bloom=0.12, halation=0.08, vignette=0.48)
 
-# @@end about-3
 
 @scene("contact", R45, "Contact page image (4:5)",
        "A single calm ribbon of light rises through the frame in an S curve, trailing fine sparks.")

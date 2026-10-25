@@ -418,12 +418,13 @@
 .pill__row:hover,
 .pill__row:focus-visible { background: var(--paper-07); }
 .pill__row:focus-visible { outline-offset: -2px; }
+/* 600 on our variable Instrument Sans renders like the reference's static 500 cut (checked at 1440 and 390) */
 .pill__label {
   display: flex;
   align-items: center;
   gap: .55em;
   font-size: var(--fs-ml);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: var(--tr-2);
   line-height: var(--lh-140);
 }
@@ -438,6 +439,8 @@
   color: var(--paper-82);
   transition: transform var(--t) var(--ease), color var(--t-fast) var(--ease);
 }
+/* arrows and the copy icon read at the reference's size (its 18px arrow at 1.15em) */
+.pill__icon:not(.pill__icon--plus) { transform: scale(1.22); stroke-width: 1.6; }
 .pill__row:hover .pill__icon { color: var(--amber); }
 .pill__row[aria-expanded="true"] .pill__icon--plus { transform: rotate(135deg); }
 .pill__row.is-current .pill__label::before,
@@ -570,8 +573,10 @@
   width: clamp(300px, 25vw, 380px);
   padding: .375em .375em .375em 1.5em;
   border-radius: var(--r-m);
-  /* darker than the shared glass: deep navy at 46% so the card reads as a dark chip over the bright hero light */
-  background: rgba(3, 11, 28, .46);
+  /* a dark frosted chip a step above the hero's navy-deep (like the reference's chip, which sits a little lighter
+     than the dark around it), plus a faint hairline, so it reads as a card without lifting toward blue */
+  background: rgba(20, 32, 60, .5);
+  box-shadow: inset 0 0 0 1px var(--paper-07);
   -webkit-backdrop-filter: var(--blur-chip);
   backdrop-filter: var(--blur-chip);
   color: var(--paper-82);
@@ -579,7 +584,7 @@
   cursor: copy;
   transition: background-color var(--t-fast) var(--ease);
 }
-.status:hover { background: rgba(3, 11, 28, .6); }
+.status:hover { background: rgba(20, 32, 60, .66); }
 .status__body {
   flex: 1;
   min-width: 0;
@@ -626,7 +631,8 @@
   width: 156px;
   border-radius: var(--r-sm);
 }
-.status__thumb > img { transition: transform var(--t) var(--ease); }
+/* the thumb is the brightest point of the card, like the reference: a lit hand on a keyboard, lifted a touch */
+.status__thumb > img { object-position: 60% 50%; filter: brightness(1.18) contrast(1.06); transition: transform var(--t) var(--ease); }
 .status:hover .status__thumb > img { transform: scale(1.05); }
 @media (min-width: 1920px) {
   .status { width: clamp(500px, 25vw, 580px); }
@@ -759,6 +765,7 @@
   transition: opacity var(--t) var(--ease);
 }
 .tile__name {
+  font-family: var(--font-display);
   font-size: var(--fs-3xl);
   font-weight: 500;
   line-height: 1;
@@ -873,22 +880,43 @@ a.ledger__row:hover { padding-inline: .75em; }
   color: var(--text-meta);
   white-space: nowrap;
 }
+/* the track (navy 11%) shows while the bar fills on scroll (staggered per row, main.js [data-bars]);
+   once full, a slow light pass runs along each bar, one row after the other, so the rows read as live */
 .ledger__track {
   display: block;
   height: .25em;
   min-height: 3px;
   border-radius: var(--r-3xs);
-  background: var(--line);
+  background: var(--navy-11);
   overflow: hidden;
 }
 .ledger__fill {
+  position: relative;
   display: block;
   width: var(--fill, 100%);
   height: 100%;
   border-radius: var(--r-3xs);
   background: var(--text);
   transform-origin: left center;
+  overflow: hidden;
 }
+.ledger__fill.is-live::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 28%;
+  background: linear-gradient(90deg, rgba(244, 245, 247, 0), rgba(244, 245, 247, .7), rgba(244, 245, 247, 0));
+  transform: translateX(-110%);
+  animation: ledger-pass 6s var(--ease) infinite;
+  animation-delay: calc(var(--i, 0) * .6s);
+}
+@keyframes ledger-pass {
+  0% { transform: translateX(-110%); }
+  32%, 100% { transform: translateX(380%); }
+}
+@media (prefers-reduced-motion: reduce) { .ledger__fill.is-live::after { content: none; } }
 .ledger__end {
   grid-column: 11 / 13;
   justify-self: end;
@@ -1057,31 +1085,35 @@ a.ledger__row:hover { padding-inline: .75em; }
 .reason__figure-text { font-family: var(--font-display); font-size: var(--fs-sm); line-height: var(--lh-140); color: var(--paper-82); text-wrap: pretty; }
 .reason__crew { display: flex; align-items: center; gap: .75em; }
 .reason__stack { display: flex; }
-/* overlapping round chips (34px, 2px navy ring), like a row of avatars but without faces: solid light
-   chips with a navy pixel glyph or the mark (--amber, --paper, --slate), closed by a live chip with the
-   pulsing amber dot (--live). Plain .reason__chip = navy chip with an amber glyph. */
+/* overlapping round chips (32px, 2px navy ring), like the reference's avatar row but without faces: three
+   close crops of our own light imagery (--burst, --swarm, --trail: each a bright amber point, so the row
+   reads as one set) and the mark on paper (--paper). --amber / --slate / --live stay available. */
 .reason__chip {
   position: relative;
   display: grid;
   place-items: center;
   flex: none;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--navy-2);
   box-shadow: 0 0 0 2px var(--navy);
   color: var(--amber);
   overflow: hidden;
 }
-.reason__chip + .reason__chip { margin-left: -10px; }
-.reason__chip svg { width: 16px; height: 16px; }
+.reason__chip + .reason__chip { margin-left: -9px; }
+.reason__chip svg { width: 15px; height: 15px; }
 .reason__chip--amber { background: var(--amber); color: var(--navy); }
 .reason__chip--paper { background: var(--paper); color: var(--navy); --logo-back: var(--navy); }
 .reason__chip--slate { background: var(--slate-light); color: var(--navy); }
 .reason__chip--live { background: var(--navy-3); }
-.reason__chip .logo__mark { width: 20px; }
+.reason__chip--img > img { transform: scale(1.6); }
+.reason__chip--burst > img { object-position: 50% 50%; transform: scale(2.2); }
+.reason__chip--swarm > img { object-position: 50% 48%; transform: scale(2.6); }
+.reason__chip--trail > img { object-position: 62% 46%; transform: scale(2.4); }
+.reason__chip .logo__mark { width: 18px; }
 .reason__chip--live .dot { width: 7px; height: 7px; }
-.reason__crew-label { max-width: 14em; font-size: var(--fs-xs); text-transform: uppercase; color: var(--paper-82); line-height: 1.3; }
+.reason__crew-label { font-size: var(--fs-xs); text-transform: uppercase; white-space: nowrap; color: var(--paper-82); line-height: 1.4; }
 @media (max-width: 767px) { .reason { min-height: 32em; } }
 
 /* ===== Reel frame with island control ===== */
@@ -1093,7 +1125,8 @@ a.ledger__row:hover { padding-inline: .75em; }
   min-height: 24em;
   border-radius: var(--r-m);
   overflow: hidden;
-  background: var(--navy-deep);
+  /* the canvas paints over this; without JS or canvas the frame is still the film's navy base */
+  background: radial-gradient(62% 60% at 50% 50%, #0B2350, var(--navy-abyss));
   isolation: isolate;
 }
 .reel__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -1140,7 +1173,7 @@ a.ledger__row:hover { padding-inline: .75em; }
 .reel__toggle .is-play { display: none; }
 .reel.is-paused .reel__toggle .is-play { display: block; }
 .reel.is-paused .reel__toggle .is-pause { display: none; }
-@media (max-width: 767px) { .reel { height: 70vh; } }
+@media (max-width: 767px) { .reel { height: 80vh; height: 80svh; } }
 
 /* ===== FAQ accordion ===== */
 .faq {
@@ -1355,7 +1388,17 @@ a.ledger__row:hover { padding-inline: .75em; }
 }
 .finale__title { max-width: var(--col-10); font-size: min(var(--h0), 14vw); font-weight: 600; color: var(--paper); }
 .finale__text { max-width: 32ch; font-size: var(--fs-l); line-height: var(--lh-150); color: var(--paper-82); text-wrap: pretty; }
-@media (max-width: 767px) { .finale { height: auto; min-height: 90vh; } }
+/* phones: a full screen band (100svh, like the reference) with the content block centered and the title
+   at the full display size; 16.5vw keeps "We’ll take it" on one line down to 320px */
+@media (max-width: 767px) { .finale { height: auto; min-height: 100vh; min-height: 100svh; } }
+/* phones: the tall crop of the 16:9 river is shifted left so the light crosses the band on a diagonal with
+   dark corners (not just its soft middle), and the navy scrim is only an ellipse behind the text block, so
+   the rest of the light keeps its amber instead of turning khaki */
+@media (max-width: 767px) {
+  .finale__media > img { object-position: 28% 50%; }
+  .finale__media::after { background: radial-gradient(72% 38% at 50% 50%, rgba(3, 11, 28, .5), rgba(3, 11, 28, .22) 55%, rgba(3, 11, 28, 0) 100%); }
+}
+@media (max-width: 479px) { .finale__title { max-width: 100%; font-size: min(var(--h0), 16.5vw); } }
 
 /* ===== Footer ===== */
 .foot {

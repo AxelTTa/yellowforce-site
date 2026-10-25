@@ -64,6 +64,8 @@
   aspect-ratio: 4 / 5;
   border-radius: var(--r-ml);
 }
+/* the photo is 4:5 like the frame (its own crop keeps the lit hand centred, no flat black top);
+   phones show a 3:2 band of it, set below so the fingertips stay in */
 .page-contact .ct-write__col {
   min-width: 0;
   display: flex;
@@ -211,6 +213,7 @@
   .page-contact .ct-write { padding-top: var(--sp-6); }
   .page-contact .ct-write__grid { grid-template-columns: 1fr; }
   .page-contact .ct-write__media { aspect-ratio: 3 / 2; }
+  .page-contact .ct-write__media > img { object-position: 50% 14%; }
   .page-contact .ct-write__col { row-gap: var(--sp-4); }
   .page-contact .ct-write__title { max-width: none; }
   .page-contact .ct-urgent { padding: var(--sp-4) var(--sp-15) var(--sp-2); }

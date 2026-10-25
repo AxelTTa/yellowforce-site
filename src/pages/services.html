@@ -11,33 +11,15 @@ css: /assets/css/pages/services.css
   <h1 class="page-head__title" id="svc-title" data-reveal="lines">Your security.<br>Run by us.</h1>
   <p class="page-head__text" data-reveal="fade" data-delay=".3">We don’t sell you a tool. We run your cybersecurity for you, from A&nbsp;to&nbsp;Z, 24/7.</p>
 </section>
-<div class="gutter svc-hero">
-  <div class="frame">
-    <div class="svc-hero__shot shot media" aria-hidden="true" data-reveal="frame">
-      <img src="/assets/img/photo/services-hero.webp" data-variants sizes="100vw" alt="" loading="eager" fetchpriority="high">
-    </div>
-  </div>
-</div>
-
-<!-- 02 Problem -->
-<section class="block gutter svc-problem" id="problem" aria-labelledby="problem-title">
-  <div class="frame svc-split">
-    <h2 class="svc-split__title" id="problem-title" data-reveal="lines">Too many tools.<br>Nobody in charge.</h2>
-    <div class="svc-split__body" data-reveal="fade" data-delay=".2">
-      <p class="svc-split__text">Most companies buy a tool for every problem. A firewall here, an endpoint agent there, an email filter, a cloud scanner, an AI add-on. Each one sends alerts. Nobody owns all of them, and attackers walk through the gaps in between.</p>
-      <p class="svc-split__text svc-split__text--strong">We take the whole thing over. One team, every domain, every alert, 24/7.</p>
-    </div>
-  </div>
-</section>
 
 <div class="svc-flow">
-  <!-- 03 Practice cards -->
+  <!-- 02 Practice cards (right under the title, like the work index) -->
   <section class="gutter svc-cards" id="practices" aria-label="Six practices">
     <div class="frame">
       <ul class="tiles" data-reveal="stagger">
         <li class="tiles__cell">
           <a class="tile" href="#deploy">
-            <span class="tile__media media"><img src="/assets/img/gen/service-1.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><img src="/assets/img/gen/service-1.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">Deploy and connect</span><span class="tile__meta"><span>Practice 001</span><span>Day one</span></span></span>
               <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__more">See the practice<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></span></span>
@@ -46,7 +28,7 @@ css: /assets/css/pages/services.css
         </li>
         <li class="tiles__cell">
           <a class="tile" href="#detect">
-            <span class="tile__media media"><img src="/assets/img/gen/service-2.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><img src="/assets/img/gen/service-2.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager"></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">Detect 24/7</span><span class="tile__meta"><span>Practice 002</span><span>Always on</span></span></span>
               <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__more">See the practice<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></span></span>
@@ -93,98 +75,85 @@ css: /assets/css/pages/services.css
     </div>
   </section>
 
+  <!-- 03 Problem (below the grid, intro to the detail rows) -->
+  <section class="block gutter svc-problem" id="problem" aria-labelledby="problem-title">
+    <div class="frame svc-split">
+      <h2 class="svc-split__title" id="problem-title" data-reveal="lines">Too many tools.<br>Nobody in charge.</h2>
+      <div class="svc-split__body" data-reveal="fade" data-delay=".2">
+        <p class="svc-split__text">Most companies buy a tool for every problem. A firewall here, an endpoint agent there, an email filter, a cloud scanner, an AI add-on. Each one sends alerts. Nobody owns all of them, and attackers walk through the gaps in between.</p>
+        <p class="svc-split__text svc-split__text--strong">We take the whole thing over. One team, every domain, every alert, 24/7.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- 04 Practice rows -->
   <section class="block gutter svc-rows" aria-label="The six practices in detail">
-    <div class="frame">
+    <div class="frame svc-rows__grid">
       <article class="svc-row" id="deploy" aria-labelledby="deploy-title">
         <div class="svc-row__top"><span class="t-label">( 001 )</span><span class="t-label">Day one</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="deploy-title" data-reveal="lines">Deploy and<br>connect.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">We go in, put our technology inside your environment and connect every tool you already run.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Our AI agents deployed inside your environment</span></li>
-              <li><span class="svc-row__n">02</span><span>Every existing tool and log source connected</span></li>
-              <li><span class="svc-row__n">03</span><span>One live map of your people, devices, apps and data</span></li>
-              <li><span class="svc-row__n">04</span><span>Your chat, tickets and workflows wired in</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="deploy-title" data-reveal="lines">Deploy and<br>connect.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">We go in, put our technology inside your environment and connect every tool you already run.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Our AI agents deployed inside your environment</span></li>
+          <li><span class="svc-row__n">02</span><span>Every existing tool and log source connected</span></li>
+          <li><span class="svc-row__n">03</span><span>One live map of your people, devices, apps and data</span></li>
+          <li><span class="svc-row__n">04</span><span>Your chat, tickets and workflows wired in</span></li>
+        </ul>
       </article>
       <article class="svc-row" id="detect" aria-labelledby="detect-title">
         <div class="svc-row__top"><span class="t-label">( 002 )</span><span class="t-label">Always on</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="detect-title" data-reveal="lines">Detect<br>24/7.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">AI agents watch every signal across every domain, day and night, and our experts confirm what matters.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Every alert triaged by AI, instantly</span></li>
-              <li><span class="svc-row__n">02</span><span>Swarm and agent traffic spotted as it starts</span></li>
-              <li><span class="svc-row__n">03</span><span>Threat hunting across all ten domains</span></li>
-              <li><span class="svc-row__n">04</span><span>Experts on watch around the clock</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="detect-title" data-reveal="lines">Detect<br>24/7.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">AI agents watch every signal across every domain, day and night, and our experts confirm what matters.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Every alert triaged by AI, instantly</span></li>
+          <li><span class="svc-row__n">02</span><span>Swarm and agent traffic spotted as it starts</span></li>
+          <li><span class="svc-row__n">03</span><span>Threat hunting across all ten domains</span></li>
+          <li><span class="svc-row__n">04</span><span>Experts on watch around the clock</span></li>
+        </ul>
       </article>
       <article class="svc-row" id="respond" aria-labelledby="respond-title">
         <div class="svc-row__top"><span class="t-label">( 003 )</span><span class="t-label">Real time</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="respond-title" data-reveal="lines">Respond.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">We contain and shut down attacks in real time, then run the incident end to end.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Devices isolated, sessions killed, accounts locked in real time</span></li>
-              <li><span class="svc-row__n">02</span><span>Full investigation and root cause</span></li>
-              <li><span class="svc-row__n">03</span><span>Clean recovery and restore</span></li>
-              <li><span class="svc-row__n">04</span><span>Clear updates for your leadership</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="respond-title" data-reveal="lines">Respond.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">We contain and shut down attacks in real time, then run the incident end to end.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Devices isolated, sessions killed, accounts locked in real time</span></li>
+          <li><span class="svc-row__n">02</span><span>Full investigation and root cause</span></li>
+          <li><span class="svc-row__n">03</span><span>Clean recovery and restore</span></li>
+          <li><span class="svc-row__n">04</span><span>Clear updates for your leadership</span></li>
+        </ul>
       </article>
       <article class="svc-row" id="attack" aria-labelledby="attack-title">
         <div class="svc-row__top"><span class="t-label">( 004 )</span><span class="t-label">Continuous</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="attack-title" data-reveal="lines">Attack.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">We attack you first, with AI and human red teamers, to find every way in before anyone else does.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Continuous AI red teaming of apps, APIs and cloud</span></li>
-              <li><span class="svc-row__n">02</span><span>Phishing and deepfake drills on your people</span></li>
-              <li><span class="svc-row__n">03</span><span>Swarm-style attacks against your defenses</span></li>
-              <li><span class="svc-row__n">04</span><span>Every finding proven, with steps to reproduce</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="attack-title" data-reveal="lines">Attack.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">We attack you first, with AI and human red teamers, to find every way in before anyone else does.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Continuous AI red teaming of apps, APIs and cloud</span></li>
+          <li><span class="svc-row__n">02</span><span>Phishing and deepfake drills on your people</span></li>
+          <li><span class="svc-row__n">03</span><span>Swarm-style attacks against your defenses</span></li>
+          <li><span class="svc-row__n">04</span><span>Every finding proven, with steps to reproduce</span></li>
+        </ul>
       </article>
       <article class="svc-row" id="harden" aria-labelledby="harden-title">
         <div class="svc-row__top"><span class="t-label">( 005 )</span><span class="t-label">Fixed and retested</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="harden-title" data-reveal="lines">Harden.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">We fix what we find. Patch, reconfigure and retest until the hole is closed.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Patches and config changes done for you</span></li>
-              <li><span class="svc-row__n">02</span><span>Accounts, keys and permissions cleaned up</span></li>
-              <li><span class="svc-row__n">03</span><span>Every fix retested against the real attack</span></li>
-              <li><span class="svc-row__n">04</span><span>Hardening kept current as you grow</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="harden-title" data-reveal="lines">Harden.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">We fix what we find. Patch, reconfigure and retest until the hole is closed.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Patches and config changes done for you</span></li>
+          <li><span class="svc-row__n">02</span><span>Accounts, keys and permissions cleaned up</span></li>
+          <li><span class="svc-row__n">03</span><span>Every fix retested against the real attack</span></li>
+          <li><span class="svc-row__n">04</span><span>Hardening kept current as you grow</span></li>
+        </ul>
       </article>
       <article class="svc-row" id="govern" aria-labelledby="govern-title">
         <div class="svc-row__top"><span class="t-label">( 006 )</span><span class="t-label">Kept current</span></div>
-        <div class="svc-row__grid">
-          <h2 class="svc-row__title" id="govern-title" data-reveal="lines">Govern.</h2>
-          <div class="svc-row__body">
-            <p class="svc-row__line" data-reveal="fade" data-delay=".2">Policies, risk and compliance, kept current as your company changes.</p>
-            <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
-              <li><span class="svc-row__n">01</span><span>Security policies written and maintained</span></li>
-              <li><span class="svc-row__n">02</span><span>Risk register and vendor reviews</span></li>
-              <li><span class="svc-row__n">03</span><span>Audit evidence ready when you need it</span></li>
-              <li><span class="svc-row__n">04</span><span>Customer security questionnaires answered</span></li>
-            </ul>
-          </div>
-        </div>
+        <h2 class="svc-row__title" id="govern-title" data-reveal="lines">Govern.</h2>
+        <p class="svc-row__line" data-reveal="fade" data-delay=".2">Policies, risk and compliance, kept current as your company changes.</p>
+        <ul class="svc-row__list" data-reveal="stagger" data-stagger=".06">
+          <li><span class="svc-row__n">01</span><span>Security policies written and maintained</span></li>
+          <li><span class="svc-row__n">02</span><span>Risk register and vendor reviews</span></li>
+          <li><span class="svc-row__n">03</span><span>Audit evidence ready when you need it</span></li>
+          <li><span class="svc-row__n">04</span><span>Customer security questionnaires answered</span></li>
+        </ul>
       </article>
     </div>
   </section>
@@ -215,7 +184,7 @@ css: /assets/css/pages/services.css
         <div class="ledger__row">
           <h3 class="ledger__name"><span class="ledger__num">01</span>Deploy.</h3>
           <p class="ledger__tag">We go inside your company and place our technology in your environment. Nothing to rip out.</p>
-          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 01</span><span>of 04</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 25%"></span></span></span>
+          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 01</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 25%"></span></span></span>
           <span class="ledger__end">Day one</span>
         </div>
       </li>
@@ -223,7 +192,7 @@ css: /assets/css/pages/services.css
         <div class="ledger__row">
           <h3 class="ledger__name"><span class="ledger__num">02</span>Connect.</h3>
           <p class="ledger__tag">We plug into every system you run: cloud, devices, identity, email, code, logs and chat. Your workflows stay.</p>
-          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 02</span><span>of 04</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 50%"></span></span></span>
+          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 02</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 50%"></span></span></span>
           <span class="ledger__end">Day one</span>
         </div>
       </li>
@@ -231,7 +200,7 @@ css: /assets/css/pages/services.css
         <div class="ledger__row">
           <h3 class="ledger__name"><span class="ledger__num">03</span>Defend.</h3>
           <p class="ledger__tag">Our AI agents and experts watch, hunt and respond across every domain. Attacks get shut down as they start.</p>
-          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 03</span><span>of 04</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 75%"></span></span></span>
+          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 03</span></span><span class="ledger__track"><span class="ledger__fill" style="--fill: 75%"></span></span></span>
           <span class="ledger__end">24/7</span>
         </div>
       </li>
@@ -239,7 +208,7 @@ css: /assets/css/pages/services.css
         <div class="ledger__row">
           <h3 class="ledger__name"><span class="ledger__num">04</span>Improve.</h3>
           <p class="ledger__tag">We attack, fix and retest without stopping, so your defense gets harder to break every day.</p>
-          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 04</span><span>of 04</span></span><span class="ledger__track"><span class="ledger__fill"></span></span></span>
+          <span class="ledger__gauge" aria-hidden="true"><span class="ledger__gauge-meta"><span>Step 04</span></span><span class="ledger__track"><span class="ledger__fill"></span></span></span>
           <span class="ledger__end">Continuous</span>
         </div>
       </li>
