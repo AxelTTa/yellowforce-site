@@ -6,13 +6,13 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Security and responsible disclosure | YellowForce</title>
-<meta name="description" content="Found a vulnerability in yellow-force.com? Here&#x27;s how to report it to us, what&#x27;s in scope and the safe harbor we give researchers.">
+<meta name="description" content="Found a vulnerability in yellow-force.com? Here’s how to report it to us, what’s in scope and the safe harbor we give researchers.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://yellow-force.com/security/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="YellowForce">
 <meta property="og:title" content="Security and responsible disclosure | YellowForce">
-<meta property="og:description" content="Found a vulnerability in yellow-force.com? Here&#x27;s how to report it to us, what&#x27;s in scope and the safe harbor we give researchers.">
+<meta property="og:description" content="Found a vulnerability in yellow-force.com? Here’s how to report it to us, what’s in scope and the safe harbor we give researchers.">
 <meta property="og:url" content="https://yellow-force.com/security/">
 <meta property="og:image" content="https://yellow-force.com/assets/img/og.png">
 <meta property="og:image:width" content="1200">
@@ -21,8 +21,9 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Security and responsible disclosure | YellowForce">
-<meta name="twitter:description" content="Found a vulnerability in yellow-force.com? Here&#x27;s how to report it to us, what&#x27;s in scope and the safe harbor we give researchers.">
+<meta name="twitter:description" content="Found a vulnerability in yellow-force.com? Here’s how to report it to us, what’s in scope and the safe harbor we give researchers.">
 <meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
 <meta name="theme-color" content="#071B3E">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -30,6 +31,53 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
 <link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -105,7 +153,7 @@
   </div>
 </header>
 
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 <!-- Head -->
 <section class="lg-top gutter" aria-labelledby="lg-title">
   <div class="frame lg-top__wrap">
@@ -140,7 +188,7 @@
     <div class="prose lg-prose">
       <h2 id="in-scope">In scope.</h2>
       <ul>
-        <li>The yellow-force.com website and its pages.</li>
+        <li>The pages and client-side code we publish at yellow-force.com. The servers behind it are GitHub’s: report those to GitHub.</li>
       </ul>
 
       <h2 id="out-of-scope">Out of scope.</h2>
@@ -173,7 +221,7 @@
       <h2 id="what-we-promise">What we promise.</h2>
       <ul>
         <li>We acknowledge reports quickly and keep you updated until it’s fixed.</li>
-        <li>If you follow this policy, we consider your research authorized. We won’t take legal action against you or ask anyone else to.</li>
+        <li>If you follow this policy, we consider your research on what’s in scope authorized. We can only authorize testing of what we own. We won’t take legal action against you or ask anyone else to.</li>
         <li>If someone else takes action against you for research done under this policy, we’ll make clear that you acted with our permission.</li>
         <li>We’ll credit you publicly once it’s fixed, if you want.</li>
       </ul>

@@ -27,6 +27,17 @@ title keeps navy behind it (white text at 10:1 or more) and the coverage card's 
 `service-5` more light in its stream and air. The photo family was regraded to sit nearer this set (see
 `assets/img/photo/MANIFEST.md`).
 
+Round 4 (2026-10-26): the darkest images were lifted without changing their shapes (additions use their own seeds,
+drawn after the original elements). `threat-swarm` (was mean 24, 73% near-black) gains an outer, out-of-focus shell of
+the same swarm through the top and bottom of the frame and a warm haze over the disc (mean about 39, 45% near-black).
+`threat-breach` (was 29, 72%) gains a deeper, soft layer of the funnelling field and a wider spray, with no extra light
+in the gap so the pinch stays tight (about 40, 51%). The four dark domain heroes now carry structure into the lower
+third under the centred title and sit at mean 35+: `domain-email` (soft near lanes rising from below into the same
+vanishing point), `domain-network` (a lower ring of softer nodes linked up into the graph), `domain-ot-iot` (rings turn
+all the way round under the axis), `domain-identity` (outer ridges fall off less, haze lit under the print). Hero text
+contrast stays well above 3:1 (title) and 4.5:1 (paragraph) with the hero scrim. The photo family was regraded to
+this set's near-black navy floor with muted slate mids (`assets/img/photo/MANIFEST.md`).
+
 Every image ships in three widths: `NAME.webp` (main), `NAME-1600.webp`, `NAME-800.webp`, WebP q82.
 For square and 4:5 images the main file is 1600 wide, so `NAME.webp` and `NAME-1600.webp` are the same picture.
 Suggested `srcset`: `NAME-800.webp 800w, NAME-1600.webp 1600w, NAME.webp <main width>w`.
@@ -35,19 +46,19 @@ Most compositions keep the left and bottom-left calm for overlaid text; the hero
 | File (base name) | Aspect | Main size | Main KB | Slot | Description |
 |---|---|---|---|---|---|
 | `hero` | 16:9 | 2400x1350 | 161 | Home hero, behind 'Fight AI. With AI.' (text bottom-left) | A coherent ribbon of warm light arcs in from the top; an amber swarm breaks against it. Bottom-left stays dark for the headline. |
-| `threat-swarm` | 1:1 | 1600x1600 | 190 | Threat card: AI swarms | Thousands of tiny lights spiral into one dense, hot vortex. |
+| `threat-swarm` | 1:1 | 1600x1600 | 215 | Threat card: AI swarms | Thousands of tiny lights spiral into one dense, hot vortex. |
 | `threat-ransomware` | 1:1 | 1600x1600 | 247 | Threat card: ransomware | A torrent of light streaks rushes in from the left and piles up against a bright wall: heads stack and burn warm white along its face, sparks splash back, the space behind it stays locked and dim. |
 | `threat-phishing` | 1:1 | 1600x1600 | 177 | Threat card: deepfakes and impersonation | A wide stream of light sweeps up through the frame and so does its copy, a twin stream offset beside it with the same twists: a double exposure, the real one warm white, the fake amber, a fainter third echo behind. |
-| `threat-breach` | 1:1 | 1600x1600 | 281 | Threat card: breach and data theft | A wide field of light funnels into a narrow gap and bursts out the other side. |
-| `domain-network` | 16:9 | 2400x1350 | 85 | Coverage: Network security (domain page hero + card) | Glowing nodes joined by fine links, packets of light racing along them; a second network glows out of focus behind. |
+| `threat-breach` | 1:1 | 1600x1600 | 264 | Threat card: breach and data theft | A wide field of light funnels into a narrow gap and bursts out the other side. |
+| `domain-network` | 16:9 | 2400x1350 | 111 | Coverage: Network security (domain page hero + card) | Glowing nodes joined by fine links, packets of light racing along them; a second network glows out of focus behind. |
 | `domain-endpoint` | 16:9 | 2400x1350 | 122 | Coverage: Endpoint and device security (high-key card) | A dense night floor of device lights in perspective, shallow focus, under a glowing horizon; one guarded device burns hot in the middle. |
 | `domain-cloud` | 16:9 | 2400x1350 | 188 | Coverage: Cloud security (high-key card) | Wisps of white-gold light drift across the frame like a cloud bank, with a bright river of light running through it that burns warm white at its core; a softer bank lower down. |
-| `domain-identity` | 16:9 | 2400x1350 | 228 | Coverage: Identity and access | Fingerprint-like ridges drawn in light on a tilted plane, centred in the frame, sharp in the middle and falling out of focus, in lit haze. |
-| `domain-email` | 16:9 | 2400x1350 | 129 | Coverage: Email security | Message traffic streams like highway light trails towards a glowing gate; one stream is pulled out. |
+| `domain-identity` | 16:9 | 2400x1350 | 238 | Coverage: Identity and access | Fingerprint-like ridges drawn in light on a tilted plane, centred in the frame, sharp in the middle and falling out of focus, in lit haze. |
+| `domain-email` | 16:9 | 2400x1350 | 154 | Coverage: Email security | Message traffic streams like highway light trails towards a glowing gate; one stream is pulled out. |
 | `domain-applications` | 16:9 | 2400x1350 | 135 | Coverage: Application and API security (high-key card) | Lines of code written in light on a tilted, backlit page, sharp near the focus and melting into bokeh; the lines around the flaw burn hotter and one line flares where the flaw is. |
 | `domain-data` | 16:9 | 2400x1350 | 171 | Coverage: Data protection (high-key card) | A bright stream of light crosses the frame above a dark, glossy floor that holds its copy: a softer reflection broken into ripples. Every byte has a backup. |
 | `domain-ai-agents` | 16:9 | 2400x1350 | 297 | Coverage: AI and agent security | A murmuration of light: tens of thousands of tiny agents fly as one folded sheet arcing over the upper half of the frame and down its right side, burning warm white where the sheet turns edge-on; two small rogue clusters fly against the flow. The title area and the top-left corner stay dark navy. |
-| `domain-ot-iot` | 16:9 | 2400x1350 | 261 | Coverage: OT and IoT security | Long-exposure arcs of rotating machinery around a glowing axis inside the frame, dense and layered in depth, some blinking like sensors. |
+| `domain-ot-iot` | 16:9 | 2400x1350 | 297 | Coverage: OT and IoT security | Long-exposure arcs of rotating machinery around a glowing axis inside the frame, dense and layered in depth, some blinking like sensors. |
 | `domain-governance` | 16:9 | 2400x1350 | 168 | Coverage: Governance, risk and compliance (high-key card) | A ruled floor falling away to the horizon, flooded by one wide, warm beam that lights the rules it crosses and the haze above them. |
 | `service-1` | 4:3 | 2400x1800 | 227 | Services 001 Deploy and connect | One beam enters from the left and branches into a delta of fine filaments reaching every corner; two more deltas glow out of focus behind it, so the whole frame is wired. |
 | `service-2` | 4:3 | 2400x1800 | 297 | Services 002 Detect 24/7 (high-key card) | A broad river of soft-focus light drifts through the whole frame in every focus plane; one sharp trail moves against the grain and lights up. |
@@ -64,3 +75,5 @@ Most compositions keep the left and bottom-left calm for overlaid text; the hero
 | `contact` | 4:5 | 1600x2000 | 129 | Contact page image (4:5) | A single calm ribbon of light rises through the frame in an S curve, trailing fine sparks. |
 
 Regenerate: `/path/to/.venv/bin/python tools/gen_all.py [names] [--ss 2]` (numpy, scipy, opencv, pillow).
+
+- `about-2-320.webp`, `threat-swarm-320.webp`, `status-320.webp` (2026-10-26): 320 px downsizes of the full frames (PIL Lanczos, WebP q84) for the 32 px reason chips on Home, which scale the image up to about 2.6x. Same crop (object-position and scale stay in CSS).

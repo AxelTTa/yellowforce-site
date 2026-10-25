@@ -242,7 +242,32 @@ def threat_swarm(cv):
     cv.points(c[None], 10.0, ramp(0.05), 1.0)
     glow(cv, c, 10.0, 12, 0.5)
     motes(cv, 16, (0, 0, 1600, 1600), energy=(0.01, 0.05), blur=(20, 70), hue=(0.5, 1.0), seed=4)
-    return dict(exposure=1.0, bloom=0.11, halation=0.07, vignette=0.4)
+    # round 4 (QA C4): this card opens the home grid and was the darkest on the page (mean 24, 73% near-black).
+    # The swarm now lights the air it turns in: an outer shell of the same swarm sweeps through the top and the
+    # bottom of the frame (soft, out of focus on the near side), and a wide warm haze sits over the disc. The
+    # vortex, its arms and the hot core above are unchanged (own seed, drawn after them).
+    r4 = np.random.default_rng(2104)
+    nf = SWARM_SHELL
+    r0 = np.exp(r4.uniform(np.log(520), np.log(2000), nf))
+    th0 = r4.uniform(0, 2 * np.pi, nf)
+    L = 4.5 * r0 ** 0.45 * np.exp(r4.normal(0, 0.35, nf))
+    dth = L / r0
+    M = 10
+    s = np.linspace(0, 1, M)
+    th = th0[:, None] + dth[:, None] * s[None]
+    rr = r0[:, None] * np.exp(-0.2 * dth[:, None] * s[None])
+    P, z = place(rr, th, r4.normal(0, 1, nf)[:, None] * (0.06 * r0[:, None]))
+    zm = z.mean(1)
+    blur = np.minimum(1.0 + np.where(zm > 0, zm * 0.014, -zm * 0.005), 14)
+    inten = lognormal_int(r4, nf, SWARM_SHELL_I, 0.6) * (1 + blur / 8) ** 0.6
+    hue = np.clip(0.35 + 0.25 * np.log(r0 / 520) + r4.normal(0, 0.1, nf), 0, 0.95)
+    trails(cv, P, inten, hue, blur, r4, env=None, speed=0, prof=(0.12 + 0.88 * s ** 1.5)[None])
+    glow(cv, c, SWARM_HAZE, 520, 0.45, n=9000, seed=31)
+    glow(cv, c, SWARM_HAZE * 0.35, 230, 0.3, n=6000, seed=32)
+    return dict(exposure=SWARM_EXP, bloom=0.11, halation=0.07, vignette=0.4, atmos=SWARM_ATMOS)
+
+
+SWARM_SHELL, SWARM_SHELL_I, SWARM_HAZE, SWARM_EXP, SWARM_ATMOS = 2000, 0.085, 16000.0, 1.2, 0.05
 
 
 @scene("threat-ransomware", R11, "Threat card: ransomware",
@@ -410,7 +435,39 @@ def threat_breach(cv):
         cv.polylines(np.c_[np.full(600, g[0] + 1), y][None], I[None], ramp(0.3), 0.5)
     cv.points(np.array([[g[0] + 4, g[1]]]), 5.0, ramp(0.05), 1.5)
     motes(cv, 14, (900, 0, 1600, 1600), energy=(0.01, 0.05), blur=(20, 70), seed=7)
-    return dict(exposure=1.12, bloom=0.12, halation=0.07, vignette=0.42)
+    # round 4 (QA C4): second card of the home grid, was mean 29 with 72% near-black. A deeper, out-of-focus
+    # layer of the same field funnels in behind the sharp one (so the left half carries soft light top to bottom),
+    # the burst throws a wider soft spray, and the gap lights the haze around it. The bow-tie above is unchanged
+    # (own seed, drawn after it).
+    r4 = np.random.default_rng(5104)
+    nb = BREACH_DEEP
+    sx = r4.uniform(-300, 420, nb)
+    sy = r4.uniform(-250, 1850, nb)
+    gy = g[1] + r4.uniform(-gh, gh, nb)
+    ctrl = np.stack([np.c_[sx, sy], np.c_[sx + 380, sy],
+                     np.c_[np.full(nb, g[0] - 260), gy + (sy - gy) * 0.08], np.c_[np.full(nb, g[0]), gy]], 1)
+    A = bezier(ctrl, t)
+    ang = r4.normal(0, 0.42, nb)
+    ln = r4.uniform(500, 1300, nb)
+    dist = ln[:, None] * u[None]
+    a2 = ang[:, None] + r4.normal(0, 0.0004, nb)[:, None] * dist
+    Bx = g[0] + np.cumsum(np.cos(a2) * (ln[:, None] / (M2 - 1)), 1)
+    By = gy[:, None] + np.cumsum(np.sin(a2) * (ln[:, None] / (M2 - 1)), 1)
+    P = np.concatenate([A, np.stack([Bx, By], -1)], 1)
+    # out of focus away from the gap (sharp where the lines squeeze through it)
+    dg = np.hypot(P[..., 0] - g[0], P[..., 1] - g[1])
+    blur = 1.0 + r4.uniform(6, 22, nb)[:, None] * smoothstep(60, 520, dg)
+    prof = (0.30 + 0.70 * s1 ** 1.6) * (1 - smoothstep(0.45, 1.0, s2))
+    # it gives the gap no extra light: the pinch stays as tight and hot as before
+    prof = prof[None] * smoothstep(40, 360, dg)
+    hue = np.where(s2 > 0, 0.2 + 0.5 * s2, 0.9 - 0.6 * s1 ** 3)[None] * np.ones((nb, 1))
+    trails(cv, P, lognormal_int(r4, nb, BREACH_DEEP_I, 0.6), hue, blur, r4, env=(0.12, 0.02), prof=prof)
+    glow(cv, g + np.array([420.0, 0.0]), BREACH_HAZE, 420, 0.5, n=8000, seed=53)
+    glow(cv, g - np.array([440.0, 0.0]), BREACH_HAZE * 0.8, 520, 0.6, n=8000, seed=54)
+    return dict(exposure=BREACH_EXP, bloom=0.12, halation=0.07, vignette=0.42, atmos=0.05)
+
+
+BREACH_DEEP, BREACH_DEEP_I, BREACH_HAZE, BREACH_EXP = 700, 0.03, 8000.0, 1.12
 
 
 # ---------------------------------------------------------------------------
@@ -491,7 +548,65 @@ def domain_network(cv):
     glow(cv, (1650.0, 560.0), 22000.0, 460, 0.5, n=8000, seed=9)
     glow(cv, (1000.0, 420.0), 9000.0, 360, 0.55, n=7000, seed=10)
     motes(cv, 20, (900, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 70), seed=8)
-    return dict(exposure=1.2, bloom=0.13, halation=0.08, vignette=0.42)
+    # round 4 (QA C5): the graph now carries on down the frame (it stopped at two thirds, so phones showed an
+    # empty lower 40%). A lower ring of nodes sits a little nearer the camera, softer, linked to each other and up
+    # into the graph above, with packets on the links; its light fills the haze under the title. The graph above
+    # is unchanged (own seed, drawn after it).
+    r4 = np.random.default_rng(6104)
+    low = []
+    while len(low) < NET_LOW:
+        q0 = np.array([r4.uniform(520, 2560), r4.uniform(940, 1500)])
+        if all(np.hypot(*(q0 - q1)) > 330 for q1 in low) and np.min(np.hypot(*(pts - q0).T)) > 220:
+            low.append(q0)
+    low = np.array(low)
+    dlow = r4.uniform(0.3, 0.62, len(low))
+
+    def link(A, B, dz):
+        v = B - A
+        L = np.linalg.norm(v)
+        nr = np.array([-v[1], v[0]]) / L
+        bend = r4.normal(0, 0.04) * L
+        ctrl = np.array([A, A + v / 3 + nr * bend, A + 2 * v / 3 + nr * bend, B])
+        bl = 0.5 + 34 * dz ** 2
+        dim = (1 - 0.5 * dz) * (1 + bl / 6) ** 0.5
+        M = 400
+        t = np.linspace(0, 1, M)
+        sp = bezier(ctrl, t)
+        nn = normals(sp)
+        for off in (-1.5, 0.0, 1.6):
+            cv.polylines((sp + nn * off)[None], np.full((1, M), 0.15 * dim * NET_LOW_I), ramp(0.5), bl)
+        for _ in range(r4.integers(2, 5)):
+            a0 = r4.uniform(0.05, 0.75)
+            ln = r4.uniform(0.08, 0.22)
+            tt = np.clip((t - a0) / ln, 0, 1)
+            on = (t >= a0) & (t <= a0 + ln)
+            prof = on * (0.05 + 0.95 * tt ** 2.2)
+            if r4.random() < 0.5:
+                prof = prof[::-1]
+            cv.polylines(sp[None], (prof * lognormal_int(r4, 1, 1.4, 0.4) * dim * NET_LOW_I)[None], ramp(0.12), bl)
+            cv.polylines(sp[None], (prof * 0.25 * dim * NET_LOW_I)[None], ramp(0.5), bl + 7)
+
+    # each lower node: its nearest lower neighbour and its nearest node in the graph above
+    Dl = np.hypot(*(low[:, None] - low[None]).transpose(2, 0, 1))
+    np.fill_diagonal(Dl, 1e9)
+    done = set()
+    for i in range(len(low)):
+        j = int(Dl[i].argmin())
+        if (j, i) not in done:
+            done.add((i, j))
+            link(low[i], low[j], 0.5 * (dlow[i] + dlow[j]))
+        up = np.hypot(*(pts - low[i]).T)
+        u = int(up.argmin())
+        link(low[i], pts[u], 0.5 * (dlow[i] + depth[u]))
+    e = 22.0 * (1 - 0.5 * dlow)
+    bl = 0.5 + 34 * dlow ** 2
+    cv.points(low, e * (1 + (bl / 6) ** 2 * 0.25) * NET_LOW_I, ramp(0.03), bl)
+    glow(cv, low, e * 2.5 * NET_LOW_I, 8 + bl * 0.6, 0.5, n=800)
+    glow(cv, (1250.0, 1120.0), NET_HAZE, 480, 0.5, n=8000, seed=11)
+    return dict(exposure=NET_EXP, bloom=0.13, halation=0.08, vignette=0.42, atmos=0.04)
+
+
+NET_LOW, NET_LOW_I, NET_HAZE, NET_EXP = 7, 1.0, 24000.0, 1.45
 
 
 @scene("domain-endpoint", R169, "Coverage: Endpoint and device security (high-key card)",
@@ -615,7 +730,8 @@ def domain_identity(cv):
             dd = np.angle(np.exp(1j * (th - a)))
             g *= smoothstep(w * 0.5, w, np.abs(dd))
         paths.append(p)
-        Is.append(g * (0.66 - 0.010 * k) * (0.7 + 0.3 * np.sin(th * 3 + k)))
+        # round 4 (QA C5): outer ridges fall off less (they carry the print into the lower third)
+        Is.append(g * (0.66 - ID_FALL * k) * (0.7 + 0.3 * np.sin(th * 3 + k)))
         hues.append(np.full_like(th, 0.08 + 0.55 * k / K))
     P = np.array(paths)
     I = np.array(Is)
@@ -628,7 +744,12 @@ def domain_identity(cv):
     glow(cv, c, 12000.0, 420, 0.5, n=8000, seed=12)
     glow(cv, c + np.array([380.0, -260.0]), 9000.0, 300, 0.5, n=7000, seed=13)
     motes(cv, 20, (300, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=11)
-    return dict(exposure=1.15, bloom=0.13, halation=0.08, vignette=0.42)
+    # round 4 (QA C5): the scanning light also lights the haze under the print (was mean 29, dark lower third)
+    glow(cv, c + np.array([-160.0, 430.0]), ID_HAZE, 440, 0.5, n=8000, seed=14)
+    return dict(exposure=ID_EXP, bloom=0.13, halation=0.08, vignette=0.42, atmos=0.04)
+
+
+ID_FALL, ID_HAZE, ID_EXP = 0.0065, 10000.0, 1.3
 
 
 @scene("domain-email", R169, "Coverage: Email security",
@@ -680,7 +801,38 @@ def domain_email(cv):
     # round 1: the gate lights the haze around it (midtones, less empty navy)
     glow(cv, (gate_x, float(vp[1])), 18000.0, 380, 0.45, n=8000, seed=9)
     motes(cv, 18, (1000, 0, 2400, 1350), energy=(0.01, 0.05), blur=(20, 60), seed=23)
-    return dict(exposure=1.15, bloom=0.12, halation=0.08, vignette=0.42)
+    # round 4 (QA C5): the hero was mean 22 and its lower 40% was empty navy on phones. More lanes now come up
+    # from below the frame into the same vanishing point: near the camera, so soft and out of focus, crossing the
+    # lower third under the title. The gate lights the haze below it too. The lanes above are unchanged (own seed).
+    r4 = np.random.default_rng(1104)
+    yl2 = np.sort(r4.uniform(1380, 2080, EMAIL_LOW))
+    for i in range(len(yl2)):
+        yc = yl2[i] + (vp[1] - yl2[i]) * a
+        k = 4
+        offs = (r4.normal(0, 2.2, k) + np.linspace(-3, 3, k))[:, None] * (1 - a)[None]
+        P = np.stack([np.broadcast_to(x, (k, M)), yc[None] + offs], -1)
+        bl = min(0.5 + 26 * max(0.0, abs(yl2[i] - vp[1]) / 750 - 0.3) ** 1.6, 34.0)
+        I = np.zeros((k, M))
+        for q in range(k):
+            sp = 1 + 0.6 * wobble(r4, 1, a, terms=3, fmin=1.5, fmax=5)[0]
+            I[q] = lognormal_int(r4, 1, 0.07, 0.5)[0] * np.clip(sp, 0.1, 3)
+        cm = np.zeros(M)
+        for _ in range(r4.integers(2, 5)):
+            x0c = r4.uniform(0, 2300)
+            lc = r4.uniform(140, 380)
+            on = (x >= x0c) & (x <= x0c + lc)
+            cm += on * np.clip((x - x0c) / lc, 0, 1) ** 2.2 * lognormal_int(r4, 1, 0.45, 0.4)[0]
+        I += cm[None] * np.r_[1.0, np.full(k - 1, 0.25)][:, None]
+        I *= EMAIL_LOW_I * (1 + bl / 6) ** 0.7
+        I *= envelope(np.linspace(0, 1, M), 0.10, 0.02)[None] * (0.5 + 0.5 * smoothstep(gate_x - 200, gate_x + 60, x))[None]
+        H = np.where(x < gate_x, 0.82, 0.12)[None] * np.ones((k, 1))
+        cv.polylines(P, I, ramp(H), np.full(k, bl))
+    glow(cv, (gate_x - 60, 1080.0), EMAIL_HAZE, 440, 0.5, n=8000, seed=24)
+    glow(cv, (gate_x + 200, 300.0), EMAIL_HAZE * 0.5, 380, 0.5, n=6000, seed=25)
+    return dict(exposure=EMAIL_EXP, bloom=0.12, halation=0.08, vignette=0.42, atmos=0.04)
+
+
+EMAIL_LOW, EMAIL_LOW_I, EMAIL_HAZE, EMAIL_EXP = 9, 1.0, 12000.0, 1.4
 
 
 @scene("domain-applications", R169, "Coverage: Application and API security (high-key card)",
@@ -904,7 +1056,29 @@ def domain_ot_iot(cv):
     glow(cv, c, 900.0, 50, 0.1, n=5000, seed=5)
     glow(cv, (c[0] - 400, c[1] - 320), 9000.0, 320, 0.5, n=6000, seed=4)
     motes(cv, 24, (300, 0, 2400, 1350), energy=(0.02, 0.08), blur=(20, 80), seed=14)
-    return dict(exposure=1.1, bloom=0.13, halation=0.08, vignette=0.45)
+    # round 4 (QA C5): wider rings. The machinery now turns all the way round under the axis too, so the lower
+    # third (under the centred hero title) carries arcs instead of empty navy. The arcs above are unchanged.
+    r4 = np.random.default_rng(1424)
+    n2 = OT_LOW
+    r = np.sqrt(r4.uniform(0.01, 1, n2)) * 1700
+    th0 = r4.uniform(-0.05 * np.pi, 0.80 * np.pi, n2)
+    span = r4.uniform(0.08, 0.6, n2)
+    th = th0[:, None] + span[:, None] * s[None]
+    P = np.stack([c[0] + r[:, None] * np.cos(th), c[1] + r[:, None] * np.sin(th)], -1)
+    depth = r4.random(n2)
+    blur = np.where(depth < 0.3, 4 + 46 * (0.3 - depth) / 0.3, r4.uniform(0.5, 1.0, n2))
+    inten = lognormal_int(r4, n2, 0.10, 0.75) * (1 + blur / 6) ** 0.5 * (0.6 + 0.8 * np.exp(-r / 900)) * OT_LOW_I
+    hue = np.clip(0.15 + 0.8 * (r / 2500) ** 0.7 + r4.normal(0, 0.12, n2), 0, 1)
+    dashed = r4.random(n2) < 0.2
+    L = r[:, None] * span[:, None] * s[None]
+    sg = (L / r4.uniform(25, 70, n2)[:, None]) % 1.0
+    prof = np.where(dashed[:, None], 0.15 + 0.85 * (sg < 0.4), 1.0)
+    trails(cv, P, inten, hue[:, None] * np.ones((1, M)), blur, r4, env=(0.06, 0.06), prof=prof)
+    glow(cv, (c[0] - 300, c[1] + 120), OT_HAZE, 460, 0.45, n=8000, seed=6)
+    return dict(exposure=OT_EXP, bloom=0.13, halation=0.08, vignette=0.45, atmos=0.04)
+
+
+OT_LOW, OT_LOW_I, OT_HAZE, OT_EXP = 1000, 1.0, 14000.0, 1.35
 
 
 @scene("domain-governance", R169, "Coverage: Governance, risk and compliance (high-key card)",

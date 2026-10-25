@@ -23,6 +23,7 @@
 <meta name="twitter:title" content="Coverage | Every cyber domain, defended 24/7 | YellowForce">
 <meta name="twitter:description" content="Network, endpoint, cloud, identity, email, apps, data, AI agents, OT and governance. All ten cyber domains, one team, 24/7.">
 <meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
 <meta name="theme-color" content="#071B3E">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -30,6 +31,53 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
 <link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -105,7 +153,7 @@
   </div>
 </header>
 
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 <!-- 01 Hero -->
 <section class="page-head cov-head gutter" aria-labelledby="cov-title">
   <p class="t-label" data-reveal="fade">(    Coverage    )</p>
@@ -119,7 +167,7 @@
     <ul class="tiles cov-tiles" data-reveal="stagger">
         <li class="tiles__cell">
           <a class="tile" href="/coverage/network/">
-            <span class="tile__media media"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-network-1600.webp" srcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><img decoding="async" src="/assets/img/gen/domain-network-1600.webp" srcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">Network</span><span class="tile__meta"><span>Domain 01</span><span>Watched 24/7</span></span></span>
               <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__line">Every connection watched, every intruder cut off.</span><span class="tile__more">See the domain<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span></span>
@@ -128,10 +176,10 @@
         </li>
         <li class="tiles__cell">
           <a class="tile" href="/coverage/endpoint/">
-            <span class="tile__media media"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-endpoint-1600.webp" srcset="/assets/img/gen/domain-endpoint-800.webp 800w, /assets/img/gen/domain-endpoint-1600.webp 1600w, /assets/img/gen/domain-endpoint.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><img decoding="async" src="/assets/img/gen/domain-endpoint-1600.webp" srcset="/assets/img/gen/domain-endpoint-800.webp 800w, /assets/img/gen/domain-endpoint-1600.webp 1600w, /assets/img/gen/domain-endpoint.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager"></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">Endpoint</span><span class="tile__meta"><span>Domain 02</span><span>Watched 24/7</span></span></span>
-              <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__line">Laptops, servers and phones, isolated the moment they turn.</span><span class="tile__more">See the domain<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span></span>
+              <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__line">Laptops, servers and phones, isolated the moment one is hit.</span><span class="tile__more">See the domain<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span></span>
             </span>
           </a>
         </li>

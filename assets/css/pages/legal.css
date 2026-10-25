@@ -121,6 +121,17 @@
   /* phones: same title size as the About cover (the h1 token), text inset like the reference card */
   .page-404 .nf__inner { padding-inline: 2em; }
   .page-404 .nf__media::after { background: linear-gradient(rgba(3, 11, 28, .12), rgba(3, 11, 28, .42)), var(--scrim-hero); }
+  /* phones: the square image fills a portrait frame by its height, so object-position cannot move it down.
+     Grow it from the top edge instead: the burst core drops from the title to behind the buttons and its
+     lower flare fills the bottom of the card (no empty navy under the buttons) */
+  .page-404 .nf__media > img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
+  /* the light now runs behind the second button: give it a dark glass pill (like the reference) so the label keeps AA */
+  .page-404 .nf__ghost {
+    --btn-bg: rgba(3, 11, 28, .46);
+    -webkit-backdrop-filter: var(--blur-ghost);
+    backdrop-filter: var(--blur-ghost);
+    box-shadow: inset 0 0 0 1px var(--paper-16);
+  }
 }
 @media (max-width: 479px) {
   .page-404 .nf__title { max-width: none; }

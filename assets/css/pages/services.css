@@ -34,7 +34,7 @@
 .page-services .svc-split__text--strong { color: var(--text); }
 
 /* ---------- 02 practice cards: 2 columns of square image cards ---------- */
-.page-services .svc-cards { padding-bottom: 0; }
+.page-services .svc-cards { padding-bottom: 0; scroll-margin-top: 7em; }
 /* the label panel is the shared tile as is (compact half-width glass, opens on hover) */
 
 /* ---------- 04 practice rows ---------- */
@@ -139,6 +139,7 @@
 .page-services .svc-jump__link:hover { color: var(--amber); }
 .page-services .svc-jump__link.is-current { background: var(--paper); color: var(--navy); }
 .page-services .svc-jump__link:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.page-services .svc-jump__link.is-current:focus-visible { outline-color: var(--navy); }
 
 /* ---------- 05 how we work (progress table) ---------- */
 .page-services .svc-steps .ledger__name { grid-column: 1 / 5; }
@@ -259,4 +260,6 @@
   .page-services .svc-steps .ledger__tag { display: block; grid-column: 1 / -1; grid-row: 2; max-width: none; }
   .page-services .svc-steps .ledger__gauge { grid-column: 1 / -1; grid-row: 3; padding-top: 0; }
   .page-services .svc-stack__foot .btn { width: 100%; justify-content: space-between; }
+  .page-services .svc-jump__bar { gap: 0; padding: .375em; }
+  .page-services .svc-jump__link { padding-inline: .5em; }
 }

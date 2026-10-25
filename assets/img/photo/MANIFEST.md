@@ -1,6 +1,6 @@
 # Photo manifest (graded photographs)
 
-All files are WebP, graded to the brand look (navy #071B3E, amber #FFBF00, slate #777F98; regraded 2026-10-26, round 3: lifted to a navy floor) by `tools/grade_photos.py` (re-run it from `site/` with `../.venv/bin/python tools/grade_photos.py`).
+All files are WebP, graded to the brand look (navy #071B3E, amber #FFBF00, slate #777F98; regraded 2026-10-26, round 3: lifted to a navy floor; round 4: darker navy floor, muted slate mids) by `tools/grade_photos.py` (re-run it from `site/` with `../.venv/bin/python tools/grade_photos.py`).
 Sources: free Unsplash License only, originals in `../photo-src/orig/` (outside the site). Credits: `CREDITS.md` at the site root.
 
 Each photo ships in three widths. Use real widths in `srcset` (some full-size files are narrower than 2400 because the source crop is):
@@ -25,7 +25,8 @@ Each photo ships in three widths. Use real widths in `srcset` (some full-size fi
 
 ## The look (matches the brand and the light-streak family in `assets/img/gen/`)
 - Round 3 (2026-10-26): the set was far darker than the generated family and the reference's mid-key galleries (mean luma 16 to 30, up to 89% near-black). Shadows now sit on a navy floor: open shadows about `#0B1E45`, only the vignetted corners fall to `#050E22`, never neutral black. Midtones are lifted about +0.5 EV in linear light with a soft shoulder (`mid`), the darkest sources get an extra `shadow` lift. Every file is now mean luma 41 to 56 with 30 to 50% of pixels under 25 (was 16 to 36 and 62 to 90%).
-- Midtones desaturated with a slight slate-blue cast: about `#22345E` to `#525D7E`, brand slate `#777F98` at 62% of the tone range, then a neutral-warm climb to warm white `#F8F1E4`.
+- Round 4 (2026-10-26, QA C1): next to the generated family (near-black navy floor, warm-neutral mids) the round 3 grade read as a royal-blue duotone (median tone about 15/28/59, darkest 10% about 6/17/40). The darkest 10% now sit at about `#060F22` (between `#050E22` and `#071B3E`, near the generated floor) and the blue chroma of the shadow and mid steps is cut by about 40 to 50% at the same luminance (median tone about 20/26/43), with a slightly stronger S-curve so the deeper floor reads as depth. Amber light, bloom and grain are unchanged. Every file stays at mean luma 41 to 56 with 37 to 55% of pixels under 25.
+- Midtones are a muted, near-neutral dark slate: open shadows about `#131C2F`, mids about `#29304A` to `#585B6C`, `#83848E` at 62% of the tone range, then a neutral-warm climb to warm white `#F8F1E4`.
 - Thin light (streaks, LEDs, lamps, keys, lit knuckles) maps through burnt orange `#965E0C` to brand amber `#FFBF00`, then rolls early into `#FFD678`, `#FFEABE` and a warm-white core `#FFF4E2`: hot light glows, it never sits as a flat amber block.
 - Broad lit surfaces (a floor, a wall) get a low-chroma caramel to cream wash (about `#C09E72` to `#EAD4B0`), never khaki and never flat amber. `bottom` fades a lit floor into the dark, `gain` pulls a blown wall back from white.
 - Bloom in linear light (three radii, soft knee, round 3 strength 0.5), tinted towards warm white, plus amber halation around light (round 3: a third, wide radius and less suppression on broad light, so glows fall off into the navy): the same soft, luminous glow as the generated family. A hue-preserving shoulder burns the hottest light to warm white instead of lemon.

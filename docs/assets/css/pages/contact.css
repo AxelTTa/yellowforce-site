@@ -1,8 +1,3 @@
-/* Contact (/contact/). Scoped under .page-contact. No form: every email is a copy button.
-   Rhythm measured on the reference contact page: head 12em top, strip 5em under the title,
-   10.5em to the image + text block. */
-
-/* ---------- 01 head + direct strip ---------- */
 .page-contact .ct-head { padding-bottom: 0; }
 .page-contact .ct-direct {
   width: 100%;
@@ -50,7 +45,6 @@
 }
 .page-contact button.ct-direct__cell:focus-visible { outline-offset: -2px; border-radius: 0; }
 
-/* ---------- 02 write to us: 4:5 image | title top, big email + next steps bottom ---------- */
 .page-contact .ct-write { padding-top: var(--sp-105); padding-bottom: var(--sp-6); }
 .page-contact .ct-write__grid {
   display: grid;
@@ -64,8 +58,7 @@
   aspect-ratio: 4 / 5;
   border-radius: var(--r-ml);
 }
-/* the photo is 4:5 like the frame (its own crop keeps the lit hand centred, no flat black top);
-   phones show a 3:2 band of it, set below so the fingertips stay in */
+
 .page-contact .ct-write__col {
   min-width: 0;
   display: flex;
@@ -83,7 +76,6 @@
   text-wrap: pretty;
 }
 
-/* the big copy-email button: reads like the reference's underlined form field, acts like a button */
 .page-contact .ct-big {
   display: flex;
   align-items: center;
@@ -151,7 +143,6 @@
 .page-contact .ct-steps__num { font-size: var(--fs-xs); line-height: var(--lh-120); color: var(--text-meta); font-variant-numeric: tabular-nums; }
 .page-contact .ct-steps__text { font-size: var(--fs-ml); line-height: var(--lh-140); letter-spacing: var(--tr-micro); color: var(--text); text-wrap: pretty; }
 
-/* ---------- 03 under attack: dark card with live dot ---------- */
 .page-contact .ct-urgent-block { padding-bottom: var(--sp-105); }
 .page-contact .ct-urgent {
   position: relative;
@@ -204,7 +195,6 @@
   background: var(--amber);
 }
 
-/* ---------- responsive ---------- */
 @media (max-width: 991px) {
   .page-contact .ct-big__addr { font-size: var(--fs-6xl); }
   .page-contact .ct-urgent__grid { grid-template-columns: 1fr; }
@@ -221,7 +211,7 @@
   .page-contact .ct-urgent-block { padding-bottom: var(--sp-6); }
 }
 @media (max-width: 479px) {
-  /* the address fills its half of the strip like the reference values (about 16px at 390), not the 11px body step */
+
   .page-contact .ct-direct__value { font-size: min(4.05vw, 16px); letter-spacing: -.01em; }
   .page-contact .ct-direct__value .icon { display: none; }
   .page-contact .ct-direct__cell { padding: var(--sp-2) .5em; }

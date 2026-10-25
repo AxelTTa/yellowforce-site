@@ -1,12 +1,6 @@
-/* About page (/about/). Mirrors the Vantra about rhythm with our own markup and content.
-   Scoped under .page-about. Shared pieces (cover, pile, mosaic, head, btn) come from components.css;
-   this file adds the snapshot panel and the careers table, and tunes spacing to the reference. */
-
-/* ---------- 01 hero ---------- */
 .page-about .ab-cover .cover__media > img { opacity: 1; object-position: 40% 50%; }
 .page-about .ab-cover .cover__inner { gap: var(--sp-25); padding-top: 4em; }
 
-/* ---------- 02 approach + image strip ---------- */
 .page-about .ab-approach { padding-block: var(--sp-105); }
 .page-about .ab-split {
   display: grid;
@@ -35,7 +29,6 @@
 .page-about .ab-strip > * { aspect-ratio: 1 / 1; }
 .page-about .ab-strip > :first-child { aspect-ratio: 1 / 1; }
 
-/* ---------- 03 values (sticky stack) ---------- */
 .page-about .ab-values { padding-bottom: var(--sp-105); }
 .page-about .ab-values .pile__item { padding-top: 0; padding-bottom: var(--sp-12); }
 .page-about .ab-values .pile__item:last-child { padding-bottom: var(--sp-12); }
@@ -45,13 +38,12 @@
 .page-about .ab-values .pile__text {
   justify-self: end;
   width: 100%;
-  max-width: 23.3em; /* 480px at 1440, like the reference text column */
+  max-width: 23.3em;
   padding-right: .75em;
   line-height: var(--lh-140);
   color: var(--text);
 }
 
-/* ---------- 04 company snapshot ---------- */
 .page-about .ab-snapshot { padding-bottom: var(--sp-105); }
 .page-about .snap {
   display: grid;
@@ -89,7 +81,7 @@
   justify-content: center;
   align-items: baseline;
   column-gap: .625em;
-  padding-block: 14.375em; /* 11.5em at the reference figure font size (1.25em) */
+  padding-block: 14.375em;
 }
 .page-about .snap__num {
   font-family: var(--font-text);
@@ -132,7 +124,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- 05 careers: table of disciplines + copy-email line ---------- */
 .page-about .ab-careers { padding-bottom: var(--sp-105); }
 .page-about .roles {
   width: 100%;
@@ -156,7 +147,7 @@
   border-bottom: 1px solid var(--line);
   vertical-align: baseline;
 }
-/* 1.5em of the base size above and below, expressed in each cell's own font size */
+
 .page-about .roles tbody th { padding: calc(1.5em / 1.375) calc(1.5em / 1.375) calc(1.5em / 1.375) 0; }
 .page-about .roles tbody td { padding: 1.6em 1.6em 1.6em 0; }
 .page-about .roles tbody th {
@@ -177,7 +168,7 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-/* dark split panel (image | title, line, copy-email card), our take on Vantra's profile panel */
+
 .page-about .ab-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -292,7 +283,6 @@
 .page-about .ab-mailcard.is-copied .ab-mailcard__done { opacity: 1; transform: none; }
 .page-about .ab-careers .roles { margin-top: var(--sp-5); }
 
-/* ---------- responsive ---------- */
 @media (max-width: 991px) {
   .page-about .snap__figure { padding-block: 7.5em; }
 }

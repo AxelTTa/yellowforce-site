@@ -23,6 +23,7 @@
 <meta name="twitter:title" content="One team for every cyber domain | YellowForce">
 <meta name="twitter:description" content="One attack can cross email, identity, cloud, data and devices in a morning. Why split vendors leave gaps, and what one team changes.">
 <meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
 <meta name="theme-color" content="#071B3E">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -30,6 +31,53 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
 <link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -53,7 +101,7 @@
     <div class="pill__bar">
       <a class="pill__brand" href="/" aria-label="YellowForce home"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
 </a>
-      <p class="pill__tagline">Worth five minutes</p>
+      <p class="pill__tagline">Worth four minutes</p>
       <button class="pill__toggle" type="button" data-nav-toggle data-qa="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu"><span class="pill__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
     </div>
     <div class="pill__drawer" id="site-menu" hidden>
@@ -105,7 +153,7 @@
   </div>
 </header>
 
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 <!-- 01 Article head -->
 <section class="art-top gutter" aria-labelledby="art-title">
   <div class="frame art-top__wrap">

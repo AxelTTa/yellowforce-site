@@ -3,8 +3,8 @@
 
 Brand look (Axel's logo kit: navy #071B3E, amber #FFBF00, slate #777F98):
 blacks sit on deep navy (#030B1C floor, deep shadows around #071B3E, never
-neutral black), shadows navy-tinted, midtones desaturated with a slight
-slate-blue cast (#777F98), highlights and small light sources pushed to amber
+neutral black), shadows navy-tinted, midtones a muted, near-neutral dark
+slate (round 4: blue chroma cut so they sit with the generated family), highlights and small light sources pushed to amber
 #FFBF00 and warm white like light streaks, gentle S-curve, soft amber
 halation on bright light, navy-tinted film grain, subtle vignette. Built to
 sit next to the generated light-streak family in assets/img/gen/.
@@ -51,17 +51,21 @@ AMBER = (255, 191, 0)        # #FFBF00, brand amber
 WARM_WHITE = (255, 244, 226)
 
 # Three ramps, luminance -> sRGB.
-# MONO: the photo itself. Deep navy floor in the corners, open shadows on navy #0B1E45,
-# slate-blue desaturated mids (#777F98 at 0.62), then a neutral-warm climb to warm white
+# MONO: the photo itself. Deep navy floor in the corners, open shadows on navy,
+# muted slate mids, then a neutral-warm climb to warm white
 # (cool-to-warm through neutral, so a blend with the amber ramps never passes through olive).
+# Round 4 (2026-10-26, QA C1): next to the generated family (near-black navy floor, warm-neutral mids) the round 3
+# ramp read as a royal-blue duotone (median tone about 15/28/59). The darkest tones now sit back near #050E22
+# and the blue chroma of the shadow and mid steps is cut by about 40 to 50% at the same luminance, so the mids
+# trend to a neutral dark slate instead of saturated blue. Amber light is unchanged.
 MONO = [
     (0.00, NAVY_FLOOR),
-    (0.07, (8, 22, 52)),
-    (0.16, NAVY_OPEN),
-    (0.30, (34, 52, 94)),
-    (0.46, (82, 93, 126)),
-    (0.62, SLATE),
-    (0.78, (180, 178, 186)),
+    (0.07, (7, 16, 35)),
+    (0.16, (19, 28, 47)),
+    (0.30, (41, 48, 68)),
+    (0.46, (88, 91, 108)),
+    (0.62, (131, 132, 142)),
+    (0.78, (184, 180, 184)),
     (0.90, (228, 220, 208)),
     (1.00, (248, 241, 228)),
 ]
@@ -100,6 +104,8 @@ GRAIN_LIGHT = np.array([1.0, 0.97, 0.92], dtype=np.float32)
 PHOTOS: list[dict] = [
     # Round 3 (2026-10-26): every photo is graded on the lifted navy floor (open shadows #0B1E45,
     # +0.5 EV mids, see MONO). Targets on the 800 px files: mean luma 40+, under 60% of pixels below 25.
+    # Round 4 (2026-10-26): same lift on the darker, less blue MONO ramp (darkest 10% about #060F22,
+    # median tone about 19/25/42); photo-spare-2 and about-team open a little more to stay at mean 40+.
     # `shadow` lifts the deepest tones of the darkest sources; `exposure` < 1 opens the mids further.
     # Insights (4:3 cards)
     # insight-1: tighter on the fibre bundle so the light swarm fills the card instead of a black field.
@@ -111,7 +117,7 @@ PHOTOS: list[dict] = [
     # zoom-burst long exposure from a moving train: light rushing forward, no people. In the panel's
     # square crop at 30% the streaks run in from the left and meet at its right edge, next to the title.
     # A light pre-blur calms the stepped edges of the zoom. Same name, aspect and size.
-    dict(name="about-team", src="YU5C3R3Evqc.jpg", aspect=(16, 9), max=2308, focus=(0.5, 0.5), exposure=0.9, shadow=0.08, soften=1.2),
+    dict(name="about-team", src="YU5C3R3Evqc.jpg", aspect=(16, 9), max=2308, focus=(0.5, 0.5), exposure=0.85, shadow=0.08, soften=1.2),
     # round 2: a brighter, cleaner hand on a backlit keyboard (round 1 source Vr0uBwEBWIg was murky at
     # thumbnail size and had plastic bokeh blobs). Also the hero "Under attack?" card thumbnail.
     dict(name="about-strip-1", src="A6QgqHWq2eQ.jpg", aspect=(4, 3), max=2000, focus=(0.52, 0.46), exposure=0.85, lift=0.02),
@@ -128,7 +134,7 @@ PHOTOS: list[dict] = [
     # kbtIiCzK4lQ was the last figure in profile). Same name, aspect and size.
     dict(name="photo-spare-1", src="a66u8vmMcMc.jpg", aspect=(4, 3), max=1578, focus=(0.5, 0.47), zoom=1.25, exposure=1.15, bottom=0.45),
     # photo-spare-2 is the About cover: lifted the most (it was mean 20, 85% near-black).
-    dict(name="photo-spare-2", src="KN66Tjx8Zzs.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5), exposure=0.75, shadow=0.10),
+    dict(name="photo-spare-2", src="KN66Tjx8Zzs.jpg", aspect=(16, 9), max=2342, focus=(0.5, 0.5), exposure=0.70, shadow=0.10),
     dict(name="photo-spare-3", src="i2M4JeyBIV8.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5)),
     dict(name="photo-spare-4", src="jcRi2yH6OhE.jpg", aspect=(4, 5), max=1600, focus=(0.6, 0.62), zoom=1.25, spread=0.6),
 ]
@@ -142,6 +148,8 @@ def _lut(ramp) -> np.ndarray:
 
 
 LUT_MONO = _lut(MONO)
+# S-curve (tone space): pivot, slope and how much of it is mixed in.
+S_PIVOT, S_SLOPE, S_MIX = 0.40, 6.5, 0.50
 LUT_LIGHT = _lut(LIGHT)
 LUT_WASH = _lut(WASH)
 FLOOR = np.array(NAVY_FLOOR, dtype=np.float32) / 255.0
@@ -205,11 +213,11 @@ def grade(rgb: np.ndarray, exposure=1.0, glow=0.22, keep_chroma=0.04, lift=0.0, 
     L = L * (1 - vignette * smoothstep(0.55, 1.45, r))
     if bottom:
         L = L * (1 - bottom * smoothstep(0.55, 1.0, yy / h))
-    # Gentle S-curve around 0.42.
+    # Gentle S-curve (round 4: a touch more contrast, so the darker floor reads as depth, not as a flat filter).
     L = np.clip(L, 0, 1)
-    s = 1 / (1 + np.exp(-(L - 0.42) * 6.0))
-    s0, s1 = 1 / (1 + np.exp(0.42 * 6.0)), 1 / (1 + np.exp(-(0.58) * 6.0))
-    L = (0.55 * L + 0.45 * (s - s0) / (s1 - s0)).astype(np.float32)
+    s = 1 / (1 + np.exp(-(L - S_PIVOT) * S_SLOPE))
+    s0, s1 = 1 / (1 + np.exp(S_PIVOT * S_SLOPE)), 1 / (1 + np.exp(-(1 - S_PIVOT) * S_SLOPE))
+    L = ((1 - S_MIX) * L + S_MIX * (s - s0) / (s1 - s0)).astype(np.float32)
     idx = np.clip((L * 1023).astype(np.int32), 0, 1023)
     mono = LUT_MONO[idx]
     light = LUT_LIGHT[idx]

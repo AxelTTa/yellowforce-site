@@ -1,5 +1,3 @@
-/* Base: fonts, reset, typography roles, focus, selection, reduced motion. Colors come from tokens.css (navy + amber brand). */
-
 @font-face {
   font-family: "Inter";
   src: url("/assets/fonts/inter-latin-var.woff2") format("woff2");
@@ -58,7 +56,6 @@ button {
 }
 [hidden] { display: none !important; }
 
-/* headings */
 h1, h2, h3, h4, h5, h6,
 .t-h0, .t-h1, .t-h2, .t-h3, .t-h4, .t-h5, .t-h6 {
   font-family: var(--font-display);
@@ -74,7 +71,6 @@ h4, .t-h4 { font-size: var(--h4); line-height: var(--lh-104); }
 h5, .t-h5 { font-size: var(--h5); line-height: var(--lh-112); }
 h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 
-/* text roles */
 .t-statement {
   font-family: var(--font-text);
   font-size: var(--statement);
@@ -107,7 +103,6 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 .t-label--strong { font-weight: 500; }
 .t-num { font-variant-numeric: tabular-nums; }
 
-/* dark surfaces flip the semantic colors (navy surfaces: paper text, slate-light meta, white logo back) */
 .on-dark {
   --text: var(--paper);
   --text-2: var(--paper-82);
@@ -121,10 +116,8 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
   color: var(--paper);
 }
 
-/* selection: amber light, navy text */
 ::selection { background: var(--amber); color: var(--navy); }
 
-/* focus */
 :focus { outline: none; }
 :focus-visible {
   outline: 2px solid var(--navy);
@@ -132,7 +125,11 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
   border-radius: 4px;
 }
 .on-dark :focus-visible,
-.on-dark:focus-visible { outline-color: var(--amber); }
+.on-dark:focus-visible,
+.pill :focus-visible,
+.pill:focus-visible { outline-color: var(--amber); }
+
+.main:focus, .main:focus-visible { outline: none; }
 
 .skip-link {
   position: fixed;
@@ -161,9 +158,8 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
   border: 0;
 }
 
-/* pre-JS hidden states: only when JS runs and motion is allowed (boot.js sets html.motion) */
-.motion [data-reveal] { visibility: hidden; }
-.motion [data-reveal="statement"] { visibility: visible; }
+.motion [data-reveal] { opacity: 0; }
+.motion [data-reveal="statement"] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -6,13 +6,13 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Page not found | YellowForce</title>
-<meta name="description" content="This page doesn&#x27;t exist. Everything we defend is still where it should be.">
+<meta name="description" content="This page doesn’t exist. Everything we defend is still where it should be.">
 <meta name="robots" content="noindex">
 <link rel="canonical" href="https://yellow-force.com/404.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="YellowForce">
 <meta property="og:title" content="Page not found | YellowForce">
-<meta property="og:description" content="This page doesn&#x27;t exist. Everything we defend is still where it should be.">
+<meta property="og:description" content="This page doesn’t exist. Everything we defend is still where it should be.">
 <meta property="og:url" content="https://yellow-force.com/404.html">
 <meta property="og:image" content="https://yellow-force.com/assets/img/og.png">
 <meta property="og:image:width" content="1200">
@@ -21,8 +21,9 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Page not found | YellowForce">
-<meta name="twitter:description" content="This page doesn&#x27;t exist. Everything we defend is still where it should be.">
+<meta name="twitter:description" content="This page doesn’t exist. Everything we defend is still where it should be.">
 <meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
 <meta name="theme-color" content="#071B3E">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -30,6 +31,53 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
 <link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -105,7 +153,7 @@
   </div>
 </header>
 
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 <!-- Hero (inset dark card, full height, no footer) -->
 <section class="cover cover--full on-dark nf" aria-labelledby="nf-title">
   <div class="cover__media media nf__media" aria-hidden="true">
@@ -115,7 +163,7 @@
   <div class="cover__inner nf__inner gutter">
     <p class="t-label cover__label" data-reveal="fade" data-delay=".2">(    Error / 404    )</p>
     <h1 class="cover__title nf__title" id="nf-title" data-reveal="lines">Nothing here<br>to defend.</h1>
-    <p class="cover__text nf__text" data-reveal="fade" data-delay=".35">This page doesn’t exist, moved, or never did. Everything we protect is still exactly where it should be.</p>
+    <p class="cover__text nf__text" data-reveal="fade" data-delay=".35">This page moved or never existed. Everything we protect is still exactly where it should be.</p>
     <div class="btn-row nf__actions" data-reveal="stagger" data-delay=".45">
       <a class="btn btn--light" href="/">
         <span class="btn__roll"><span class="btn__line">Back to home</span><span class="btn__line" aria-hidden="true">Back to home</span></span>

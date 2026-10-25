@@ -132,7 +132,12 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
   border-radius: 4px;
 }
 .on-dark :focus-visible,
-.on-dark:focus-visible { outline-color: var(--amber); }
+.on-dark:focus-visible,
+.pill :focus-visible,
+.pill:focus-visible { outline-color: var(--amber); }
+
+/* the skip link moves focus to <main tabindex="-1">; the container itself shows no ring */
+.main:focus, .main:focus-visible { outline: none; }
 
 .skip-link {
   position: fixed;
@@ -161,9 +166,10 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
   border: 0;
 }
 
-/* pre-JS hidden states: only when JS runs and motion is allowed (boot.js sets html.motion) */
-.motion [data-reveal] { visibility: hidden; }
-.motion [data-reveal="statement"] { visibility: visible; }
+/* pre-JS hidden states: only when JS runs and motion is allowed (boot.js sets html.motion).
+   Opacity only, never visibility: content waiting for its reveal must stay reachable by Tab and screen readers. */
+.motion [data-reveal] { opacity: 0; }
+.motion [data-reveal="statement"] { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

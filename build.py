@@ -3,7 +3,8 @@
 
     python3 build.py            production build into docs/
     python3 build.py --dev      same, but without the CSP upgrade-insecure-requests directive
-                                (so http://127.0.0.1 previews load assets); never deploy a --dev build
+                                (so http://127.0.0.1 previews load assets in Safari); never deploy a --dev build
+    python3 build.py --out .out/NAME [--dev]   build somewhere else (previews); unknown flags are an error
 
 Pages: src/pages/**/*.html. Each starts with a front-matter block:
 
@@ -37,10 +38,12 @@ Copies assets/ -> docs/assets/ and static/ -> docs/ (dotfiles included), writes 
 """
 from __future__ import annotations
 
+import argparse
 import datetime as _dt
 import html
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -50,10 +53,7 @@ PAGES = SRC / "pages"
 PARTIALS = SRC / "partials"
 ASSETS = ROOT / "assets"
 STATIC = ROOT / "static"
-OUT = ROOT / "docs"
-# --out DIR builds somewhere else (parallel agents each preview their own copy)
-if "--out" in sys.argv:
-    OUT = Path(sys.argv[sys.argv.index("--out") + 1]).resolve()
+OUT = ROOT / "docs"  # --out DIR builds somewhere else (parallel agents each preview their own copy); see main()
 
 SITE_URL = "https://yellow-force.com"
 EMAIL = "info@yellow-force.com"
@@ -82,7 +82,7 @@ LAYOUT = """<!doctype html>
 <body class="{{bodyclass}}">
 <a class="skip-link" href="#main">Skip to content</a>
 <!-- include:nav -->
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 {{__content__}}
 </main>
 <!-- include:footer -->
@@ -350,10 +350,25 @@ def check_links(pages: dict[str, str]) -> None:
         warn(f"missing target {ref} (linked from {shown})")
 
 
-def write_sitemap(entries: list[str]) -> None:
-    today = _dt.date.today().isoformat()
+def last_changed(src: Path) -> str:
+    """Date the page source last changed: its last git commit if the file is unmodified, else its mtime."""
+    try:
+        dirty = subprocess.run(["git", "status", "--porcelain", "--", str(src)], cwd=ROOT,
+                               capture_output=True, text=True, timeout=10).stdout.strip()
+        if not dirty:
+            d = subprocess.run(["git", "log", "-1", "--format=%cs", "--", str(src)], cwd=ROOT,
+                               capture_output=True, text=True, timeout=10).stdout.strip()
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", d):
+                return d
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return _dt.date.fromtimestamp(src.stat().st_mtime).isoformat()
+
+
+def write_sitemap(entries: dict[str, str]) -> None:
+    """entries: URL path -> lastmod date of its source page (not the build date, which Google ignores)."""
     rows = "\n".join(
-        f"  <url><loc>{SITE_URL}{p}</loc><lastmod>{today}</lastmod></url>" for p in sorted(entries, key=lambda p: (p != "/", p))
+        f"  <url><loc>{SITE_URL}{p}</loc><lastmod>{entries[p]}</lastmod></url>" for p in sorted(entries, key=lambda p: (p != "/", p))
     )
     (OUT / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -362,18 +377,53 @@ def write_sitemap(entries: list[str]) -> None:
     )
 
 
+def strip_css_comments(root: Path) -> None:
+    """Published CSS carries no comments (they are build notes). Vendor files keep theirs."""
+    for css in root.rglob("*.css"):
+        text = css.read_text(encoding="utf-8")
+        text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+        text = re.sub(r"[ \t]+$", "", text, flags=re.M)
+        text = re.sub(r"\n{3,}", "\n\n", text).strip() + "\n"
+        css.write_text(text, encoding="utf-8")
+
+
+def refresh_security_txt() -> None:
+    """RFC 9116: Expires must stay under a year out, so it is rewritten on every build (build date + 180 days)."""
+    p = OUT / ".well-known" / "security.txt"
+    if not p.exists():
+        return
+    exp = (_dt.datetime.now(_dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+           + _dt.timedelta(days=180)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    text = p.read_text(encoding="utf-8")
+    if not re.search(r"^Expires:", text, flags=re.M):
+        warn("security.txt has no Expires line")
+        return
+    p.write_text(re.sub(r"^Expires:.*$", f"Expires: {exp}", text, flags=re.M), encoding="utf-8")
+
+
 def main() -> int:
-    dev = "--dev" in sys.argv
+    global OUT
+    ap = argparse.ArgumentParser(description="Build the YellowForce site (src/ -> docs/).")
+    ap.add_argument("--dev", action="store_true", help="drop upgrade-insecure-requests from the CSP (local previews only)")
+    ap.add_argument("--out", metavar="DIR", help="build into DIR instead of docs/")
+    args = ap.parse_args()  # unknown flags (even --help typos) stop here instead of building into docs/
+    dev = args.dev
+    if args.out:
+        OUT = Path(args.out).resolve()
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir(parents=True)
     if ASSETS.exists():
-        shutil.copytree(ASSETS, OUT / "assets", ignore=shutil.ignore_patterns(".DS_Store", "*.psd", "_src", "*.tmp"))
+        # build notes (*.md, VERSIONS.txt) stay private; licence files (fonts/OFL.txt) are published
+        shutil.copytree(ASSETS, OUT / "assets", ignore=shutil.ignore_patterns(
+            ".DS_Store", "*.psd", "_src", "*.tmp", "*.md", "VERSIONS.txt"))
+        strip_css_comments(OUT / "assets" / "css")
     if STATIC.exists():
         shutil.copytree(STATIC, OUT, dirs_exist_ok=True, ignore=shutil.ignore_patterns(".DS_Store"))
+        refresh_security_txt()
 
     built: dict[str, str] = {}
-    sitemap: list[str] = []
+    sitemap: dict[str, str] = {}
     for src in sorted(PAGES.rglob("*.html")):
         if any(part.startswith("_") for part in src.relative_to(PAGES).parts):
             continue
@@ -384,7 +434,7 @@ def main() -> int:
         dest.write_text(ctx["html"], encoding="utf-8")
         built[url] = ctx["html"]
         if url != "/404.html" and ctx.get("sitemap", "true").lower() != "false":
-            sitemap.append(url)
+            sitemap[url] = last_changed(src)
     write_sitemap(sitemap)
     check_links(built)
 

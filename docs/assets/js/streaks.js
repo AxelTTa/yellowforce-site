@@ -22,15 +22,19 @@ const FILM_PALETTE = [
 /* reel: a filmic long exposure, graded like the generated image family. Deep navy edges (#030B1C) rising to at
    most #0B2350 behind the light, a river of amber trails pinched through the middle, drawn on a half resolution
    layer so every trail is soft (no vector lines, no comet heads), two blurred glow passes, a warm amber bloom
-   with a white core, a navy vignette and film grain. Mean luma about 58 at 1440.
+   with a warm white core (#FFE9C2), a navy vignette and film grain. The light and the trails are summed with a
+   tone map (core: how close the core gets to #FFE9C2; trailPeak: a trail's peak over its local mean; trailWhite:
+   how much of the light a trail cannot add as amber comes back as warm white). Mean luma about 58 at 1440.
    accent: transparent overlay for the hero. */
 const VARIANTS = {
-  reel: { film: true, lanes: 72, comets: 44, fast: 10, ribbons: 6, spread: 1.4, pinch: 0.48, tilt: 0.3, focus: 0.5, center: 0.5, swell: 0.8, laneAlpha: 1, cometAlpha: 1, centerBias: 2, exposure: 1.05, shade: 0.85, lightGain: 1, bloom: 1.25, glow: 1.8, vignette: 0.5, grain: 0.1, speed: 0.85 },
-  accent: { lanes: 22, comets: 14, fast: 4, spread: 1.1, pinch: 0.45, focus: 0.62, center: 0.42, swell: 0.8, laneAlpha: 0.75, cometAlpha: 0.8, centerBias: 0, haze: 0.05, speed: 0.8 },
+  reel: { film: true, lanes: 72, comets: 44, fast: 10, ribbons: 6, spread: 1.4, pinch: 0.48, tilt: 0.3, focus: 0.5, center: 0.5, swell: 0.8, laneAlpha: 1, cometAlpha: 1, centerBias: 2, exposure: 1.05, shade: 0.85, lightGain: 1, bloom: 1.25, glow: 1.8, vignette: 0.5, grain: 0.1, speed: 0.85, core: 1, lift: 0.35, trailPeak: 2.75, trailWhite: 1.4 },
+  accent: { lanes: 22, comets: 14, fast: 4, spread: 1.1, pinch: 0.45, focus: 0.62, center: 0.42, swell: 0.8, laneAlpha: 0.75, cometAlpha: 0.8, centerBias: 0, haze: 0.05, speed: 0.8, settle: 3.4, settleFor: 1.6 },
 };
 
 const EDGE = [3, 11, 28];    // #030B1C navy-deep
 const CORE = [11, 35, 80];   // #0B2350, the brightest the base gets
+const WARM = [1, 233 / 255, 194 / 255]; // #FFE9C2, the warm white the hottest light rolls into (never lemon)
+const LW = 0.299 * WARM[0] + 0.587 * WARM[1] + 0.114 * WARM[2];
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -67,6 +71,8 @@ class Streaks {
     this.paused = reduced;
     this.raf = 0;
     this.t = 7.3;
+    this.age = 0;      // seconds of motion shown so far (variants with `settle` ease to a still frame)
+    this.settled = false;
     this.last = 0;
     this.frame = 0;
     this.rnd = mulberry32(0x59f0 + (canvas.dataset.seed | 0));
@@ -197,6 +203,12 @@ class Streaks {
       this.haze = layer(this.w / 24, this.h / 24);
       this.mist = layer(this.w / 64, this.h / 64);
       this.light = layer(this.w / 8, this.h / 8);
+      // trail compositing: the trails scaled by how much room the light under them has left (amber part and
+      // warm white part), at the soft layer's resolution
+      this.trail = layer(this.soft.width, this.soft.height);
+      this.trailW = layer(this.soft.width, this.soft.height);
+      this.roomA = layer(this.light.width, this.light.height);
+      this.roomW = layer(this.light.width, this.light.height);
       this.field();
       if (!this.noise) this.makeNoise();
     }
@@ -213,12 +225,12 @@ class Streaks {
     // base: elliptical radial gradient, #0B2350 (CORE) at the centre to #030B1C (EDGE)
     const R0 = portrait ? h * 0.62 : w * 0.62, sy0 = portrait ? 0.9 : 0.6;
     const MID = [mix(EDGE[0], CORE[0], 0.55), mix(EDGE[1], CORE[1], 0.55), mix(EDGE[2], CORE[2], 0.55)];
-    // bloom: amber falling off from a white core, a wide flat ellipse
+    // bloom: amber falling off from a warm white core (#FFE9C2), a wide flat ellipse
     const sy1 = portrait ? 0.55 : Math.max(0.26, Math.min(0.5, (h / w) * 0.6));
     const R1 = portrait ? Math.max(w * 0.72, h * 0.4) : w * 0.44;
     const k = v.bloom;
     const stops = [
-      [0, 255, 248, 236, 0.75 * k], [0.06, 255, 234, 198, 0.42 * k], [0.16, 255, 186, 64, 0.22 * k],
+      [0, 255, 233, 194, 0.75 * k], [0.06, 255, 222, 168, 0.42 * k], [0.16, 255, 186, 64, 0.22 * k],
       [0.36, 255, 156, 30, 0.15 * k], [0.62, 236, 130, 14, 0.07 * k], [1, 236, 130, 14, 0],
     ];
     // vignette: clear inside 0.32 of the short side, navy-deep at v.vignette in the corners
@@ -277,14 +289,12 @@ class Streaks {
 
   syncUi() {
     if (this.scope) this.scope.classList.toggle("is-paused", this.paused);
-    if (this.toggle) {
-      this.toggle.setAttribute("aria-pressed", String(this.paused));
-      this.toggle.setAttribute("aria-label", this.paused ? (this.toggle.dataset.labelPlay || "Play animation") : (this.toggle.dataset.labelPause || "Pause animation"));
-    }
+    // a toggle button keeps one fixed name ("Pause reel"); aria-pressed carries the state
+    if (this.toggle) this.toggle.setAttribute("aria-pressed", String(this.paused));
   }
 
   update() {
-    const run = this.visible && !this.paused && !document.hidden;
+    const run = this.visible && !this.paused && !this.settled && !document.hidden;
     if (run && !this.raf) {
       this.last = performance.now();
       this.raf = requestAnimationFrame((n) => this.tick(n));
@@ -295,8 +305,19 @@ class Streaks {
   }
 
   tick(now) {
-    const dt = Math.min(0.05, (now - this.last) / 1000);
+    let dt = Math.min(0.05, (now - this.last) / 1000);
     this.last = now;
+    if (this.v.settle) {
+      // full speed for `settle` s, then a smooth slow-down over `settleFor` s to a still frame
+      this.age += dt;
+      const k = Math.max(0, Math.min(1, (this.v.settle + this.v.settleFor - this.age) / this.v.settleFor));
+      dt *= k * k * (3 - 2 * k);
+      if (k === 0) {
+        this.settled = true;
+        this.raf = 0;
+        return;
+      }
+    }
     this.t += dt;
     for (let i = 0; i < this.comets.length; i++) {
       const c = this.comets[i];
@@ -390,29 +411,45 @@ class Streaks {
     mx.imageSmoothingQuality = "high";
     mx.drawImage(Hz, 0, 0, M.width, M.height);
 
-    // 3. the 1/8 frame: glow summed at half gain (no clipping), then on the CPU (about 15k pixels):
-    //    a filmic shoulder on luma with the hue kept, the brightest light rolling off to warm white (not
-    //    lemon); the navy base pulled down under the light so amber stays amber (no khaki); the warm bloom
-    //    (screen) and the navy vignette. Everything smooth lives here, so the full-size frame takes only
-    //    three more passes: this frame scaled up, the soft trails and the grain.
-    const T = this.light, tx = T.getContext("2d", { willReadFrequently: true });
+    // 3. the 1/8 frame, on the CPU (about 15k pixels). First the trail layer's local mean (G), which says how
+    //    bright the trails over each pixel get. Then the glow summed at half gain (no clipping) and per pixel:
+    //    a filmic shoulder on luma with the hue kept; the navy base pulled down under the light so amber stays
+    //    amber (no khaki); the warm bloom (screen); the navy vignette; the highlights graded toward warm white
+    //    #FFE9C2 (never lemon). Last, the additive sum with the sharp trails is tone mapped: added as is, amber
+    //    on amber clips red first and then green, and the hottest light turns lemon. So each pixel keeps two
+    //    room masks: how much of a trail can stay amber before the sum reaches the warm white ceiling (roomA,
+    //    from the trails' local peak), and what is left of the ceiling for the rest of its light, added as warm
+    //    white (roomW). A trail crossing the core lifts it toward #FFE9C2, never past it. Everything smooth
+    //    lives here, so the full-size frame takes only a few more passes: this frame scaled up, the trails
+    //    through the two masks (at the soft layer's size) and the grain.
+    const T = this.light, tx = T.getContext("2d", { willReadFrequently: true }), tw = T.width, th = T.height;
     tx.imageSmoothingQuality = "high";
     tx.globalCompositeOperation = "source-over";
     tx.globalAlpha = 1;
     tx.fillStyle = "#000";
-    tx.fillRect(0, 0, T.width, T.height);
+    tx.fillRect(0, 0, tw, th);
+    tx.drawImage(G, 0, 0, tw, th);
+    const gm = tx.getImageData(0, 0, tw, th).data;
+    tx.fillRect(0, 0, tw, th);
     tx.globalCompositeOperation = "lighter";
     tx.globalAlpha = 0.5;
-    tx.drawImage(M, 0, 0, T.width, T.height);
-    tx.drawImage(M, 0, 0, T.width, T.height);
-    tx.drawImage(M, 0, 0, T.width, T.height);
-    tx.drawImage(Hz, 0, 0, T.width, T.height);
+    tx.drawImage(M, 0, 0, tw, th);
+    tx.drawImage(M, 0, 0, tw, th);
+    tx.drawImage(M, 0, 0, tw, th);
+    tx.drawImage(Hz, 0, 0, tw, th);
     tx.globalAlpha = 0.5 * 0.55;
-    tx.drawImage(G, 0, 0, T.width, T.height);
+    tx.drawImage(G, 0, 0, tw, th);
     tx.globalAlpha = 1;
-    const img = tx.getImageData(0, 0, T.width, T.height), d = img.data;
+    const img = tx.getImageData(0, 0, tw, th), d = img.data;
+    if (!this.roomImg || this.roomImg[0].width !== tw || this.roomImg[0].height !== th) {
+      this.roomImg = [tx.createImageData(tw, th), tx.createImageData(tw, th)];
+    }
+    const ra = this.roomImg[0].data, rw = this.roomImg[1].data;
     const fb = this.fBase, fl = this.fBloom, fv = this.fVig;
     const E = 2 * v.glow, sh = v.shade, eR = EDGE[0] / 255, eG = EDGE[1] / 255, eB = EDGE[2] / 255;
+    const wR = WARM[0], wG = WARM[1], wB = WARM[2], top = v.core, kP = v.trailPeak / 255, kW = v.trailWhite;
+    // the ceiling the trails lift the light to: #FFE9C2 lifted toward white by v.lift (a trail still reads over the core)
+    const cR = wR + (1 - wR) * v.lift, cG = wG + (1 - wG) * v.lift, cB = wB + (1 - wB) * v.lift;
     for (let i = 0, q = 0; i < d.length; i += 4, q++) {
       let r = (d[i] / 255) * E, g = (d[i + 1] / 255) * E, b = (d[i + 2] / 255) * E;
       const L = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -424,7 +461,8 @@ class Streaks {
         let u = (Lt - 0.42) / 0.5;
         if (u > 0) {
           u = Math.min(1, u); u *= u;
-          r += (Lt * 1.08 - r) * u; g += (Lt - g) * u; b += (Lt * 0.86 - b) * u;
+          const c = Lt / LW;
+          r += (wR * c - r) * u; g += (wG * c - g) * u; b += (wB * c - b) * u;
         }
         o = 1 - Math.min(1, Lt * 1.6) * sh;
       }
@@ -432,18 +470,59 @@ class Streaks {
       r = Math.min(1, fb[q3] * o + r); g = Math.min(1, fb[q3 + 1] * o + g); b = Math.min(1, fb[q3 + 2] * o + b);
       r += fl[q3] * (1 - r); g += fl[q3 + 1] * (1 - g); b += fl[q3 + 2] * (1 - b);
       const a = fv[q];
-      d[i] = (r + (eR - r) * a) * 255; d[i + 1] = (g + (eG - g) * a) * 255; d[i + 2] = (b + (eB - b) * a) * 255;
+      r += (eR - r) * a; g += (eG - g) * a; b += (eB - b) * a;
+      // highlights graded toward warm white: the core settles just under #FFE9C2 (v.core), mids stay amber
+      let s = (0.299 * r + 0.587 * g + 0.114 * b - 0.5) * 2;
+      if (s > 0) {
+        s = Math.min(1, s); s *= s * (3 - 2 * s);
+        r *= 1 + (wR * top - 1) * s; g *= 1 + (wG * top - 1) * s; b *= 1 + (wB * top - 1) * s;
+      }
+      d[i] = r * 255; d[i + 1] = g * 255; d[i + 2] = b * 255;
       d[i + 3] = 255;
+      // room for the trails: their local peak is about trailPeak x their local mean
+      const pr = Math.min(1, gm[i] * kP), pg = Math.min(1, gm[i + 1] * kP), pb = Math.min(1, gm[i + 2] * kP);
+      const hr = cR - r, hg = cG - g, hb = cB - b;
+      let m = 1;
+      if (pr > 0.004) m = Math.min(m, hr / pr);
+      if (pg > 0.004) m = Math.min(m, hg / pg);
+      if (pb > 0.004) m = Math.min(m, hb / pb);
+      if (m < 0) m = 0;
+      const n = (1 - m) * kW * 255;
+      ra[i] = ra[i + 1] = ra[i + 2] = m * 255;
+      rw[i] = Math.max(0, hr - m * pr) * n; rw[i + 1] = Math.max(0, hg - m * pg) * n; rw[i + 2] = Math.max(0, hb - m * pb) * n;
+      ra[i + 3] = rw[i + 3] = 255;
     }
     tx.putImageData(img, 0, 0);
+    this.roomA.getContext("2d").putImageData(this.roomImg[0], 0, 0);
+    this.roomW.getContext("2d").putImageData(this.roomImg[1], 0, 0);
 
     ctx.globalAlpha = 1;
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "medium";
     ctx.globalCompositeOperation = "copy";
     ctx.drawImage(T, 0, 0, w, h);
+    // the trails through the room masks, at the soft layer's size: the amber part (trails x roomA) plus the warm
+    // white part (the trails' luminance x roomW), then added to the frame in one full-size pass
+    const Q = this.trail, qx = Q.getContext("2d"), P = this.trailW, px = P.getContext("2d"), qw = Q.width, qh = Q.height;
+    qx.imageSmoothingEnabled = px.imageSmoothingEnabled = true;
+    qx.imageSmoothingQuality = px.imageSmoothingQuality = "high";
+    qx.globalCompositeOperation = "source-over";
+    qx.fillStyle = "#000";
+    qx.fillRect(0, 0, qw, qh);
+    qx.drawImage(S, 0, 0, qw, qh);
+    px.globalCompositeOperation = "copy";
+    px.drawImage(Q, 0, 0);
+    px.globalCompositeOperation = "saturation";
+    px.fillStyle = "#808080";
+    px.fillRect(0, 0, qw, qh);
+    px.globalCompositeOperation = "multiply";
+    px.drawImage(this.roomW, 0, 0, qw, qh);
+    qx.globalCompositeOperation = "multiply";
+    qx.drawImage(this.roomA, 0, 0, qw, qh);
+    qx.globalCompositeOperation = "lighter";
+    qx.drawImage(P, 0, 0);
     ctx.globalCompositeOperation = "lighter";
-    ctx.drawImage(S, 0, 0, w, h);
+    ctx.drawImage(Q, 0, 0, w, h);
 
     // 4. grain: overlay for the mids, a faint veil for the shadows; it moves every other frame (a 24-30 fps
     //    feel) and stays put on the static frame

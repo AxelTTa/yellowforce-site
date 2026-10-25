@@ -222,47 +222,41 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - H2: Too many tools. / Nobody in charge.
 - Text: Most companies buy a tool for every problem. A firewall here, an endpoint agent there, an email filter, a cloud scanner, an AI add-on. Each one sends alerts. Nobody owns all of them, and attackers walk through the gaps in between. We take the whole thing over. One team, every domain, every alert, 24/7.
 
-### 04 Practice rows (anchors: #deploy #detect #respond #attack #harden #govern; two per row on desktop, one per row on phones)
+### 04 Practice rows (anchors: #deploy #detect #respond #attack #harden #govern; two per row on desktop, one per row on phones; 3 items each, kept short so the page stays close to the work index length)
 - ( 001 ) Deploy and connect. (#deploy)
   - Line: We go in, put our technology inside your environment and connect every tool you already run.
   - Includes:
     - Our AI agents deployed inside your environment
     - Every existing tool and log source connected
-    - One live map of your people, devices, apps and data
     - Your chat, tickets and workflows wired in
 - ( 002 ) Detect 24/7. (#detect)
   - Line: AI agents watch every signal across every domain, day and night, and our experts confirm what matters.
   - Includes:
     - Every alert triaged by AI, instantly
     - Swarm and agent traffic spotted as it starts
-    - Threat hunting across all ten domains
-    - Experts on watch around the clock
+    - Experts hunting across all ten domains, 24/7
 - ( 003 ) Respond. (#respond)
   - Line: We contain and shut down attacks in real time, then run the incident end to end.
   - Includes:
     - Devices isolated, sessions killed, accounts locked in real time
     - Full investigation and root cause
     - Clean recovery and restore
-    - Clear updates for your leadership
 - ( 004 ) Attack. (#attack)
   - Line: We attack you first, with AI and human red teamers, to find every way in before anyone else does.
   - Includes:
     - Continuous AI red teaming of apps, APIs and cloud
     - Phishing and deepfake drills on your people
     - Swarm-style attacks against your defenses
-    - Every finding proven, with steps to reproduce
 - ( 005 ) Harden. (#harden)
   - Line: We fix what we find. Patch, reconfigure and retest until the hole is closed.
   - Includes:
     - Patches and config changes done for you
     - Accounts, keys and permissions cleaned up
     - Every fix retested against the real attack
-    - Hardening kept current as you grow
 - ( 006 ) Govern. (#govern)
   - Line: Policies, risk and compliance, kept current as your company changes.
   - Includes:
     - Security policies written and maintained
-    - Risk register and vendor reviews
     - Audit evidence ready when you need it
     - Customer security questionnaires answered
 
@@ -294,21 +288,8 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - OT and IoT / Sensors, cameras, controllers, building systems
 - Closing line: Running something else? If it has an API or writes logs, we can connect it. [copy-email] "Tell us what you run"
 
-### 07 FAQ
-- H2: Questions about the work.
-- Q/A:
-  1. Q: Do you replace our security team?
-     A: Only if you want us to. We can run everything, or work right next to the people you already have.
-  2. Q: What access do you need?
-     A: What the job needs, agreed with you up front. Every action our agents and experts take is logged.
-  3. Q: Can you act inside our tools?
-     A: Yes. We isolate devices, lock accounts, block traffic and pull emails through the tools you already own.
-  4. Q: What happens during an attack?
-     A: We contain it in real time, keep your leadership updated and run the incident end to end until you're clean.
-  5. Q: Is it really 24/7?
-     A: Yes. Nights, weekends and holidays. Our agents never stop, and an expert is always on.
-
-### 08 CTA band + footer
+### 07 CTA band + footer
+- No FAQ on this page (2026-10-26, page length): Home carries the FAQ, incl. "Is this software?".
 - Global.
 
 ---

@@ -1,12 +1,5 @@
-/* Insights index (/insights/) and insight articles (/insights/<slug>/).
-   Scoped under .page-insights and .page-article. Numbers measured on the reference journal pages. */
-
-/* ===================== Insights index ===================== */
-
-/* header: 12em top (page-head), 6em bottom + 6em featured top = 12em to the cards */
 .page-insights .ins-head { padding-bottom: var(--sp-6); }
 
-/* filter pills: float at the bottom of the viewport while the notes are on screen, then rest under the list */
 .page-insights .ins-board { position: relative; }
 .page-insights .ins-filter {
   position: sticky;
@@ -57,13 +50,11 @@
 .page-insights .ins-filter__btn:has(input:checked) { background: var(--paper); color: var(--navy); }
 .page-insights .ins-filter__btn:has(input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 2px; }
 
-/* CSS-only filtering (radios above) */
 .page-insights:has(#ins-f-threats:checked) .ins-board [data-cat]:not([data-cat="threats"]),
 .page-insights:has(#ins-f-approach:checked) .ins-board [data-cat]:not([data-cat="approach"]),
 .page-insights:has(#ins-f-coverage:checked) .ins-board [data-cat]:not([data-cat="coverage"]),
 .page-insights:has(#ins-f-coverage:checked) .ins-featured { display: none; }
 
-/* the featured cards are the reveal on the first screen: keep their titles 2 lines like the reference */
 .page-insights .note__title { max-width: 13em; }
 
 @media (max-width: 767px) {
@@ -76,9 +67,6 @@
   .page-insights .ins-filter__btn { padding: .65em .7em; }
 }
 
-/* ===================== Articles ===================== */
-
-/* head: 12em top, meta / title / cover image 5em apart */
 .page-article .art-top { padding-top: var(--sp-12); }
 .page-article .art-top__wrap { display: flex; flex-direction: column; gap: var(--sp-5); }
 .page-article .art-meta {
@@ -119,7 +107,6 @@
   border-radius: var(--r-m);
 }
 
-/* body: rail .34fr | text 1fr, 8em apart (shared .article grid) */
 .page-article .art-body { padding-bottom: 0; }
 .page-article .article__rail {
   gap: var(--sp-125);
@@ -148,7 +135,6 @@
   color: var(--text);
 }
 
-/* long-form text: full column, 1em body, 1.5em rhythm (reference rich text) */
 .page-article .art-body .prose {
   max-width: none;
   min-width: 0;
@@ -202,7 +188,6 @@
   color: var(--text-meta);
 }
 
-/* keep reading: 12em under the text, cards 5em under the title */
 .page-article .art-more { padding-top: var(--sp-12); }
 .page-article .art-more .head__title { max-width: none; }
 
@@ -215,7 +200,8 @@
   .page-article .art-title { max-width: none; font-size: 4.125em; }
   .page-article .art-hero { height: 80vh; height: 80svh; min-height: 20em; }
   .page-article .art-more { padding-top: var(--sp-8); }
-  .page-article .art-body .prose h2 { font-size: var(--fs-4xl); }
-  .page-article .art-body .prose h3 { font-size: var(--fs-2xl); }
+
+  .page-article .art-body .prose h2 { font-size: 3em; line-height: 1.05; }
+  .page-article .art-body .prose h3 { font-size: var(--fs-3xl); }
   .page-article .art-body .prose blockquote { font-size: var(--fs-xl); }
 }

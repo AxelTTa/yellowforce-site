@@ -1,13 +1,6 @@
-/* Services page (/services/). Mirrors the Vantra work index rhythm with our own markup.
-   Everything is scoped under .page-services. Shared components (page-head, tiles, ledger, faq, btn)
-   come from components.css; this file only adds the page pieces and small overrides. */
-
-/* ---------- 01 hero: centered header, the card grid follows right under it (work index rhythm) ---------- */
 .page-services .svc-head { padding-bottom: var(--sp-5); }
 .page-services .svc-head .page-head__text { max-width: 26em; text-wrap: balance; }
 
-/* ---------- 03 problem: below the grid, h2 left, text right (Vantra header grid) ---------- */
-/* one 6em section step after the grid; the practice rows add their own 6em under it */
 .page-services .svc-problem { padding-block: var(--section-y) 0; }
 .page-services .svc-split {
   display: grid;
@@ -33,14 +26,8 @@
 }
 .page-services .svc-split__text--strong { color: var(--text); }
 
-/* ---------- 02 practice cards: 2 columns of square image cards ---------- */
-.page-services .svc-cards { padding-bottom: 0; }
-/* the label panel is the shared tile as is (compact half-width glass, opens on hover) */
+.page-services .svc-cards { padding-bottom: 0; scroll-margin-top: 7em; }
 
-/* ---------- 04 practice rows ---------- */
-/* six practices, two per row on the 12-column grid (6 + 6), so no column sits empty next to a short
-   title: hairline, meta line, title, line, list. Each practice is a subgrid of four rows, so titles,
-   lines and lists start at the same height in both columns whatever the text length. */
 .page-services .svc-rows { padding-top: var(--section-y); }
 .page-services .svc-rows__grid {
   display: grid;
@@ -95,7 +82,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---------- jump bar (like Vantra's bottom filter bar, our own build) ---------- */
 .page-services .svc-flow { position: relative; }
 .page-services .svc-jump {
   position: sticky;
@@ -139,8 +125,8 @@
 .page-services .svc-jump__link:hover { color: var(--amber); }
 .page-services .svc-jump__link.is-current { background: var(--paper); color: var(--navy); }
 .page-services .svc-jump__link:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.page-services .svc-jump__link.is-current:focus-visible { outline-color: var(--navy); }
 
-/* ---------- 05 how we work (progress table) ---------- */
 .page-services .svc-steps .ledger__name { grid-column: 1 / 5; }
 .page-services .svc-steps .ledger__tag {
   grid-column: 5 / 9;
@@ -154,7 +140,6 @@
 .page-services .svc-steps .ledger__gauge { grid-column: 9 / 11; }
 .page-services .svc-steps .ledger__end { grid-column: 11 / 13; }
 
-/* ---------- 06 on top of your stack ---------- */
 .page-services .svc-stack__grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -197,7 +182,7 @@
   letter-spacing: var(--tr-2);
 }
 .page-services .svc-stack__text {
-  /* always reserve two lines, so cards in one row keep their titles on one baseline (content is bottom aligned) */
+
   min-height: calc(2em * 1.4);
   font-size: var(--fs-s);
   line-height: var(--lh-140);
@@ -224,7 +209,6 @@
   text-wrap: pretty;
 }
 
-/* ---------- responsive ---------- */
 @media (max-width: 1199px) {
   .page-services .svc-steps .ledger__name { grid-column: 1; grid-row: 1; }
   .page-services .svc-steps .ledger__end { grid-column: 2; grid-row: 1; }
@@ -259,4 +243,6 @@
   .page-services .svc-steps .ledger__tag { display: block; grid-column: 1 / -1; grid-row: 2; max-width: none; }
   .page-services .svc-steps .ledger__gauge { grid-column: 1 / -1; grid-row: 3; padding-top: 0; }
   .page-services .svc-stack__foot .btn { width: 100%; justify-content: space-between; }
+  .page-services .svc-jump__bar { gap: 0; padding: .375em; }
+  .page-services .svc-jump__link { padding-inline: .5em; }
 }

@@ -111,11 +111,15 @@ function initNav() {
       e.preventDefault();
       setOpen(false, true);
     } else if (e.key === "Tab") {
+      // move focus ourselves on every Tab: Safari's default Tab skips links, so a wrap-only trap leaks
       const f = focusables();
       if (!f.length) return;
-      const first = f[0], last = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      e.preventDefault();
+      const i = f.indexOf(document.activeElement);
+      let n;
+      if (i === -1) n = e.shiftKey ? f.length - 1 : 0;
+      else n = (i + (e.shiftKey ? -1 : 1) + f.length) % f.length;
+      f[n].focus();
     }
   }
 
@@ -131,15 +135,16 @@ function initNav() {
       drawer.hidden = false;
       if (scrim) scrim.hidden = false;
       if (lenis) lenis.stop();
+      document.addEventListener("keydown", onKey);
+      // focus before the rows fade in (rows tween opacity only, so they stay focusable)
+      const first = drawer.querySelector("a[href], button");
+      if (first) first.focus({ preventScroll: true });
       if (motionOn()) {
         gsap.killTweensOf([drawer, scrim, ...rows]);
         gsap.fromTo(drawer, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE });
-        gsap.fromTo(rows, { autoAlpha: 0, y: emOf(drawer), scale: 0.98 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: EASE, stagger: 0.06 });
+        gsap.fromTo(rows, { opacity: 0, y: emOf(drawer), scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: EASE, stagger: 0.06 });
         if (scrim) gsap.fromTo(scrim, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: EASE });
       }
-      document.addEventListener("keydown", onKey);
-      const first = drawer.querySelector("a[href], button");
-      if (first) first.focus({ preventScroll: true });
     } else {
       if (lenis) lenis.start();
       document.removeEventListener("keydown", onKey);
@@ -181,7 +186,7 @@ function initNav() {
         panel.hidden = false;
         if (motionOn()) {
           gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE });
-          gsap.fromTo(links, { autoAlpha: 0, y: emOf(panel) * 0.5 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: EASE, stagger: 0.04 });
+          gsap.fromTo(links, { opacity: 0, y: emOf(panel) * 0.5 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE, stagger: 0.04 });
         }
       } else if (motionOn()) {
         gsap.to(panel, { height: 0, duration: 0.45, ease: EASE, onComplete: () => { panel.hidden = true; panel.style.height = ""; } });
@@ -245,10 +250,14 @@ class Carousel {
     this.offset = 0;
     this.measure();
     this.el.classList.add("is-start");
-    this.slides.forEach((s, i) => {
-      s.setAttribute("role", "group");
-      s.setAttribute("aria-roledescription", "slide");
-      s.setAttribute("aria-label", `${i + 1} of ${this.slides.length}`);
+    // keyboard focus on a slide brings that slide into view (the clipped section never scrolls natively);
+    // a mouse press that focuses a card link is not keyboard focus and must not move the row mid-drag
+    this.track.addEventListener("focusin", (e) => {
+      let kb = true;
+      try { kb = e.target.matches(":focus-visible"); } catch (err) { /* old engines: treat as keyboard */ }
+      if (!kb) return;
+      const i = this.slides.findIndex((s) => s.contains(e.target));
+      if (i > -1) this.go(Math.min(i, this.maxIndex));
     });
     if (this.prev) this.prev.addEventListener("click", () => this.go(this.index - 1));
     if (this.next) this.next.addEventListener("click", () => this.go(this.index + 1));
@@ -371,17 +380,26 @@ function initLenis() {
 }
 
 /* ---------- reveals ---------- */
+/* accessible name of a two-line heading: a <br> counts as a space ("What<br>we stop." -> "What we stop.") */
+function spokenText(el) {
+  const c = el.cloneNode(true);
+  c.querySelectorAll("br").forEach((br) => br.replaceWith(" "));
+  return c.textContent.replace(/\s+/g, " ").trim();
+}
+
 function revealLines(el) {
-  gsap.set(el, { autoAlpha: 1 });
+  gsap.set(el, { opacity: 1 });
   if (!SplitText) {
-    gsap.from(el, { autoAlpha: 0, y: emOf(el) * 0.25, duration: 0.45, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+    gsap.from(el, { opacity: 0, y: emOf(el) * 0.25, duration: 0.45, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
     return;
   }
+  const label = spokenText(el);
   SplitText.create(el, {
     type: "lines",
     linesClass: "split-line",
     autoSplit: true,
     onSplit(self) {
+      if (label) el.setAttribute("aria-label", label);
       return gsap.from(self.lines, {
         opacity: 0,
         y: emOf(el) * 0.25,
@@ -397,8 +415,11 @@ function revealLines(el) {
 
 function revealStatement(el) {
   if (!SplitText) return;
+  // the text is read from a screen-reader-only copy next to it; the split copy is aria-hidden in the markup
   SplitText.create(el, {
     type: "words,chars",
+    tag: "span",
+    aria: "none",
     autoSplit: true,
     onSplit(self) {
       return gsap.fromTo(self.chars, { opacity: 0.15 }, {
@@ -417,18 +438,19 @@ function initReveals() {
 
   document.querySelectorAll('[data-reveal="fade"], [data-reveal="status"]').forEach((el) => {
     const delay = parseFloat(el.dataset.delay || (el.dataset.reveal === "status" ? 0.54 : 0.15));
-    gsap.fromTo(el, { autoAlpha: 0, y: emOf(el) * 0.5 }, { autoAlpha: 1, y: 0, duration: 0.45, ease: EASE, delay, scrollTrigger: { trigger: el, start: "top 95%", once: true } });
+    gsap.fromTo(el, { opacity: 0, y: emOf(el) * 0.5 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE, delay, scrollTrigger: { trigger: el, start: "top 95%", once: true } });
   });
 
   document.querySelectorAll('[data-reveal="frame"]').forEach((el) => {
-    gsap.fromTo(el, { autoAlpha: 0, scale: 0.95, y: emOf(el) * 2 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+    gsap.fromTo(el, { opacity: 0, scale: 0.95, y: emOf(el) * 2 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
   });
 
+  // opacity only (never visibility): hidden-until-scrolled content must stay reachable by Tab and screen readers
   document.querySelectorAll('[data-reveal="stagger"]').forEach((list) => {
     const items = [...list.children];
-    gsap.set(list, { autoAlpha: 1 });
-    gsap.fromTo(items, { autoAlpha: 0, y: emOf(list) * 0.5 }, {
-      autoAlpha: 1, y: 0, duration: 0.45, ease: EASE, delay: parseFloat(list.dataset.delay || 0.15), stagger: parseFloat(list.dataset.stagger || 0.15),
+    gsap.set(list, { opacity: 1 });
+    gsap.fromTo(items, { opacity: 0, y: emOf(list) * 0.5 }, {
+      opacity: 1, y: 0, duration: 0.45, ease: EASE, delay: parseFloat(list.dataset.delay || 0.15), stagger: parseFloat(list.dataset.stagger || 0.15),
       scrollTrigger: { trigger: list, start: "top 92%", once: true },
     });
   });

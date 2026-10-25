@@ -21,6 +21,12 @@ python3 -m http.server 8787 --bind 127.0.0.1 -d docs        # keep running (back
 
 Check it answers: `curl -sI http://127.0.0.1:8787/ | head -1`.
 
+**Safari / WebKit previews:** the production CSP has `upgrade-insecure-requests`, so WebKit rewrites every asset URL
+on `http://127.0.0.1` to `https://` and the page never loads (TLS errors, `html.ready` never set). Chromium and
+Firefox exempt localhost. For WebKit, build with `python3 build.py --dev --out .out/NAME` (never deploy that build)
+or serve over HTTPS: `qa/test/functional/serve_https.py` serves `docs/` on https://127.0.0.1:8788 (404.html for
+missing paths). The live https site is not affected.
+
 ## 2. Capture ours (whole standard set, about 2 minutes)
 
 ```sh

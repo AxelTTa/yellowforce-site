@@ -23,6 +23,7 @@
 <meta name="twitter:title" content="Application and API security | YellowForce">
 <meta name="twitter:description" content="We attack your apps and APIs first with AI and human red teamers, fix what we find, retest it and watch them 24/7.">
 <meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
 <meta name="theme-color" content="#071B3E">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -30,6 +31,53 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
 <link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -105,7 +153,7 @@
   </div>
 </header>
 
-<main id="main" class="main">
+<main id="main" class="main" tabindex="-1">
 <!-- 01 Hero -->
 <section class="cover cover--full on-dark dom-hero" aria-labelledby="dom-title">
   <div class="cover__media media" aria-hidden="true">
@@ -127,7 +175,7 @@
       <h2 class="dom-brief__title" id="threat-title" data-reveal="lines">The threat.</h2>
       <div class="dom-brief__copy">
         <p class="dom-brief__lead" data-reveal="fade">Every public app and API is a door attackers can test as often as they like. Broken access controls let one user read another user’s data.</p>
-        <p class="dom-brief__body" data-reveal="fade" data-delay=".3">Injection flaws, exposed admin panels, forgotten test endpoints and vulnerable open-source packages do the rest. AI agents now crawl your app, read your JavaScript, map every endpoint and try thousands of variations without getting tired. They chain small bugs into a real breach, faster than a yearly test can keep up with. Supply chain attacks hide in the packages your code trusts.</p>
+        <p class="dom-brief__body" data-reveal="fade" data-delay=".3">Injection flaws, exposed admin panels, forgotten test endpoints and vulnerable open-source packages do the rest. AI agents now crawl your app, read your JavaScript, map every endpoint and try thousands of variations without getting tired. They chain small bugs into a real breach, long before a yearly test would catch it. Supply chain attacks hide in the packages your code trusts.</p>
       </div>
     </div>
     <div class="dom-gallery" aria-hidden="true">

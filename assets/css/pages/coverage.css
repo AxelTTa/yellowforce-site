@@ -62,6 +62,7 @@
 .page-coverage-index .cov-bar__link:hover { color: var(--amber); }
 .page-coverage-index .cov-bar__link.is-current { background: var(--paper); color: var(--navy); }
 .page-coverage-index .cov-bar__link:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+.page-coverage-index .cov-bar__link.is-current:focus-visible { outline-color: var(--navy); }
 
 @media (max-width: 767px) {
   .page-coverage-index .cov-head__title { max-width: none; }
@@ -97,7 +98,7 @@
   padding: .5em .75em;
   border: 1px solid var(--paper-16);
   border-radius: var(--r-xs);
-  background: var(--glass);
+  background: rgba(4, 16, 41, .45);
   -webkit-backdrop-filter: var(--blur-chip);
   backdrop-filter: var(--blur-chip);
   font-size: var(--fs-xs);

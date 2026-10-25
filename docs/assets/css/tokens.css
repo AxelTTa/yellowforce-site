@@ -1,36 +1,15 @@
-/* YellowForce design tokens.
-   One fluid em system: every size is in em of the body font-size, which scales
-   with the viewport (container / (1440 / unit)). Radii are rem (fixed px).
-
-   Brand (Axel's logo kit, brand/): navy #071B3E is the ink of the whole site (text on paper,
-   nav glass, hero, dark cards, footer, every alpha step). Amber #FFBF00 is the accent and is used
-   like light: the mark, live dots, hover/active on dark, focus on dark, selection, imagery.
-   Never amber text on paper. Slate #777F98 is the kit's secondary grey.
-
-   Paper: cool off-white #F4F5F7, chosen over Vantra's warm #f5f4f0. Side by side with navy the
-   warm paper reads cream/yellowed next to the blue; the cool one keeps navy crisp and the amber
-   the only warm note on the page. Raised cards may use white.
-
-   Legacy names (--ink*, --signal*, --black) are kept as aliases so older markup keeps working:
-   they all resolve to the brand values below. */
-
 :root {
-  /* fonts */
+
   --font-text: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* fluid base: body font-size = container / (1440 / unit)
-     >=1440: 15 (15px at 1440, 20px cap at 1920) | 992-1439: 17 | 768-991: 17 | <=767: 20 (10.67px fixed, same as
-     the reference). Every small text size below has a 10px floor (--fs-4xs ... --fs-s use max(), --fs-sm is
-     exactly 10px there), so mobile labels never drop under 10px. */
   --fluid-unit: 17;
   --fluid-container: clamp(768px, 100vw, 1920px);
 
-  /* brand: navy */
-  --navy: #071B3E;            /* rgb(7, 27, 62): the brand navy, every dark surface */
-  --navy-deep: #041029;       /* very large image-backed surfaces (reel, image bases) */
-  --navy-abyss: #030B1C;      /* deepest shadows: vignettes, scrims, imagery */
-  --navy-2: #0C2350;          /* raised navy: image placeholders, chips on navy */
+  --navy: #071B3E;
+  --navy-deep: #041029;
+  --navy-abyss: #030B1C;
+  --navy-2: #0C2350;
   --navy-3: #12305F;
   --navy-05: rgba(7, 27, 62, .05);
   --navy-08: rgba(7, 27, 62, .08);
@@ -39,26 +18,23 @@
   --navy-22: rgba(7, 27, 62, .22);
   --navy-40: rgba(7, 27, 62, .40);
   --navy-48: rgba(7, 27, 62, .48);
-  --navy-68: rgba(7, 27, 62, .68);   /* 5.7:1 on paper */
-  --navy-72: rgba(7, 27, 62, .72);   /* 6.6:1 on paper */
+  --navy-68: rgba(7, 27, 62, .68);
+  --navy-72: rgba(7, 27, 62, .72);
   --navy-78: rgba(7, 27, 62, .78);
   --navy-90: rgba(7, 27, 62, .9);
 
-  /* brand: amber (accent, used like light) */
-  --amber: #FFBF00;           /* rgb(255, 191, 0) */
-  --amber-warm: #FFA21A;      /* glow and imagery */
-  --amber-hot: #FFF1C7;       /* white-hot cores */
+  --amber: #FFBF00;
+  --amber-warm: #FFA21A;
+  --amber-hot: #FFF1C7;
   --amber-55: rgba(255, 191, 0, .55);
   --amber-24: rgba(255, 191, 0, .24);
   --amber-12: rgba(255, 191, 0, .12);
   --amber-00: rgba(255, 191, 0, 0);
 
-  /* brand: slate (secondary grey) */
-  --slate: #777F98;           /* kit slate: large secondary text, "Force" on paper (4.3:1 on navy, so not for small text) */
-  --slate-ink: #5A627A;       /* small secondary text on paper: 5.6:1 */
-  --slate-light: #A3AABF;     /* secondary text on dark, "Force" on dark: 7.3:1 on navy */
+  --slate: #777F98;
+  --slate-ink: #5A627A;
+  --slate-light: #A3AABF;
 
-  /* paper (cool off-white) */
   --paper: #F4F5F7;
   --paper-82: rgba(244, 245, 247, .82);
   --paper-62: rgba(244, 245, 247, .62);
@@ -70,7 +46,6 @@
   --paper-00: rgba(244, 245, 247, 0);
   --white: #fff;
 
-  /* legacy aliases (Vantra names): resolve to the brand */
   --ink: var(--navy);
   --ink-2: var(--navy-2);
   --ink-3: var(--navy-3);
@@ -92,16 +67,14 @@
   --signal-12: var(--amber-12);
 
   --island: rgba(4, 16, 41, .82);
-  --pill-glass: rgba(7, 27, 62, .9);    /* nav pill: stays clearly brand navy over paper and over imagery */
-  --scrim-nav: rgba(3, 11, 28, .72);    /* open-menu backdrop: deep navy so the pill stands out */
+  --pill-glass: rgba(7, 27, 62, .9);
+  --scrim-nav: rgba(3, 11, 28, .72);
 
-  /* logo colors (the lockup in src/partials/logo.html reads these; .on-dark and the nav pill flip them) */
   --logo-front: var(--amber);
   --logo-back: var(--navy);
   --logo-yellow: var(--navy);
   --logo-force: var(--slate);
 
-  /* semantic */
   --bg: var(--paper);
   --text: var(--navy);
   --text-2: var(--navy-68);
@@ -116,7 +89,6 @@
   --line-dark-soft: var(--paper-07);
   --placeholder: var(--navy-2);
 
-  /* type scale (em). Small sizes never drop under 10px. */
   --fs-4xs: max(.65625em, 10px);
   --fs-3xs: max(.6875em, 10px);
   --fs-2xs: max(.75em, 10px);
@@ -166,7 +138,6 @@
   --tr-display: -.045em;
   --tr-figure: -.055em;
 
-  /* spacing (em) */
   --sp-0125: .125em;
   --sp-025: .25em;
   --sp-0375: .375em;
@@ -196,7 +167,6 @@
   --sp-1275: 12.75em;
   --sp-14: 14em;
 
-  /* layout */
   --page-x: 3em;
   --section-y: 6em;
   --gutter: 1.5em;
@@ -213,7 +183,6 @@
   --nav-w: 30em;
   --inset: .5em;
 
-  /* radius (rem = fixed px) */
   --r-3xs: .25rem;
   --r-2xs: .375rem;
   --r-xs: .5rem;
@@ -225,7 +194,6 @@
   --r-hero: 20px;
   --r-round: 999px;
 
-  /* effects */
   --blur-nav: blur(10px) saturate(130%);
   --blur-bar: blur(18px) saturate(130%);
   --blur-chip: blur(12px);
@@ -233,7 +201,6 @@
   --blur-backdrop: blur(5px);
   --glass: rgba(7, 27, 62, .24);
 
-  /* motion */
   --ease: cubic-bezier(.645, .045, .355, 1);
   --ease-out: cubic-bezier(.215, .61, .355, 1);
   --ease-strong: cubic-bezier(.86, 0, .07, 1);
@@ -242,11 +209,10 @@
   --t: .45s;
   --t-slow: .6s;
 
-  /* gradients (navy shadows, never neutral black) */
   --scrim-hero: linear-gradient(rgba(3, 11, 28, .42), rgba(3, 11, 28, .06) 32%, rgba(3, 11, 28, .44) 72%, rgba(3, 11, 28, .78));
   --scrim-media: linear-gradient(rgba(4, 16, 41, .62), rgba(4, 16, 41, .24) 44%, rgba(4, 16, 41, .78));
   --scrim-top: linear-gradient(rgba(4, 16, 41, .72) 0%, rgba(4, 16, 41, .28) 52%, rgba(4, 16, 41, 0) 100%);
-  /* fallback behind every image slot, so a missing file still looks intentional */
+
   --media-fallback:
     radial-gradient(120% 90% at 78% 18%, rgba(255, 162, 26, .20), rgba(255, 162, 26, 0) 55%),
     radial-gradient(90% 70% at 12% 92%, rgba(255, 191, 0, .10), rgba(255, 191, 0, 0) 60%),
@@ -272,7 +238,6 @@
   }
 }
 
-/* phones: 1em gutters and a 34.5em pill (368px at 390), so the nav sits close to the edges like the reference */
 @media (max-width: 479px) {
   :root {
     --page-x: 1em;

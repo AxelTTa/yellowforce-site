@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Build the site and serve docs/ on http://127.0.0.1:8787/
 #   tools/serve.sh          production build (same CSP as the live site)
-#   tools/serve.sh --dev    build without upgrade-insecure-requests (use if a browser upgrades local asset URLs to https)
+#   tools/serve.sh --dev    build without upgrade-insecure-requests. Needed for Safari/WebKit: with the production CSP
+#                           WebKit upgrades every http://127.0.0.1 asset URL to https and the page never loads.
+#                           Never deploy a --dev build.
 # Port override: PORT=8800 tools/serve.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."

@@ -6,7 +6,7 @@ Own markup only. Never paste Vantra HTML, class names or SVGs.
 
 ## 1. Build, pages, partials
 
-- Build: `python3 build.py` (production) or `tools/serve.sh` (build + http://127.0.0.1:8787/). `python3 build.py --dev` drops `upgrade-insecure-requests` from the CSP if a browser ever upgrades local asset URLs (Chromium does not).
+- Build: `python3 build.py` (production) or `tools/serve.sh` (build + http://127.0.0.1:8787/). `python3 build.py --dev` drops `upgrade-insecure-requests` from the CSP: needed to preview in Safari/WebKit over http://127.0.0.1 (Chromium and Firefox exempt localhost). Previews: `python3 build.py --out .out/NAME`. Unknown flags are an error.
 - The build prints warnings: missing images/pages, unknown `{{vars}}`, and copy-rule hits (em dash, `mailto:`, "platform", "SaaS", "dashboard", "pilot", "N days/weeks", quarter dates, "trusted by"...). Fix copy-rule hits.
 - A page is `src/pages/<name>.html` = front matter + the content of `<main>`. Layout (head, skip link, nav, main, footer, toast) is added for you.
 
@@ -49,7 +49,7 @@ sitemap: false                          (optional)
 
 | Class | Use |
 |---|---|
-| `.block` | section vertical padding 6em (`.block--top-0`, `.block--bottom-0`, `.block--about` 10.5em bottom, `.block--clip` overflow hidden, needed around carousels) |
+| `.block` | section vertical padding 6em (`.block--top-0`, `.block--bottom-0`, `.block--about` 10.5em bottom, `.block--clip` overflow clip, needed around carousels: clip, not hidden, so keyboard focus can never scroll the section sideways) |
 | `.gutter` | side padding 3em (1.25em <= 991) |
 | `.frame` | max 1920 container |
 | `.stack` | column gap 5em (header to content). `.stack--m` 3em, `.stack--s` 1.5em |
@@ -97,15 +97,15 @@ One look on Home, Services and Coverage (all in components.css, no page override
 ```html
 <section class="block gutter block--clip"> ...
 <div class="carousel" data-carousel role="region" aria-roledescription="carousel" aria-label="Six practices">
-  <div class="carousel__viewport" data-carousel-viewport tabindex="0" aria-label="Six practices. Use the arrow keys to move.">
+  <div class="carousel__viewport" data-carousel-viewport tabindex="0" role="group" aria-label="Six practices. Use the arrow keys to move.">
     <ul class="carousel__track" data-carousel-track data-reveal="stagger"><li class="carousel__slide">CARD</li>...</ul>
   </div>
   <button class="carousel__btn carousel__btn--prev" type="button" data-carousel-prev aria-label="Previous"><span class="carousel__arrow">svg</span></button>
   <button class="carousel__btn carousel__btn--next" type="button" data-carousel-next aria-label="Next"><span class="carousel__arrow">svg</span></button>
 </div>
 ```
-Slide width 28em (`.carousel--narrow` 23.9em), same on phones (298px at 390: the next card peeks under the paper fade, the arrow chip sits over the gap, like the reference). Buttons, drag/swipe, arrow keys; wraps at the ends.
-Cards: `.practice` (`.practice__num`, `svg.glyph.practice__glyph`, `.practice__body > .practice__title + .practice__text`; can be an `<a>`; the text reserves two lines so titles align, keep it to two lines at 1440, about 60 characters), `.reason` (`.reason__who > .reason__icon + .reason__id > .reason__title + .reason__meta`, `.reason__text`; odd slides flip automatically), `.reason--feature on-dark` (`.reason__score > .reason__figure(24<small>/7</small>) + .reason__figure-text`, `.reason__crew > .reason__stack > .reason__chip` x4 + `.reason__crew-label`). Chips are 32px overlapping circles in the reference's avatar slot, never faces. Home uses three close crops of our light imagery, each a bright amber point so the row reads as one set: `--img --burst` (`gen/about-2-800.webp`), `--img --swarm` (`gen/threat-swarm-800.webp`), `--img --trail` (`gen/status-800.webp`), then `--paper` (put `<!-- include:logo-mark -->` inside). The label is two short uppercase lines with a `<br>` ("AI and experts / on watch now"); it never wraps further. An `--img` chip is `<span class="reason__chip reason__chip--img reason__chip--burst media"><img src="...-800.webp" alt="" loading="lazy" decoding="async"></span>` (zoomed crop, object-position per modifier). `--live` (`<span class="dot dot--live">`), `--amber` / `--slate` (solid chip with a navy glyph) remain for other pages.
+Slide width 28em (`.carousel--narrow` 23.9em), same on phones (298px at 390: the next card peeks under the paper fade, the arrow chip sits over the gap, like the reference). Buttons, drag/swipe, arrow keys; wraps at the ends. Tabbing onto a slide's link moves the carousel to it. The viewport never selects text on drag. Slides stay plain list items (no role on the `<li>`).
+Cards: `.practice` (`.practice__num`, `svg.glyph.practice__glyph`, `.practice__body > .practice__title + .practice__text`; can be an `<a>`; the text reserves two lines so titles align, keep it to two lines at 1440, about 60 characters), `.reason` (`.reason__who > .reason__icon + .reason__id > .reason__title + .reason__meta`, `.reason__text`; odd slides flip automatically), `.reason--feature on-dark` (`.reason__score > .reason__figure(24<small>/7</small>) + .reason__figure-text`, `.reason__crew > .reason__stack > .reason__chip` x4 + `.reason__crew-label`). Chips are 32px overlapping circles in the reference's avatar slot, never faces. Home uses three close crops of our light imagery, each a bright amber point so the row reads as one set: `--img --burst` (`gen/about-2-320.webp`), `--img --swarm` (`gen/threat-swarm-320.webp`), `--img --trail` (`gen/status-320.webp`), then `--paper` (put `<!-- include:logo-mark -->` inside). The label is two short uppercase lines with a `<br>` ("AI and experts / on watch now"); it never wraps further. An `--img` chip is `<span class="reason__chip reason__chip--img reason__chip--burst media"><img src="...-320.webp" alt="" loading="lazy" decoding="async"></span>` (320 px file, zoomed crop, object-position per modifier). `--live` (`<span class="dot dot--live">`), `--amber` / `--slate` (solid chip with a navy glyph) remain for other pages.
 Pixel glyphs: inline SVG, 30px cells on a 180 grid, `<rect width="24" height="24" rx="5">` LED blocks, `fill: currentColor` via `.glyph`. Examples in `src/pages/index.html`.
 
 **Reel** (live canvas)
@@ -113,11 +113,11 @@ Pixel glyphs: inline SVG, 30px cells on a 180 grid, `<rect width="24" height="24
 <div class="reel on-dark" data-streaks-scope data-reveal="frame">
   <canvas class="reel__canvas" data-streaks="reel" aria-hidden="true"></canvas>
   <div class="reel__island"><span class="reel__dot"></span><span class="reel__items"><span class="reel__label">YellowForce reel</span><span class="reel__time" data-clock>Live</span></span><span class="reel__sep"></span>
-    <button class="reel__toggle" type="button" data-streaks-toggle data-label-play="Play reel" data-label-pause="Pause reel" aria-pressed="false" aria-label="Pause reel">pause svg.is-pause + play svg.is-play</button></div>
+    <button class="reel__toggle" type="button" data-streaks-toggle aria-pressed="false" aria-label="Pause reel">pause svg.is-pause + play svg.is-play</button></div>
 </div>
 ```
 `data-streaks="reel"` is a filmic long exposure graded like the generated images (mean luma about 58 at 1440): navy-deep `#030B1C` edges rising to at most `#0B2350` behind the light (never royal blue), a diagonal river of amber trails drawn on a half-resolution layer (soft, varied width and opacity, no comet heads), three blurred glow passes, a warm amber bloom with a white core, a navy vignette and grain that moves at film rate. The glow is tone mapped on a 1/8 frame on the CPU (filmic shoulder: the brightest light rolls off to warm white, never lemon; the navy is pulled down under the light so amber never turns khaki), so a frame costs about 2 ms with a GPU. Phones draw 75% of the lanes on a steeper diagonal; reduced motion draws one static frame. Frame height 80vh (max 960px) at every width, 80svh on phones, like the reference.
-`data-streaks="accent"` = transparent, softer version to lay over a hero/cover image (`<canvas class="hero__streaks">` or `.cover__streaks`). Optional `data-seed="7"` changes the layout. `[data-clock]` shows live San Francisco time.
+`data-streaks="accent"` = transparent, softer version to lay over a hero/cover image (`<canvas class="hero__streaks">` or `.cover__streaks`). It moves for 3.4 s, then eases to a still frame by 5 s (WCAG 2.2.2: no endless motion without a pause control; `settle` in `streaks.js`). The reel toggle keeps the fixed name "Pause reel"; `aria-pressed` carries the state. Optional `data-seed="7"` changes the layout. `[data-clock]` shows live San Francisco time.
 
 **FAQ** `.faq` (12-col: `.faq__head` left, `.faq__list[data-faq]` right) > `.faq__item > h3.faq__h > button.faq__q#id[aria-expanded][aria-controls] (span + .faq__icon)` and `div.faq__a#id[role=region][aria-labelledby] > .faq__a-inner > p`. Answers are open without JS. Add `is-open` on an item to start it open. The question text must be the button's first `<span>` (it carries the 1.375em display size; the button keeps the base size so rows are 2em of the base, about 85px at 1440). No rule above the first row, a hairline under every row. Keep it to 5 or 6 questions (Home has 6, "Is this software?" first and "We’re under attack right now." last).
 
@@ -147,8 +147,8 @@ Status card = the "Under attack?" copy-email button: `<button class="status" typ
 
 | Attribute | Effect |
 |---|---|
-| `data-reveal="lines"` | headings: SplitText lines fade + rise .25em, .45s, once |
-| `data-reveal="statement"` | characters fill from 15% to 100% opacity, scrubbed by scroll |
+| `data-reveal="lines"` | headings: SplitText lines fade + rise .25em, .45s, once. The heading's aria-label reads a `<br>` as a space |
+| `data-reveal="statement"` | characters fill from 15% to 100% opacity, scrubbed by scroll. Put it on an `aria-hidden` span next to a `.sr-only` copy of the text (see Home) |
 | `data-reveal="fade"` | fade + rise .5em (`data-delay=".3"`) |
 | `data-reveal="stagger"` | direct children fade + rise, .15s stagger (`data-stagger`, `data-delay`) |
 | `data-reveal="frame"` | scale .95 -> 1 + rise 2em, .6s |
@@ -157,7 +157,7 @@ Status card = the "Under attack?" copy-email button: `<button class="status" typ
 | `data-copy-email` / `="urgent"` | copy info@yellow-force.com + toast |
 | `data-carousel*`, `data-faq`, `data-streaks*`, `data-clock`, `data-lenis-prevent` | see components |
 
-Elements with `data-reveal` are hidden until JS runs (`html.motion`); a 3.5s failsafe shows everything if JS fails. Smooth scroll is Lenis (lerp .1) wired to ScrollTrigger; anchor links scroll smoothly.
+Elements with `data-reveal` are hidden until JS runs (`html.motion`), with opacity only, never `visibility`, so content below the fold stays reachable by Tab and screen readers; a 3.5s failsafe shows everything if JS fails. Smooth scroll is Lenis (lerp .1) wired to ScrollTrigger; anchor links scroll smoothly.
 
 ## 6. Tokens and rules
 

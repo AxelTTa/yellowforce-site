@@ -1,8 +1,3 @@
-/* Legal pages (/privacy/, /security/) and the 404.
-   .page-legal: article-like head (12em top), then a sticky rail (contents + email) beside the prose.
-   .page-404: the full-height inset dark card, left-aligned, no footer (reference 404). */
-
-/* ===================== Legal ===================== */
 .page-legal .lg-top { padding-top: var(--sp-12); }
 .page-legal .lg-top__wrap {
   display: flex;
@@ -58,11 +53,10 @@
 }
 .page-legal .lg-ask .mail { font-size: var(--fs-ml); color: var(--text); }
 
-/* prose: shared component; first heading sits on the rail's top line */
 .page-legal .lg-prose { max-width: 44em; color: var(--text-2); }
 .page-legal .lg-prose > :first-child { margin-top: 0; }
 .page-legal .lg-prose ul { gap: .5em; }
-/* each section opens on a hairline; the first one lines up with the rail's top rule */
+
 .page-legal .lg-prose h2 {
   scroll-margin-top: 6em;
   margin-top: 1.6em;
@@ -86,13 +80,11 @@
   .page-legal .lg-prose h2 { font-size: var(--fs-3xl); padding-top: .75em; }
 }
 
-/* ===================== 404 ===================== */
 .page-404 .foot { display: none; }
-/* inset via padding on main, so the card's margin cannot collapse through body (page = exactly 100vh) */
+
 .page-404 .main { padding: var(--inset); }
 .page-404 .nf { margin: 0; }
-/* one burst of light near the middle of the frame, just right of the text (mirrored so the hot core
-   sits past the title instead of under it); the scrim only darkens the far left for the copy */
+
 .page-404 .nf__media > img { opacity: .95; transform: scaleX(-1); }
 .page-404 .nf__media::after {
   background:
@@ -118,9 +110,18 @@
   .page-404 .nf__text { max-width: var(--col-8); }
 }
 @media (max-width: 767px) {
-  /* phones: same title size as the About cover (the h1 token), text inset like the reference card */
+
   .page-404 .nf__inner { padding-inline: 2em; }
   .page-404 .nf__media::after { background: linear-gradient(rgba(3, 11, 28, .12), rgba(3, 11, 28, .42)), var(--scrim-hero); }
+
+  .page-404 .nf__media > img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
+
+  .page-404 .nf__ghost {
+    --btn-bg: rgba(3, 11, 28, .46);
+    -webkit-backdrop-filter: var(--blur-ghost);
+    backdrop-filter: var(--blur-ghost);
+    box-shadow: inset 0 0 0 1px var(--paper-16);
+  }
 }
 @media (max-width: 479px) {
   .page-404 .nf__title { max-width: none; }
