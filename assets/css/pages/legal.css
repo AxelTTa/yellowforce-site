@@ -1,0 +1,120 @@
+/* Legal pages (/privacy/, /security/) and the 404.
+   .page-legal: article-like head (12em top), then a sticky rail (contents + email) beside the prose.
+   .page-404: the full-height inset dark card, left-aligned, no footer (reference 404). */
+
+/* ===================== Legal ===================== */
+.page-legal .lg-top { padding-top: var(--sp-12); }
+.page-legal .lg-top__wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-25);
+}
+.page-legal .lg-title { max-width: var(--col-8); font-size: var(--fs-10xl); line-height: var(--lh-100); }
+.page-legal .lg-meta { display: inline-flex; align-items: center; gap: .75em; }
+.page-legal .lg-meta .dot { background: var(--navy); box-shadow: none; }
+.page-legal .lg-intro {
+  max-width: 36em;
+  font-size: var(--fs-l);
+  line-height: var(--lh-150);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+
+.page-legal .lg-body { padding-bottom: var(--sp-105); }
+.page-legal .lg-rail {
+  gap: var(--sp-125);
+  padding-top: var(--sp-125);
+  border-top: 1px solid var(--line);
+}
+.page-legal .lg-toc { counter-reset: toc; display: flex; flex-direction: column; }
+.page-legal .lg-toc li { counter-increment: toc; }
+.page-legal .lg-toc a {
+  display: flex;
+  align-items: baseline;
+  gap: .875em;
+  padding: .45em 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-130);
+  color: var(--text-2);
+  transition: color var(--t-fast) var(--ease), transform var(--t) var(--ease-out-quint);
+}
+.page-legal .lg-toc a::before {
+  content: counter(toc, decimal-leading-zero);
+  flex: none;
+  width: 1.6em;
+  font-size: .8em;
+  color: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+}
+.page-legal .lg-toc a:hover { color: var(--text); transform: translateX(.25em); }
+.page-legal .lg-ask {
+  display: flex;
+  flex-direction: column;
+  gap: .625em;
+  margin-top: var(--sp-1);
+  padding-top: var(--sp-125);
+  border-top: 1px solid var(--line);
+}
+.page-legal .lg-ask .mail { font-size: var(--fs-ml); color: var(--text); }
+
+/* prose: shared component; first heading sits on the rail's top line */
+.page-legal .lg-prose { max-width: 44em; color: var(--text-2); }
+.page-legal .lg-prose > :first-child { margin-top: 0; }
+.page-legal .lg-prose ul { gap: .5em; }
+/* each section opens on a hairline; the first one lines up with the rail's top rule */
+.page-legal .lg-prose h2 {
+  scroll-margin-top: 6em;
+  margin-top: 1.6em;
+  padding-top: .625em;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-4xl);
+  letter-spacing: var(--tr-3);
+  line-height: var(--lh-112);
+}
+.page-legal .lg-prose h2 + * { margin-top: .75em; }
+.page-legal .lg-prose .mail { cursor: copy; }
+.page-legal .lg-prose code { font-size: .85em; white-space: nowrap; }
+
+@media (max-width: 991px) {
+  .page-legal .lg-rail { display: none; }
+}
+@media (max-width: 767px) {
+  .page-legal .lg-top { padding-top: 10em; }
+  .page-legal .lg-title { font-size: 4.125em; max-width: none; }
+  .page-legal .lg-body { padding-bottom: var(--sp-8); }
+  .page-legal .lg-prose h2 { font-size: var(--fs-3xl); padding-top: .75em; }
+}
+
+/* ===================== 404 ===================== */
+.page-404 .foot { display: none; }
+/* inset via padding on main, so the card's margin cannot collapse through body (page = exactly 100vh) */
+.page-404 .main { padding: var(--inset); }
+.page-404 .nf { margin: 0; }
+.page-404 .nf__media > img { opacity: .8; }
+.page-404 .nf__media::after {
+  background:
+    linear-gradient(90deg, rgba(3, 11, 28, .78) 0%, rgba(3, 11, 28, .46) 42%, rgba(3, 11, 28, .08) 72%),
+    var(--scrim-hero);
+}
+.page-404 .nf__inner {
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--sp-25);
+  padding: 4.5em 6em;
+  text-align: left;
+}
+.page-404 .nf__title { max-width: var(--col-6); font-size: var(--h1); line-height: var(--lh-90); }
+.page-404 .nf__text { max-width: var(--col-5); font-size: var(--fs-ml); line-height: var(--lh-150); color: var(--paper-82); }
+.page-404 .nf__actions { padding-top: var(--sp-075); gap: var(--sp-0375); }
+.page-404 .nf__ghost { --btn-bg: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+@media (max-width: 991px) {
+  .page-404 .nf__inner { padding: 6em var(--page-x) 3em; }
+  .page-404 .nf__media::after { background: linear-gradient(rgba(3, 11, 28, .2), rgba(3, 11, 28, .55)), var(--scrim-hero); }
+  .page-404 .nf__title { max-width: var(--col-10); }
+  .page-404 .nf__text { max-width: var(--col-8); }
+}
+@media (max-width: 479px) {
+  .page-404 .nf__title { font-size: var(--fs-6xl); max-width: none; }
+  .page-404 .nf__text { max-width: none; }
+}

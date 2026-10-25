@@ -1,0 +1,79 @@
+---
+title: Insights | Notes on AI threats and defense | YellowForce
+description: Notes on AI swarms, fighting AI with AI and why one team should cover every cyber domain. Plain words, no hype.
+tagline: Know your enemy
+bodyclass: page-insights
+css: /assets/css/pages/insights.css
+---
+<!-- 01 Header -->
+<section class="page-head ins-head gutter" aria-labelledby="ins-title">
+  <p class="t-label" data-reveal="fade">( Insights )</p>
+  <h1 class="page-head__title" id="ins-title" data-reveal="lines">Notes From<br>the Front.</h1>
+</section>
+
+<div class="ins-board">
+  <!-- 02 Featured -->
+  <section class="block gutter ins-featured" aria-labelledby="ins-featured-title">
+    <div class="frame">
+      <h2 class="sr-only" id="ins-featured-title">Featured notes</h2>
+      <div class="notes" data-reveal="stagger">
+        <a class="note" href="/insights/ai-swarms/" data-cat="threats">
+          <span class="note__media media"><img src="/assets/img/photo/insight-1.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
+          <span class="note__scrim" aria-hidden="true"></span>
+          <span class="note__body"><span class="note__meta"><span>Threats</span><span>Oct 25, 2026</span></span><span class="note__title">What an AI swarm attack looks like.</span></span>
+          <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <a class="note" href="/insights/fight-ai-with-ai/" data-cat="approach">
+          <span class="note__media media"><img src="/assets/img/photo/insight-2.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager"></span>
+          <span class="note__scrim" aria-hidden="true"></span>
+          <span class="note__body"><span class="note__meta"><span>Approach</span><span>Oct 25, 2026</span></span><span class="note__title">Why you have to fight AI with AI.</span></span>
+          <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Index -->
+  <section class="block gutter ins-index" id="all-notes" aria-labelledby="ins-index-title">
+    <div class="frame stack">
+      <div class="head">
+        <h2 class="head__title" id="ins-index-title" data-reveal="lines">All notes.</h2>
+        <div class="head__meta" data-reveal="fade"><span>( 03 notes )</span><span>Threats, approach, coverage</span></div>
+      </div>
+      <ul class="index" data-reveal="stagger">
+        <li data-cat="threats">
+          <a class="index__row" href="/insights/ai-swarms/">
+            <span class="index__content"><span class="index__label">Threats</span><span class="index__title">What an AI swarm attack looks like.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img src="/assets/img/photo/insight-1.webp" data-variants sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+        <li data-cat="approach">
+          <a class="index__row" href="/insights/fight-ai-with-ai/">
+            <span class="index__content"><span class="index__label">Approach</span><span class="index__title">Why you have to fight AI with AI.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img src="/assets/img/photo/insight-2.webp" data-variants sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+        <li data-cat="coverage">
+          <a class="index__row" href="/insights/one-team-every-domain/">
+            <span class="index__content"><span class="index__label">Coverage</span><span class="index__title">One team for every domain.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img src="/assets/img/photo/insight-3.webp" data-variants sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Floating filter pills (CSS only: radios + :has) -->
+  <div class="ins-filter gutter">
+    <fieldset class="ins-filter__bar">
+      <legend class="sr-only">Filter notes by topic</legend>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-all" value="all" checked><span>All notes</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-threats" value="threats"><span>Threats</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-approach" value="approach"><span>Approach</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-coverage" value="coverage"><span>Coverage</span></label>
+    </fieldset>
+  </div>
+</div>
+
+<!-- 04 CTA band -->
+<!-- include:cta -->

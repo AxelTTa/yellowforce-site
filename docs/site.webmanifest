@@ -1,0 +1,29 @@
+{
+  "name": "YellowForce",
+  "short_name": "YellowForce",
+  "description": "Fully managed cybersecurity. We fight AI with AI, plus our cyber experts, 24/7.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#071B3E",
+  "theme_color": "#071B3E",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

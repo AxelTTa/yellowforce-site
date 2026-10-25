@@ -1,0 +1,221 @@
+/* Insights index (/insights/) and insight articles (/insights/<slug>/).
+   Scoped under .page-insights and .page-article. Numbers measured on the reference journal pages. */
+
+/* ===================== Insights index ===================== */
+
+/* header: 12em top (page-head), 6em bottom + 6em featured top = 12em to the cards */
+.page-insights .ins-head { padding-bottom: var(--sp-6); }
+
+/* filter pills: float at the bottom of the viewport while the notes are on screen, then rest under the list */
+.page-insights .ins-board { position: relative; }
+.page-insights .ins-filter {
+  position: sticky;
+  bottom: var(--sp-15);
+  z-index: 40;
+  height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+.page-insights .ins-filter__bar {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-025);
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: var(--sp-05);
+  border: 1px solid var(--paper-16);
+  border-radius: var(--r-m);
+  background: var(--pill-glass);
+  -webkit-backdrop-filter: var(--blur-bar);
+  backdrop-filter: var(--blur-bar);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.page-insights .ins-filter__bar::-webkit-scrollbar { display: none; }
+.page-insights .ins-filter__btn {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sp-075) var(--sp-1);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--paper);
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+@media (hover: hover) {
+  .page-insights .ins-filter__btn:not(:has(input:checked)):hover { color: var(--amber); }
+}
+.page-insights .ins-filter__btn:has(input:checked) { background: var(--paper); color: var(--navy); }
+.page-insights .ins-filter__btn:has(input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+/* CSS-only filtering (radios above) */
+.page-insights:has(#ins-f-threats:checked) .ins-board [data-cat]:not([data-cat="threats"]),
+.page-insights:has(#ins-f-approach:checked) .ins-board [data-cat]:not([data-cat="approach"]),
+.page-insights:has(#ins-f-coverage:checked) .ins-board [data-cat]:not([data-cat="coverage"]),
+.page-insights:has(#ins-f-coverage:checked) .ins-featured { display: none; }
+
+/* the featured cards are the reveal on the first screen: keep their titles 2 lines like the reference */
+.page-insights .note__title { max-width: 13em; }
+
+@media (max-width: 767px) {
+  .page-insights .ins-head { padding-bottom: var(--sp-5); }
+  .page-insights .ins-filter__btn { padding: .7em .8em; font-size: var(--fs-s); }
+}
+@media (max-width: 479px) {
+  .page-insights .ins-filter { bottom: var(--sp-1); }
+  .page-insights .ins-filter__bar { padding: .375em; gap: .125em; }
+  .page-insights .ins-filter__btn { padding: .65em .7em; }
+}
+
+/* ===================== Articles ===================== */
+
+/* head: 12em top, meta / title / cover image 5em apart */
+.page-article .art-top { padding-top: var(--sp-12); }
+.page-article .art-top__wrap { display: flex; flex-direction: column; gap: var(--sp-5); }
+.page-article .art-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-075);
+  font-size: var(--fs-s);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+.page-article .art-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-05);
+  color: var(--text-meta);
+  transition: color var(--t-fast) var(--ease);
+}
+.page-article .art-back span {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .2em;
+}
+.page-article .art-back .icon { transition: transform var(--t) var(--ease-out-quint); }
+.page-article .art-back:hover { color: var(--text); }
+.page-article .art-back:hover .icon { transform: translateX(-.2em); }
+.page-article .art-title {
+  max-width: var(--col-8);
+  font-size: var(--fs-10xl);
+  line-height: var(--lh-100);
+}
+.page-article .art-hero {
+  width: 100%;
+  height: 80vh;
+  min-height: 24em;
+  max-height: 1100px;
+  border-radius: var(--r-m);
+}
+
+/* body: rail .34fr | text 1fr, 8em apart (shared .article grid) */
+.page-article .art-body { padding-bottom: 0; }
+.page-article .article__rail {
+  gap: var(--sp-125);
+  padding-top: var(--sp-125);
+  border-top: 1px solid var(--line);
+}
+.page-article .art-author { display: flex; align-items: center; gap: var(--sp-1); }
+.page-article .art-author__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4em;
+  height: 4em;
+  border-radius: 50%;
+  background: var(--navy);
+  font-size: 1em;
+}
+.page-article .art-author__mark .logo__mark { width: 1.9em; }
+.page-article .art-author__lines { display: flex; flex-direction: column; gap: var(--sp-025); }
+.page-article .art-author__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-ml);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-1);
+  color: var(--text);
+}
+
+/* long-form text: full column, 1em body, 1.5em rhythm (reference rich text) */
+.page-article .art-body .prose {
+  max-width: none;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-15);
+  font-size: var(--fs-m);
+  line-height: var(--lh-155);
+  color: var(--text);
+}
+.page-article .art-body .prose > * + * { margin-top: 0; }
+.page-article .art-body .prose h2 {
+  margin-top: 0;
+  font-size: var(--h2);
+  line-height: var(--lh-112);
+  letter-spacing: var(--tr-3);
+}
+.page-article .art-body .prose h3 {
+  margin-top: 0;
+  font-size: var(--h3);
+  line-height: var(--lh-112);
+  letter-spacing: var(--tr-3);
+}
+.page-article .art-body .prose h2 + *,
+.page-article .art-body .prose h3 + * { margin-top: 0; }
+.page-article .art-body .prose ul,
+.page-article .art-body .prose ol { gap: var(--sp-05); }
+.page-article .art-body .prose ul li::before { top: .6em; width: .375em; height: .375em; }
+.page-article .art-body .prose ol li::before { top: .2em; }
+.page-article .art-body .prose blockquote {
+  margin: .25em 0;
+  padding: 0;
+  border: 0;
+  font-family: var(--font-text);
+  font-size: var(--fs-2xl);
+  font-weight: 500;
+  line-height: var(--lh-140);
+  letter-spacing: var(--tr-1);
+  color: var(--text);
+}
+.page-article .art-tag {
+  display: inline-block;
+  margin-left: .35em;
+  padding: .3em .55em;
+  border-radius: var(--r-3xs);
+  background: var(--card);
+  font-size: var(--fs-3xs);
+  line-height: 1;
+  text-transform: uppercase;
+  vertical-align: .12em;
+  color: var(--text-meta);
+}
+
+/* keep reading: 12em under the text, cards 5em under the title */
+.page-article .art-more { padding-top: var(--sp-12); }
+.page-article .art-more .head__title { max-width: none; }
+
+@media (max-width: 991px) {
+  .page-article .art-title { max-width: var(--col-10); }
+}
+@media (max-width: 767px) {
+  .page-article .art-top { padding-top: 10em; }
+  .page-article .art-top__wrap { gap: var(--sp-3); }
+  .page-article .art-title { max-width: none; font-size: 4.125em; }
+  .page-article .art-hero { height: 80vh; height: 80svh; min-height: 20em; }
+  .page-article .art-more { padding-top: var(--sp-8); }
+  .page-article .art-body .prose h2 { font-size: var(--fs-4xl); }
+  .page-article .art-body .prose h3 { font-size: var(--fs-2xl); }
+  .page-article .art-body .prose blockquote { font-size: var(--fs-xl); }
+}

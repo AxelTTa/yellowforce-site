@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yellow-force.com/sitemap.xml

@@ -1,0 +1,346 @@
+/* About page (/about/). Mirrors the Vantra about rhythm with our own markup and content.
+   Scoped under .page-about. Shared pieces (cover, pile, mosaic, head, btn) come from components.css;
+   this file adds the snapshot panel and the careers table, and tunes spacing to the reference. */
+
+/* ---------- 01 hero ---------- */
+.page-about .ab-cover .cover__media > img { opacity: 1; object-position: 40% 50%; }
+.page-about .ab-cover .cover__inner { gap: var(--sp-25); padding-top: 4em; }
+
+/* ---------- 02 approach + image strip ---------- */
+.page-about .ab-approach { padding-block: var(--sp-105); }
+.page-about .ab-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 1em;
+  row-gap: var(--sp-3);
+  align-items: start;
+}
+.page-about .ab-split__body {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1.25em;
+  max-width: var(--col-5);
+}
+.page-about .ab-split__text {
+  max-width: 30em;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-140);
+  letter-spacing: var(--tr-1);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-about .ab-strip { align-items: start; }
+.page-about .ab-strip > * { aspect-ratio: 1 / 1; }
+.page-about .ab-strip > :first-child { aspect-ratio: 1 / 1; }
+
+/* ---------- 03 values (sticky stack) ---------- */
+.page-about .ab-values { padding-bottom: var(--sp-105); }
+.page-about .ab-values .pile__item { padding-top: 0; padding-bottom: var(--sp-12); }
+.page-about .ab-values .pile__item:last-child { padding-bottom: var(--sp-12); }
+.page-about .ab-values .pile__label { margin: 0; padding-block: var(--sp-3); }
+.page-about .ab-values .pile__grid { align-items: start; }
+.page-about .ab-values .pile__grid > h2 { max-width: var(--col-4); }
+.page-about .ab-values .pile__text {
+  justify-self: end;
+  width: 100%;
+  max-width: 23.3em; /* 480px at 1440, like the reference text column */
+  padding-right: .75em;
+  line-height: var(--lh-140);
+  color: var(--text);
+}
+
+/* ---------- 04 company snapshot ---------- */
+.page-about .ab-snapshot { padding-bottom: var(--sp-105); }
+.page-about .snap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--gutter);
+  row-gap: var(--gutter);
+  padding-block: 1.25em;
+  border-block: 1px solid var(--line);
+}
+.page-about .snap__left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  row-gap: var(--sp-6);
+}
+.page-about .snap__panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--gutter);
+  border-left: 1px solid var(--line);
+}
+.page-about .snap__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  column-gap: var(--gutter);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-140);
+  color: var(--text);
+}
+.page-about .snap__figure {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  column-gap: .625em;
+  padding-block: 14.375em; /* 11.5em at the reference figure font size (1.25em) */
+}
+.page-about .snap__num {
+  font-family: var(--font-text);
+  font-size: var(--fs-12xl);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: var(--tr-figure);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+.page-about .snap__unit {
+  font-size: var(--fs-2xs);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+  white-space: nowrap;
+}
+.page-about .snap__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: var(--gutter);
+  padding-top: var(--gutter);
+  border-top: 1px solid var(--line);
+}
+.page-about .snap__stat { display: flex; flex-direction: column; row-gap: .5em; min-width: 0; }
+.page-about .snap__stat dt {
+  font-size: var(--fs-2xs);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text);
+}
+.page-about .snap__stat dd {
+  margin: 0;
+  font-size: var(--fs-l);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 05 careers: table of disciplines + copy-email line ---------- */
+.page-about .ab-careers { padding-bottom: var(--sp-105); }
+.page-about .roles {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+.page-about .roles thead th {
+  padding: 0 0 .75em;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+.page-about .roles thead th:nth-child(2) { width: 30%; }
+.page-about .roles thead th:nth-child(3) { width: 4em; text-align: right; }
+.page-about .roles tbody th,
+.page-about .roles tbody td {
+  border-bottom: 1px solid var(--line);
+  vertical-align: baseline;
+}
+/* 1.5em of the base size above and below, expressed in each cell's own font size */
+.page-about .roles tbody th { padding: calc(1.5em / 1.375) calc(1.5em / 1.375) calc(1.5em / 1.375) 0; }
+.page-about .roles tbody td { padding: 1.6em 1.6em 1.6em 0; }
+.page-about .roles tbody th {
+  font-family: var(--font-text);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-2);
+  color: var(--text);
+}
+.page-about .roles tbody td {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-150);
+  color: var(--text-2);
+}
+.page-about .roles tbody td:last-child {
+  padding-right: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+/* dark split panel (image | title, line, copy-email card), our take on Vantra's profile panel */
+.page-about .ab-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: .25em;
+  border-radius: var(--r-ml);
+  background: var(--navy);
+  overflow: hidden;
+}
+.page-about .ab-panel__media {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-m);
+}
+.page-about .ab-panel__media > img { object-position: 30% 50%; }
+.page-about .ab-panel__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: var(--sp-3);
+  padding: var(--sp-175) 0 0 var(--sp-175);
+  min-width: 0;
+}
+.page-about .ab-panel__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  column-gap: var(--gutter);
+  padding-right: var(--sp-175);
+}
+.page-about .ab-panel__title { color: var(--paper); }
+.page-about .ab-panel__meta {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  row-gap: 6px;
+  padding-top: .5em;
+  font-size: var(--fs-s);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--slate-light);
+  text-align: right;
+  white-space: nowrap;
+}
+.page-about .ab-panel__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  column-gap: var(--gutter);
+  row-gap: var(--sp-2);
+}
+.page-about .ab-panel__copy {
+  display: flex;
+  flex-direction: column;
+  row-gap: .75em;
+  max-width: 19em;
+  padding-bottom: var(--sp-15);
+}
+.page-about .ab-panel__line {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-130);
+  letter-spacing: var(--tr-1);
+  color: var(--paper);
+  text-wrap: balance;
+}
+.page-about .ab-panel__sub { font-size: var(--fs-sm); line-height: var(--lh-150); color: var(--paper-82); text-wrap: pretty; }
+.page-about .ab-mailcard {
+  flex: none;
+  width: min(21em, 48%);
+  min-height: 11em;
+  padding: 1em;
+  border-radius: var(--r-m);
+  background: var(--paper-07);
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  row-gap: 1.5em;
+  text-align: left;
+  transition: background-color var(--t-fast) var(--ease);
+}
+.page-about .ab-mailcard:hover { background: var(--paper-10); }
+.page-about .ab-mailcard:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.page-about .ab-mailcard__label { font-size: var(--fs-s); line-height: var(--lh-120); text-transform: uppercase; color: var(--slate-light); }
+.page-about .ab-mailcard__row { display: flex; justify-content: space-between; align-items: center; gap: .75em; }
+.page-about .ab-mailcard__addr {
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-l);
+  font-weight: 600;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-2);
+  overflow-wrap: anywhere;
+}
+.page-about .ab-mailcard__icon {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border-radius: var(--r-2xs);
+  background: var(--paper-10);
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.page-about .ab-mailcard__icon svg { grid-area: 1 / 1; width: 1em; height: 1em; transition: opacity var(--t-fast) var(--ease), transform var(--t-fast) var(--ease); }
+.page-about .ab-mailcard__done { opacity: 0; transform: scale(.6); }
+.page-about .ab-mailcard:hover .ab-mailcard__icon { background: var(--amber); color: var(--navy); }
+.page-about .ab-mailcard.is-copied .ab-mailcard__copy { opacity: 0; }
+.page-about .ab-mailcard.is-copied .ab-mailcard__done { opacity: 1; transform: none; }
+.page-about .ab-careers .roles { margin-top: var(--sp-5); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 991px) {
+  .page-about .snap__figure { padding-block: 7.5em; }
+}
+@media (max-width: 767px) {
+  .page-about .ab-approach { padding-block: var(--sp-6); }
+  .page-about .ab-split { grid-template-columns: 1fr; }
+  .page-about .ab-split__body { max-width: none; }
+  .page-about .ab-strip { grid-template-columns: 1fr; }
+  .page-about .ab-strip > :first-child { grid-column: auto; aspect-ratio: 1 / 1; }
+  .page-about .ab-values { padding-bottom: var(--sp-6); }
+  .page-about .ab-values .pile__item,
+  .page-about .ab-values .pile__item:last-child { padding-bottom: var(--sp-5); }
+  .page-about .ab-values .pile__label { padding-block: var(--sp-2); }
+  .page-about .ab-values .pile__grid > h2 { max-width: none; }
+  .page-about .ab-values .pile__text { justify-self: start; max-width: none; padding-right: 0; }
+  .page-about .ab-snapshot,
+  .page-about .ab-careers { padding-bottom: var(--sp-6); }
+  .page-about .snap { grid-template-columns: 1fr; }
+  .page-about .snap__left { row-gap: var(--sp-2); }
+  .page-about .snap__panel { padding-left: 0; border-left: 0; }
+  .page-about .snap__figure { padding-block: 5em; }
+  .page-about .snap__stats { column-gap: 1em; }
+  .page-about .roles thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .page-about .roles,
+  .page-about .roles tbody { display: block; }
+  .page-about .roles tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: .5em;
+    column-gap: 1em;
+    padding: 1.25em 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .page-about .roles tbody tr:first-child { border-top: 1px solid var(--line); }
+  .page-about .roles tbody th { grid-column: 1 / -1; }
+  .page-about .roles tbody th,
+  .page-about .roles tbody td { display: block; padding: 0; border: 0; }
+  .page-about .ab-panel { grid-template-columns: 1fr; }
+  .page-about .ab-panel__media { aspect-ratio: 4 / 3; }
+  .page-about .ab-panel__body { padding: var(--sp-15) var(--sp-075) var(--sp-075); row-gap: var(--sp-2); }
+  .page-about .ab-panel__top { padding-right: 0; }
+  .page-about .ab-panel__foot { flex-direction: column; align-items: stretch; }
+  .page-about .ab-panel__copy { max-width: none; padding-bottom: 0; }
+  .page-about .ab-mailcard { width: 100%; min-height: 8em; }
+  .page-about .ab-careers .roles { margin-top: var(--sp-3); }
+}
+@media (max-width: 479px) {
+  .page-about .snap__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .page-about .ab-panel__top { flex-direction: column; row-gap: 1em; }
+  .page-about .ab-panel__meta { align-items: flex-start; text-align: left; padding-top: 0; }
+}

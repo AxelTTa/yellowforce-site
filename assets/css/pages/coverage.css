@@ -1,0 +1,329 @@
+/* Coverage: /coverage/ (index) and the ten /coverage/<slug>/ domain pages.
+   Page-only styles, scoped under body.page-coverage. Shared tokens, base and components come first.
+   Index mirrors the rhythm of a centered page header + square card grid + floating filter bar;
+   domain pages mirror a case-study rhythm: inset cover, brief + gallery, dark rounded section with
+   media and rows, quote block, related cards, CTA band. Numbers are em of the fluid base. */
+
+/* ===================== Coverage index ===================== */
+.page-coverage-index .cov-head { padding-bottom: var(--sp-6); }
+.page-coverage-index .cov-head__title { max-width: var(--col-8); }
+.page-coverage-index .cov-head__text { max-width: 38em; margin-top: -.75em; }
+
+/* domain cards (index + related): the frosted label must read on navy imagery, so the glass is a
+   light tint with a hairline instead of a dark one; name and meta sit together at the top left */
+.page-coverage .tile__glass {
+  background: rgba(244, 245, 247, .09);
+  box-shadow: inset 0 0 0 1px var(--paper-10);
+}
+.page-coverage .tile__row { justify-content: flex-start; align-items: flex-start; gap: .75em; }
+.page-coverage .tile__meta { align-items: flex-start; text-align: left; padding-top: .2em; }
+
+/* floating domain bar: docks at the bottom of the viewport while the grid is on screen, then
+   settles under the last row so it never covers the closing band or the footer */
+.page-coverage-index .cov-bar {
+  position: sticky;
+  bottom: 1.5em;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-15);
+  pointer-events: none;
+}
+.page-coverage-index .cov-bar__list {
+  display: flex;
+  align-items: center;
+  gap: .25em;
+  max-width: 100%;
+  padding: .5em;
+  border: 1px solid var(--paper-16);
+  border-radius: var(--r-m);
+  background: var(--pill-glass);
+  -webkit-backdrop-filter: var(--blur-bar);
+  backdrop-filter: var(--blur-bar);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.page-coverage-index .cov-bar__list::-webkit-scrollbar { display: none; }
+.page-coverage-index .cov-bar__list > li { flex: none; }
+.page-coverage-index .cov-bar__link {
+  display: flex;
+  align-items: center;
+  padding: .75em 1em;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: var(--tr-1);
+  color: var(--paper);
+  white-space: nowrap;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.page-coverage-index .cov-bar__link:hover { color: var(--amber); }
+.page-coverage-index .cov-bar__link.is-current { background: var(--paper); color: var(--navy); }
+.page-coverage-index .cov-bar__link:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+
+@media (max-width: 767px) {
+  .page-coverage-index .cov-head__title { max-width: none; }
+  .page-coverage-index .cov-head__text { margin-top: -1em; }
+  .page-coverage-index .cov-bar { bottom: 1em; }
+  .page-coverage-index .cov-bar__list { padding: .375em; gap: .125em; }
+  .page-coverage-index .cov-bar__link { padding: .75em .875em; font-size: max(.875em, 11px); }
+}
+
+/* ===================== Domain pages ===================== */
+
+/* 01 hero: inset cover, label chips, giant name */
+.page-domain .dom-hero__inner { gap: 0; padding-top: 7em; }
+.page-domain .dom-hero__inner > .dom-chips { margin-bottom: var(--sp-25); }
+.page-domain .dom-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .375em;
+  max-width: var(--col-10);
+}
+.page-domain .dom-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  padding: .5em .75em;
+  border: 1px solid var(--paper-16);
+  border-radius: var(--r-xs);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--blur-chip);
+  backdrop-filter: var(--blur-chip);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.12;
+  text-transform: uppercase;
+  color: var(--paper);
+  white-space: nowrap;
+}
+.page-domain .dom-hero__title {
+  font-size: min(var(--h0), 14vw);
+  font-weight: 600;
+  line-height: .9;
+}
+.page-domain .dom-hero__text { margin-top: 1.5em; max-width: 31em; }
+
+/* 02 the threat: heading left, lead + body right, then a three-frame gallery */
+.page-domain .dom-brief { padding-block: calc(var(--sp-4) + var(--section-y)); }
+.page-domain .dom-brief__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 1em;
+  row-gap: 1em;
+  align-items: start;
+}
+.page-domain .dom-brief__copy { max-width: var(--col-5); }
+.page-domain .dom-brief__lead {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-120);
+  font-weight: 600;
+  letter-spacing: var(--tr-3);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.page-domain .dom-brief__body {
+  margin-top: 1.25em;
+  font-size: var(--fs-l);
+  line-height: var(--lh-150);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-domain .dom-gallery { display: flex; flex-direction: column; gap: var(--gap-tight); margin-top: var(--sp-12); }
+.page-domain .dom-gallery__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--gap-tight);
+  align-items: start;
+}
+.page-domain .dom-gallery__frame { aspect-ratio: 4 / 5; border-radius: var(--r-m); min-width: 0; }
+.page-domain .dom-gallery__frame--wide { aspect-ratio: 16 / 9; }
+
+/* 03 what we do: dark rounded section, tall media with the title, then four rows */
+.page-domain .dom-ops {
+  margin: var(--sp-8) var(--inset);
+  padding: var(--inset) 0 var(--sp-25);
+  border-radius: var(--r-ml);
+  background: var(--navy);
+  color: var(--paper);
+  overflow: hidden;
+}
+.page-domain .dom-ops__media {
+  position: relative;
+  isolation: isolate;
+  height: 88vh;
+  height: 88svh;
+  min-height: 560px;
+  margin: 0 var(--inset) var(--sp-5);
+  border-radius: var(--r-m);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2em var(--page-x);
+  text-align: center;
+}
+.page-domain .dom-ops__media > img { opacity: .9; }
+.page-domain .dom-ops__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim-media);
+  pointer-events: none;
+}
+.page-domain .dom-ops__title { position: relative; z-index: 1; max-width: var(--col-5); color: var(--paper); }
+.page-domain .dom-ops__body { display: flex; flex-direction: column; gap: var(--sp-6); }
+.page-domain .dom-ops__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 1em; }
+.page-domain .dom-ops__sub {
+  grid-column: 2;
+  max-width: var(--col-5);
+  font-family: var(--font-display);
+  font-size: var(--fs-4xl);
+  line-height: var(--lh-120);
+  font-weight: 600;
+  letter-spacing: var(--tr-3);
+  color: var(--paper);
+  text-wrap: balance;
+}
+.page-domain .dom-ops__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  padding: 1.5em 0 2.5em;
+  border-top: 1px solid var(--paper-16);
+}
+.page-domain .dom-ops__name {
+  font-size: var(--h5);
+  line-height: var(--lh-112);
+  color: var(--paper);
+}
+.page-domain .dom-ops__col { display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5em; min-width: 0; }
+.page-domain .dom-ops__text {
+  width: 70%;
+  font-size: var(--fs-l);
+  line-height: var(--lh-130);
+  font-weight: 500;
+  letter-spacing: var(--tr-1);
+  color: var(--paper-82);
+  text-wrap: pretty;
+}
+/* honest tile in place of a metric: a small status chip */
+.page-domain .dom-ops__tile {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .55em;
+  padding: .5em .7em;
+  border: 1px solid var(--paper-16);
+  border-radius: var(--r-2xs);
+  background: var(--paper-07);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--paper);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.page-domain .dom-ops__tile .dot { width: 5px; height: 5px; }
+
+/* 04 principle: 4:5 image + quote between hairlines */
+.page-domain .dom-principle__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: var(--sp-2);
+  align-items: center;
+}
+.page-domain .dom-principle__media { width: 50%; aspect-ratio: 4 / 5; border-radius: var(--r-m); }
+.page-domain .dom-principle__body { display: flex; flex-direction: column; gap: var(--sp-25); min-width: 0; }
+.page-domain .dom-principle__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gutter);
+  padding-bottom: 1.25em;
+  border-bottom: 1px solid var(--line);
+}
+.page-domain .dom-principle__meta {
+  font-size: var(--fs-s);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+.page-domain .dom-principle__meta + .dom-principle__meta { text-align: right; }
+.page-domain .dom-principle__quote {
+  font-family: var(--font-display);
+  font-size: var(--fs-4xl);
+  line-height: var(--lh-120);
+  font-weight: 600;
+  letter-spacing: var(--tr-3);
+  color: var(--text);
+  text-wrap: balance;
+}
+.page-domain .dom-principle__foot {
+  display: flex;
+  align-items: center;
+  gap: .875em;
+  padding-top: 1.5em;
+  border-top: 1px solid var(--line);
+}
+.page-domain .dom-principle__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5em;
+  height: 2.5em;
+  border-radius: 50%;
+  background: var(--navy);
+  --logo-back: var(--white);
+}
+.page-domain .dom-principle__mark .logo__mark { width: 1.35em; }
+.page-domain .dom-principle__id { display: flex; flex-direction: column; row-gap: .25em; }
+.page-domain .dom-principle__name {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-1);
+  color: var(--text);
+}
+.page-domain .dom-principle__role {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+
+/* 05 related domains */
+.page-domain .dom-related__foot { display: flex; margin-top: var(--sp-25); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 767px) {
+  .page-domain .dom-hero__inner { padding-top: 6em; }
+  .page-domain .dom-hero__inner > .dom-chips { margin-bottom: var(--sp-2); }
+  .page-domain .dom-ops__title { max-width: var(--col-10); }
+  .page-domain .dom-ops__sub { grid-column: 1 / -1; max-width: none; font-size: var(--fs-2xl); }
+  .page-domain .dom-ops__row { grid-template-columns: minmax(0, 1fr); row-gap: 1.25em; padding: 1.5em 0 2em; }
+  .page-domain .dom-ops__text { width: auto; max-width: 30em; font-size: var(--fs-ml); }
+  .page-domain .dom-ops__body { gap: var(--sp-4); }
+}
+@media (max-width: 479px) {
+  .page-domain .dom-brief__head { display: flex; flex-direction: column; row-gap: var(--sp-3); }
+  .page-domain .dom-brief__copy { max-width: none; }
+  .page-domain .dom-brief__lead { font-size: var(--fs-xl); }
+  .page-domain .dom-brief__body { font-size: var(--fs-ml); }
+  .page-domain .dom-gallery { margin-top: var(--sp-10); }
+  .page-domain .dom-gallery__row { display: flex; flex-direction: column; }
+  .page-domain .dom-gallery__frame,
+  .page-domain .dom-gallery__frame--wide { width: 100%; aspect-ratio: 4 / 5; }
+  .page-domain .dom-principle__grid { grid-template-columns: minmax(0, 1fr); }
+  .page-domain .dom-principle__media { width: 100%; }
+  .page-domain .dom-principle__quote { font-size: var(--fs-3xl); }
+  .page-domain .dom-chip { white-space: normal; text-align: left; }
+  .page-coverage .tile__row { flex-direction: column; gap: .5em; }
+  .page-coverage .tile__meta { flex-direction: row; column-gap: .75em; padding-top: 0; }
+}

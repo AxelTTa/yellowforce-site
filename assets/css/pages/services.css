@@ -1,0 +1,273 @@
+/* Services page (/services/). Mirrors the Vantra work index rhythm with our own markup.
+   Everything is scoped under .page-services. Shared components (page-head, tiles, ledger, faq, btn)
+   come from components.css; this file only adds the page pieces and small overrides. */
+
+/* ---------- 01 hero: centered header + ultrawide image ---------- */
+.page-services .svc-head { padding-bottom: var(--sp-5); }
+.page-services .svc-head .page-head__text { max-width: 26em; text-wrap: balance; }
+.page-services .svc-hero__shot {
+  aspect-ratio: 21 / 9;
+  border-radius: var(--r-m);
+}
+
+/* ---------- 02 problem: h2 left, text right (Vantra header grid) ---------- */
+.page-services .svc-problem { padding-block: var(--sp-105); }
+.page-services .svc-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--gutter);
+  row-gap: var(--sp-3);
+  align-items: start;
+}
+.page-services .svc-split__body {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+  max-width: var(--col-5);
+}
+.page-services .svc-split__text {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-140);
+  letter-spacing: var(--tr-1);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-services .svc-split__text--strong { color: var(--text); }
+
+/* ---------- 03 practice cards: 2 columns of square image cards ---------- */
+.page-services .svc-cards { padding-bottom: 0; }
+/* label panel as on the reference: name with the meta stacked right next to it, and a glass that
+   reads on our dark navy imagery (the shared navy glass disappears on it) */
+.page-services .svc-cards .tile__glass { background: rgba(244, 245, 247, .1); }
+@media (min-width: 768px) and (hover: hover) {
+  .page-services .svc-cards .tile__glass { width: 50%; }
+  .page-services .svc-cards .tile:hover .tile__glass,
+  .page-services .svc-cards .tile:focus-visible .tile__glass { width: 94%; }
+}
+.page-services .svc-cards .tile__row { justify-content: flex-start; align-items: center; gap: .625em; }
+.page-services .svc-cards .tile__meta { align-items: flex-start; text-align: left; color: var(--paper-82); }
+.page-services .svc-cards .tile__more { justify-content: flex-start; }
+
+/* ---------- 04 practice rows ---------- */
+.page-services .svc-rows { padding-top: var(--sp-105); }
+.page-services .svc-row {
+  border-top: 1px solid var(--line);
+  padding-bottom: var(--sp-6);
+  scroll-margin-top: 5.5em;
+}
+.page-services .svc-row:last-child { padding-bottom: var(--sp-3); }
+.page-services .svc-row__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  padding-block: var(--sp-3);
+}
+.page-services .svc-row__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--gutter);
+  row-gap: var(--sp-2);
+  align-items: start;
+}
+.page-services .svc-row__title { max-width: var(--col-5); }
+.page-services .svc-row__body {
+  justify-self: end;
+  width: 100%;
+  max-width: 32em;
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--sp-25);
+}
+.page-services .svc-row__line {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-140);
+  letter-spacing: var(--tr-1);
+  color: var(--text);
+  text-wrap: pretty;
+}
+.page-services .svc-row__list { border-top: 1px solid var(--line); }
+.page-services .svc-row__list > li {
+  display: grid;
+  grid-template-columns: 3em minmax(0, 1fr);
+  align-items: baseline;
+  padding: .875em 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-m);
+  line-height: var(--lh-140);
+  color: var(--text-2);
+}
+.page-services .svc-row__n {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- jump bar (like Vantra's bottom filter bar, our own build) ---------- */
+.page-services .svc-flow { position: relative; }
+.page-services .svc-jump {
+  position: sticky;
+  bottom: 1.5em;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  margin-top: -4.75em;
+  pointer-events: none;
+}
+.page-services .svc-jump__bar {
+  display: flex;
+  align-items: center;
+  gap: .25em;
+  max-width: 100%;
+  padding: .5em;
+  border: 1px solid var(--paper-16);
+  border-radius: var(--r-m);
+  background: var(--pill-glass);
+  -webkit-backdrop-filter: var(--blur-bar);
+  backdrop-filter: var(--blur-bar);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.page-services .svc-jump__bar::-webkit-scrollbar { display: none; }
+.page-services .svc-jump__bar > li { flex: none; }
+.page-services .svc-jump__link {
+  display: block;
+  padding: .75em 1em;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--tr-1);
+  color: var(--paper);
+  white-space: nowrap;
+  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.page-services .svc-jump__link:hover { color: var(--amber); }
+.page-services .svc-jump__link.is-current { background: var(--paper); color: var(--navy); }
+.page-services .svc-jump__link:focus-visible { outline: 2px solid var(--amber); outline-offset: -2px; }
+
+/* ---------- 05 how we work (progress table) ---------- */
+.page-services .svc-steps .ledger__name { grid-column: 1 / 5; }
+.page-services .svc-steps .ledger__tag {
+  grid-column: 5 / 9;
+  max-width: 30em;
+  font-size: var(--fs-m);
+  line-height: var(--lh-140);
+  text-transform: none;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-services .svc-steps .ledger__gauge { grid-column: 9 / 11; }
+.page-services .svc-steps .ledger__end { grid-column: 11 / 13; }
+
+/* ---------- 06 on top of your stack ---------- */
+.page-services .svc-stack__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap-tight);
+}
+.page-services .svc-stack__intro {
+  grid-column: span 2;
+  padding: .25em var(--sp-3) var(--sp-2) 0;
+}
+.page-services .svc-stack__lead {
+  max-width: 20em;
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 600;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-3);
+  text-wrap: pretty;
+}
+.page-services .svc-stack__card {
+  min-height: 11.5em;
+  padding: 1.5em;
+  border-radius: var(--r-ml);
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 2em;
+}
+.page-services .svc-stack__num {
+  font-size: var(--fs-xs);
+  line-height: var(--lh-120);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+.page-services .svc-stack__body { display: flex; flex-direction: column; row-gap: .5em; }
+.page-services .svc-stack__title {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  line-height: var(--lh-120);
+  letter-spacing: var(--tr-2);
+}
+.page-services .svc-stack__text {
+  font-size: var(--fs-s);
+  line-height: var(--lh-140);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-services .svc-stack__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-15) var(--gutter);
+  flex-wrap: wrap;
+  margin-top: calc(var(--sp-5) * -1 + var(--sp-25));
+  padding-top: var(--sp-25);
+  border-top: 1px solid var(--line);
+}
+.page-services .svc-stack__foot-text {
+  max-width: 34em;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-140);
+  letter-spacing: var(--tr-1);
+  text-wrap: pretty;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1199px) {
+  .page-services .svc-steps .ledger__name { grid-column: 1; grid-row: 1; }
+  .page-services .svc-steps .ledger__end { grid-column: 2; grid-row: 1; }
+  .page-services .svc-steps .ledger__tag { grid-column: 1; grid-row: 2; }
+  .page-services .svc-steps .ledger__gauge { grid-column: 2; grid-row: 2; align-self: start; padding-top: .2em; }
+}
+@media (max-width: 991px) {
+  .page-services .svc-stack__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .page-services .svc-stack__intro { grid-column: 1 / -1; padding-right: 0; }
+}
+@media (max-width: 767px) {
+  .page-services .svc-head { padding-bottom: var(--sp-3); }
+  .page-services .svc-hero__shot { aspect-ratio: 4 / 3; }
+  .page-services .svc-problem { padding-block: var(--sp-6); }
+  .page-services .svc-split,
+  .page-services .svc-row__grid { grid-template-columns: 1fr; }
+  .page-services .svc-split__body,
+  .page-services .svc-row__body { justify-self: start; max-width: none; }
+  .page-services .svc-rows { padding-top: var(--sp-6); }
+  .page-services .svc-row { padding-bottom: var(--sp-5); }
+  .page-services .svc-row__top { padding-block: var(--sp-2); }
+  .page-services .svc-row__title { max-width: none; }
+  .page-services .svc-row__list > li { grid-template-columns: 2.5em minmax(0, 1fr); }
+  .page-services .svc-jump { margin-top: -4.25em; padding-inline: var(--page-x); }
+  .page-services .svc-jump__bar { justify-content: flex-start; }
+  .page-services .svc-stack__card { min-height: 12em; padding: 1.25em; }
+}
+@media (max-width: 479px) {
+  .page-services .svc-steps .ledger__row { grid-template-columns: minmax(0, 1fr) auto; }
+  .page-services .svc-steps .ledger__name { grid-column: 1; grid-row: 1; }
+  .page-services .svc-steps .ledger__end { grid-column: 2; grid-row: 1; justify-self: end; text-align: right; }
+  .page-services .svc-steps .ledger__tag { display: block; grid-column: 1 / -1; grid-row: 2; max-width: none; }
+  .page-services .svc-steps .ledger__gauge { grid-column: 1 / -1; grid-row: 3; padding-top: 0; }
+  .page-services .svc-stack__foot .btn { width: 100%; justify-content: space-between; }
+}

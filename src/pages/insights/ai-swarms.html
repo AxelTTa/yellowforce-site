@@ -1,0 +1,94 @@
+---
+title: What an AI swarm attack looks like | YellowForce
+description: Many AI agents, one target, all at once. How AI swarm attacks work, why they break slow defenses and how we stop them.
+tagline: Worth five minutes
+bodyclass: page-article
+css: /assets/css/pages/insights.css
+ogtype: article
+---
+<!-- 01 Article head -->
+<section class="art-top gutter" aria-labelledby="art-title">
+  <div class="frame art-top__wrap">
+    <div class="art-meta" data-reveal="fade">
+      <a class="art-back" href="/insights/"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span>All notes</span></a>
+      <span>Threats</span>
+      <time datetime="2026-10-25">Oct 25, 2026</time>
+      <span>4 min read</span>
+    </div>
+    <h1 class="art-title" id="art-title" data-reveal="lines">What an AI swarm attack looks like.</h1>
+    <div class="art-hero media" data-reveal="frame">
+      <img src="/assets/img/photo/insight-1.webp" data-variants sizes="100vw" alt="A bundle of optical fibers seen end-on, hundreds of amber points of light streaming out of the dark like a swarm." loading="eager" fetchpriority="high">
+    </div>
+  </div>
+</section>
+
+<!-- 02 Article body -->
+<section class="block gutter art-body" aria-label="Article">
+  <div class="frame article">
+    <aside class="article__rail" aria-label="About this note" data-reveal="fade">
+      <p class="t-label">Written by</p>
+      <div class="art-author">
+        <span class="art-author__mark on-dark" aria-hidden="true"><!-- include:logo-mark --></span>
+        <span class="art-author__lines"><span class="art-author__name">YellowForce</span><span class="t-label">Research</span></span>
+      </div>
+    </aside>
+    <div class="prose" data-reveal="fade">
+      <p>An AI swarm is a group of AI agents attacking one target at the same time. Each agent has a job. They share what they find, and a coordinating agent decides what to try next. Think of it less like one burglar picking a lock and more like a crew checking every door and window of a building at once, calling out the moment one opens.</p>
+
+      <h2>How a swarm works.</h2>
+      <p>None of the parts are exotic. Capable models, agent frameworks, tool use and cheap compute are all available to anyone. Put together, they let one operator run work that used to need a whole team. A typical swarm splits the job like this:</p>
+      <ul>
+        <li><strong>Recon.</strong> Agents collect everything public about you: domains, cloud services, job posts that name your tools, staff profiles, code in public repos.</li>
+        <li><strong>Access.</strong> Other agents try the doors in parallel: password spraying, phishing written for each employee, every exposed sign-in page and API.</li>
+        <li><strong>Exploitation.</strong> When one door opens, the finding is shared. Exploit agents chain it with what recon found to go deeper.</li>
+        <li><strong>Persistence and theft.</strong> Agents set up hidden access, look for valuable data and move it out, changing tactics when something gets blocked.</li>
+      </ul>
+      <p>Public reports from AI companies already describe attackers using AI agents to run large parts of an intrusion with little human help. As the cost of each attempt drops toward zero, smaller companies become worth attacking too.</p>
+
+      <h2>Why it breaks the old model.</h2>
+      <p>Most defenses were built for human attackers. A person runs a scan, reads the results, picks a target and keeps going for as long as they can stay awake. Detection rules are tuned to that rhythm, and so are the teams reading the alerts.</p>
+      <p>A swarm doesn’t look like that. It creates many small, quiet events across many systems at the same time: a few failed sign-ins on one account, an odd API call, a phishing email to finance, a scan from a cloud server. On its own, each event looks harmless. Spread across separate tools and read by an analyst working through a queue, they never get connected.</p>
+      <p>Swarms also adapt. Block one address and traffic comes from another. Catch one technique and the coordinator switches to the next. They don’t get tired, and they don’t stop at 6 p.m.</p>
+      <blockquote><p>A swarm wins by being everywhere at once. Your defense has to be everywhere at once too.</p></blockquote>
+
+      <h2>How we stop it.</h2>
+      <p>We fight it the only way that works at that speed: with our own AI, and with experts in charge of it.</p>
+      <ul>
+        <li><strong>One picture.</strong> Signals from every domain land in one place: identity, email, devices, network, cloud, apps. Scattered events become one attack you can see.</li>
+        <li><strong>Machine-speed triage.</strong> Our AI agents read every signal the moment it arrives. There is no queue for a swarm to hide in.</li>
+        <li><strong>Real-time response.</strong> We lock accounts, block sources, isolate devices, pull emails and revoke keys across all your tools at once.</li>
+        <li><strong>Experts on the call.</strong> Our people make the decisions that need judgment and hunt for what is new.</li>
+        <li><strong>Attack first.</strong> We run swarm-style attacks against you ourselves, so we find the open doors before anyone else does.</li>
+      </ul>
+
+      <h3>What you can do today.</h3>
+      <p>Turn on phishing-resistant multi-factor for admins and finance. List every service you expose to the internet. Remove the accounts and keys nobody uses. And decide now who you call when it starts. If the answer is nobody, <a href="/contact/">write to us</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 Keep reading -->
+<section class="block gutter art-more" aria-labelledby="more-title">
+  <div class="frame stack">
+    <div class="head">
+      <h2 class="head__title" id="more-title" data-reveal="lines">Keep reading.</h2>
+    </div>
+    <div class="notes" data-reveal="stagger">
+      <a class="note" href="/insights/fight-ai-with-ai/">
+        <span class="note__media media"><img src="/assets/img/photo/insight-2.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+        <span class="note__scrim" aria-hidden="true"></span>
+        <span class="note__body"><span class="note__meta"><span>Approach</span><span>Oct 25, 2026</span></span><span class="note__title">Why you have to fight AI with AI.</span></span>
+        <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+      <a class="note" href="/insights/one-team-every-domain/">
+        <span class="note__media media"><img src="/assets/img/photo/insight-3.webp" data-variants sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+        <span class="note__scrim" aria-hidden="true"></span>
+        <span class="note__body"><span class="note__meta"><span>Coverage</span><span>Oct 25, 2026</span></span><span class="note__title">One team for every domain.</span></span>
+        <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 04 CTA band -->
+<!-- include:cta -->

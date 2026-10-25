@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Insights | Notes on AI threats and defense | YellowForce</title>
+<meta name="description" content="Notes on AI swarms, fighting AI with AI and why one team should cover every cyber domain. Plain words, no hype.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://yellow-force.com/insights/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="YellowForce">
+<meta property="og:title" content="Insights | Notes on AI threats and defense | YellowForce">
+<meta property="og:description" content="Notes on AI swarms, fighting AI with AI and why one team should cover every cyber domain. Plain words, no hype.">
+<meta property="og:url" content="https://yellow-force.com/insights/">
+<meta property="og:image" content="https://yellow-force.com/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="YellowForce. Fight AI with AI. 24/7.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Insights | Notes on AI threats and defense | YellowForce">
+<meta name="twitter:description" content="Notes on AI swarms, fighting AI with AI and why one team should cover every cyber domain. Plain words, no hype.">
+<meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="theme-color" content="#071B3E">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/js/vendor/lenis.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/insights.css">
+<script src="/assets/js/boot.js"></script>
+<script src="/assets/js/vendor/gsap.min.js" defer></script>
+<script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
+<script src="/assets/js/vendor/SplitText.min.js" defer></script>
+<script src="/assets/js/vendor/lenis.min.js" defer></script>
+<script src="/assets/js/main.js" type="module"></script>
+
+</head>
+<body class="page-insights">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="topbar__scrim" data-nav-scrim hidden></div>
+  <div class="pill" data-nav-shell>
+    <div class="pill__bar">
+      <a class="pill__brand" href="/" aria-label="YellowForce home"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
+</a>
+      <p class="pill__tagline">Know your enemy</p>
+      <button class="pill__toggle" type="button" data-nav-toggle data-qa="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu"><span class="pill__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+    </div>
+    <div class="pill__drawer" id="site-menu" hidden>
+      <div class="pill__drawer-inner" data-lenis-prevent>
+        <nav aria-label="Main">
+          <ul class="pill__list">
+            <li data-nav-anim><a class="pill__row" href="/" data-nav-path="/"><span class="pill__label">Home</span><span class="pill__note">Fight AI with AI</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim>
+              <button class="pill__row" type="button" data-nav-sub data-nav-path="/services/" aria-expanded="false" aria-controls="menu-services"><span class="pill__label">Services</span><span class="pill__note">Six practices</span><svg class="pill__icon pill__icon--plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>
+              <div class="pill__sub" id="menu-services" hidden>
+                <ul class="pill__sublist">
+                  <li><a class="pill__sublink" href="/services/" data-nav-path="/services/">All services<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#deploy">Deploy and connect<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#detect">Detect 24/7<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#respond">Respond<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#attack">Attack<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#harden">Harden<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#govern">Govern<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                </ul>
+              </div>
+            </li>
+            <li data-nav-anim>
+              <button class="pill__row" type="button" data-nav-sub data-nav-path="/coverage/" aria-expanded="false" aria-controls="menu-coverage"><span class="pill__label">Coverage</span><span class="pill__note">10 domains</span><svg class="pill__icon pill__icon--plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>
+              <div class="pill__sub" id="menu-coverage" hidden>
+                <ul class="pill__sublist">
+                  <li><a class="pill__sublink" href="/coverage/" data-nav-path="/coverage/">All coverage<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/network/" data-nav-path="/coverage/network/">Network<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/endpoint/" data-nav-path="/coverage/endpoint/">Endpoint and devices<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/cloud/" data-nav-path="/coverage/cloud/">Cloud<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/identity/" data-nav-path="/coverage/identity/">Identity and access<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/email/" data-nav-path="/coverage/email/">Email<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/applications/" data-nav-path="/coverage/applications/">Apps and APIs<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/data/" data-nav-path="/coverage/data/">Data<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/ai-agents/" data-nav-path="/coverage/ai-agents/">AI and agents<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/ot-iot/" data-nav-path="/coverage/ot-iot/">OT and IoT<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/governance/" data-nav-path="/coverage/governance/">Governance and risk<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                </ul>
+              </div>
+            </li>
+            <li data-nav-anim><a class="pill__row" href="/about/" data-nav-path="/about/"><span class="pill__label">About</span><span class="pill__note">San Francisco</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim><a class="pill__row is-current" href="/insights/" data-nav-path="/insights/" aria-current="page"><span class="pill__label">Insights</span><span class="pill__note">Notes from the front</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim><a class="pill__row" href="/contact/" data-nav-path="/contact/"><span class="pill__label">Contact</span><span class="pill__note">Always on</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim><button class="pill__row pill__row--alert" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="pill__label"><span class="dot dot--live" aria-hidden="true"></span>Under attack?</span><span class="pill__note pill__note--keep">We answer 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button></li>
+          </ul>
+        </nav>
+        <div class="pill__cta" data-nav-anim><a class="pill__cta-btn" href="/contact/">Talk to us<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="main">
+<!-- 01 Header -->
+<section class="page-head ins-head gutter" aria-labelledby="ins-title">
+  <p class="t-label" data-reveal="fade">(    Insights    )</p>
+  <h1 class="page-head__title" id="ins-title" data-reveal="lines">Notes From<br>the Front.</h1>
+</section>
+
+<div class="ins-board">
+  <!-- 02 Featured -->
+  <section class="block gutter ins-featured" aria-labelledby="ins-featured-title">
+    <div class="frame">
+      <h2 class="sr-only" id="ins-featured-title">Featured notes</h2>
+      <div class="notes" data-reveal="stagger">
+        <a class="note" href="/insights/ai-swarms/" data-cat="threats">
+          <span class="note__media media"><img decoding="async" src="/assets/img/photo/insight-1-1600.webp" srcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
+          <span class="note__scrim" aria-hidden="true"></span>
+          <span class="note__body"><span class="note__meta"><span>Threats</span><span>Oct 25, 2026</span></span><span class="note__title">What an AI swarm attack looks like.</span></span>
+          <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <a class="note" href="/insights/fight-ai-with-ai/" data-cat="approach">
+          <span class="note__media media"><img decoding="async" src="/assets/img/photo/insight-2-1600.webp" srcset="/assets/img/photo/insight-2-800.webp 800w, /assets/img/photo/insight-2-1600.webp 1600w, /assets/img/photo/insight-2.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager"></span>
+          <span class="note__scrim" aria-hidden="true"></span>
+          <span class="note__body"><span class="note__meta"><span>Approach</span><span>Oct 25, 2026</span></span><span class="note__title">Why you have to fight AI with AI.</span></span>
+          <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Index -->
+  <section class="block gutter ins-index" id="all-notes" aria-labelledby="ins-index-title">
+    <div class="frame stack">
+      <div class="head">
+        <h2 class="head__title" id="ins-index-title" data-reveal="lines">All notes.</h2>
+        <div class="head__meta" data-reveal="fade"><span>(    03 notes    )</span><span>Threats, approach, coverage</span></div>
+      </div>
+      <ul class="index" data-reveal="stagger">
+        <li data-cat="threats">
+          <a class="index__row" href="/insights/ai-swarms/">
+            <span class="index__content"><span class="index__label">Threats</span><span class="index__title">What an AI swarm attack looks like.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img decoding="async" loading="lazy" src="/assets/img/photo/insight-1-1600.webp" srcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+        <li data-cat="approach">
+          <a class="index__row" href="/insights/fight-ai-with-ai/">
+            <span class="index__content"><span class="index__label">Approach</span><span class="index__title">Why you have to fight AI with AI.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img decoding="async" loading="lazy" src="/assets/img/photo/insight-2-1600.webp" srcset="/assets/img/photo/insight-2-800.webp 800w, /assets/img/photo/insight-2-1600.webp 1600w, /assets/img/photo/insight-2.webp 2400w" sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+        <li data-cat="coverage">
+          <a class="index__row" href="/insights/one-team-every-domain/">
+            <span class="index__content"><span class="index__label">Coverage</span><span class="index__title">One team for every domain.</span></span>
+            <span class="index__meta"><span class="index__peek media" aria-hidden="true"><img decoding="async" loading="lazy" src="/assets/img/photo/insight-3-1600.webp" srcset="/assets/img/photo/insight-3-800.webp 800w, /assets/img/photo/insight-3-1600.webp 1600w, /assets/img/photo/insight-3.webp 2400w" sizes="20em" alt=""></span><span class="index__date">Oct 25, 2026</span><svg class="icon index__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Floating filter pills (CSS only: radios + :has) -->
+  <div class="ins-filter gutter">
+    <fieldset class="ins-filter__bar">
+      <legend class="sr-only">Filter notes by topic</legend>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-all" value="all" checked><span>All notes</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-threats" value="threats"><span>Threats</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-approach" value="approach"><span>Approach</span></label>
+      <label class="ins-filter__btn"><input class="sr-only" type="radio" name="ins-topic" id="ins-f-coverage" value="coverage"><span>Coverage</span></label>
+    </fieldset>
+  </div>
+</div>
+
+<!-- 04 CTA band -->
+<section class="finale on-dark" aria-labelledby="finale-title">
+  <div class="finale__media media" aria-hidden="true">
+    <img decoding="async" loading="lazy" src="/assets/img/gen/cta-1600.webp" srcset="/assets/img/gen/cta-800.webp 800w, /assets/img/gen/cta-1600.webp 1600w, /assets/img/gen/cta.webp 2400w" sizes="100vw" alt="">
+  </div>
+  <div class="finale__inner gutter">
+    <h2 class="finale__title t-h0" id="finale-title" data-reveal="lines">We’ll Take It<br>From Here.</h2>
+    <p class="finale__text" data-reveal="fade" data-delay=".45">Tell us what you run. We go in, connect everything and defend it 24/7, starting today.</p>
+    <div class="btn-row btn-row--center" data-reveal="stagger" data-delay=".45">
+      <a class="btn btn--light" href="/contact/" data-qa="button">
+        <span class="btn__roll"><span class="btn__line">Talk to us</span><span class="btn__line" aria-hidden="true">Talk to us</span></span>
+        <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+      <a class="btn btn--dark" href="/services/">
+        <span class="btn__roll"><span class="btn__line">How we work</span><span class="btn__line" aria-hidden="true">How we work</span></span>
+        <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+      </a>
+    </div>
+    <button class="finale__mail mail" type="button" data-copy-email aria-label="Copy email address info@yellow-force.com" data-reveal="fade" data-delay=".6"><span data-email-text>info@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+  </div>
+</section>
+
+
+</main>
+<footer class="foot on-dark gutter">
+  <div class="foot__wrap">
+    <div class="foot__top">
+      <div class="foot__brand">
+        <a class="foot__logo" href="/" aria-label="YellowForce home"><span class="logo"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
+<span class="logo__word"><span class="logo__yellow">Yellow</span><span class="logo__force">Force</span></span></span>
+</a>
+        <div class="foot__about">
+          <p class="foot__blurb">YellowForce is a fully managed cybersecurity company. We stop every cyber threat, especially AI swarms, by fighting AI with AI, plus our cyber experts. We go inside your company, connect to everything you run and defend it 24/7. From A&nbsp;to&nbsp;Z.</p>
+          <button class="foot__email mail" type="button" data-copy-email aria-label="Copy email address info@yellow-force.com"><span data-email-text>info@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+        </div>
+      </div>
+      <nav class="foot__nav" aria-label="Footer">
+        <ul class="foot__big">
+          <li><a class="foot__big-link" href="/" data-nav-path="/">Home<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/services/" data-nav-path="/services/">Services<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/coverage/" data-nav-path="/coverage/">Coverage<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/about/" data-nav-path="/about/">About<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link is-current" href="/insights/" data-nav-path="/insights/" aria-current="page">Insights<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/contact/" data-nav-path="/contact/">Contact<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+        </ul>
+        <ul class="foot__small">
+          <li><a class="foot__link" href="/privacy/" data-nav-path="/privacy/">Privacy</a></li>
+          <li><a class="foot__link" href="/security/" data-nav-path="/security/">Security</a></li>
+          <li><a class="foot__link" href="/.well-known/security.txt">security.txt</a></li>
+          <li><button class="foot__link" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="dot dot--live" aria-hidden="true"></span>Under attack?</button></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="foot__bar">
+      <span>© 2026 YellowForce</span>
+      <span class="foot__bar-item"><span class="dot dot--live" aria-hidden="true"></span>Fighting AI with AI, 24/7.</span>
+      <span>San Francisco, CA</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true">
+  <span class="toast__mark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+  <span class="toast__body"><span class="toast__title" data-toast-title></span><span class="toast__value" data-toast-value></span><span class="toast__note" data-toast-note></span></span>
+</div>
+
+</body>
+</html>
