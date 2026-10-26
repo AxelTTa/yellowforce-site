@@ -171,7 +171,8 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 .motion [data-reveal] { opacity: 0; }
 .motion [data-reveal="statement"] { opacity: 1; }
 
-/* first screen (the build marks the reveals of each page's first section data-intro): CSS keyframes that start as soon
+/* first screen (the build marks the reveals of each page's first section data-intro, boot.js every other reveal already
+   in the viewport when the fonts are in): CSS keyframes that start as soon
    as the fonts are in (boot.js adds html.fonts-in, 700 ms cap), so the hero never waits for the JS bundle. They use
    the independent translate/scale properties, so a design transform on the same element is never overridden.
    --in-d is the build's delay (half the JS reveal's data-delay), --in-k the child index of a stagger. */

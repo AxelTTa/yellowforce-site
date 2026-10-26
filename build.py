@@ -32,6 +32,7 @@ Directives inside pages and partials:
     data-nav-path="/services/"        on a nav link: build adds is-current + aria-current="page" on the
                                       current page, is-section on its ancestors
     data-reveal in the first <section> gets data-intro + --in-d: the first screen plays from CSS (base.css), not JS
+                                      (boot.js marks the other reveals already in the viewport at fonts-in)
     the first <img fetchpriority="high"> is preloaded from <head> (<!--lcp-preload--> in head.html)
 
 Output: pretty URLs. services.html -> docs/services/index.html, coverage/network.html ->

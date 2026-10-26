@@ -33,7 +33,7 @@ Every agent working on this site reads this file first. When it conflicts with a
 - Never write "Palantir" or "ontology" on the site.
 - No em dashes anywhere (use periods, commas, colons). US English. Short sentences. Vantra cadence: 2 to 5 word headings ending with a period ("What we stop."), small uppercase bracket labels "( 24/7 )".
 - No people names, no faces, no team section.
-- Location: "San Francisco, CA" only. Copyright: "© 2026 YellowForce".
+- Location: "San Francisco, CA" only. Copyright: "© 2026 YellowForce Inc." (incorporated in Delaware Oct 22, 2026, confirmed Oct 26).
 
 ## Contact behavior (important)
 - The only contact is **info@yellow-force.com**. No forms, no `mailto:` links anywhere.

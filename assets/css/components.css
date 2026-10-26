@@ -323,6 +323,7 @@
   --nav-r: 14px;                              /* outer radius = 8px inner + 6px padding */
   --nav-r-in: 8px;
   --nav-glass: linear-gradient(180deg, rgba(12, 34, 74, .96), rgba(7, 27, 62, .96));
+  --nav-solid: linear-gradient(180deg, rgb(12, 34, 74), rgb(7, 27, 62)); /* the same navy, opaque: the menu card */
   --nav-edge: rgba(244, 245, 247, .08);       /* 12% drew a washed ring over paper */
   --nav-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 34px -16px rgba(3, 11, 28, .6), 0 2px 8px -4px rgba(3, 11, 28, .35);
   position: fixed;
@@ -484,8 +485,9 @@
 .pill.is-open .pill__dots i { background: var(--amber); }
 
 /* ---- menu: a card of its own under the right end of the bar ----
-   Same navy glass as the bar but no backdrop blur: it sits over the dim, where a blur shows nothing and
-   only costs frames while the card grows. Its own type floor: 14px (15px on phones). */
+   The bar's navy, but opaque (the 96% glass let the hero headline show through faintly on phones, behind the
+   Under attack row) and no backdrop blur: it sits over the dim, where a blur shows nothing and only costs frames
+   while the card grows. Its own type floor: 14px (15px on phones). */
 .pill__drawer {
   position: absolute;
   top: calc(100% + .5rem);
@@ -497,7 +499,7 @@
   font-size: max(var(--page-fs), 14px);
   border: 1px solid var(--nav-edge);
   border-radius: var(--nav-r);
-  background: var(--nav-glass);
+  background: var(--nav-solid);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 30px 60px -24px rgba(3, 11, 28, .7);
 }
 .pill__drawer-inner {

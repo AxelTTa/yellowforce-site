@@ -297,6 +297,7 @@
   --nav-r: 14px;
   --nav-r-in: 8px;
   --nav-glass: linear-gradient(180deg, rgba(12, 34, 74, .96), rgba(7, 27, 62, .96));
+  --nav-solid: linear-gradient(180deg, rgb(12, 34, 74), rgb(7, 27, 62));
   --nav-edge: rgba(244, 245, 247, .08);
   --nav-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 34px -16px rgba(3, 11, 28, .6), 0 2px 8px -4px rgba(3, 11, 28, .35);
   position: fixed;
@@ -462,7 +463,7 @@
   font-size: max(var(--page-fs), 14px);
   border: 1px solid var(--nav-edge);
   border-radius: var(--nav-r);
-  background: var(--nav-glass);
+  background: var(--nav-solid);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 30px 60px -24px rgba(3, 11, 28, .7);
 }
 .pill__drawer-inner {
