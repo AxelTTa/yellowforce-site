@@ -1,0 +1,62 @@
+---
+title: Microsoft connection | YellowForce
+description: This page completes the Microsoft connection for YellowForce clients.
+bodyclass: page-connect
+css: /assets/css/pages/connect.css
+js: /assets/js/connect-callback.js
+referrer: no-referrer
+formatdetection: telephone=no, email=no, address=no, date=no
+sitemap: false
+---
+<!-- Redirect URI of the YellowForce Microsoft app (admin consent). Microsoft sends the admin back here with query
+     params only: ?admin_consent=True&tenant=<GUID>&state=... or ?error=<code>&error_description=<text>&state=...
+     connect-callback.js shows one of the three blocks below and writes the values with textContent only.
+     No form, no request, no storage; referrer no-referrer so the query string never leaves this page. -->
+<section class="cb gutter" aria-label="Microsoft connection">
+  <div class="cb__card" data-cb data-reveal="fade">
+    <div class="cb__top">
+      <p class="t-label">( Microsoft connection )</p>
+      <p class="cb__badge t-label" data-cb-show="ok" hidden><span class="dot dot--live dot--ring" aria-hidden="true"></span>Connected</p>
+      <p class="cb__badge t-label" data-cb-show="error" hidden><span class="cb__ring" aria-hidden="true"></span>Not completed</p>
+    </div>
+
+    <div class="cb__state" data-cb-state="none">
+      <h1 class="cb__title">Microsoft<br>connection.</h1>
+      <p class="cb__text">This page completes the Microsoft connection for YellowForce clients.</p>
+      <p class="cb__next">See <a href="/integrations/">how we connect to Microsoft</a> and what we never do with your data.</p>
+    </div>
+
+    <div class="cb__state" data-cb-state="ok" hidden>
+      <h1 class="cb__title">You’re<br>connected.</h1>
+      <p class="cb__text">YellowForce is connected to your Microsoft tenant.</p>
+      <dl class="cb__fields">
+        <div class="cb__field">
+          <dt class="cb__key t-label">Tenant ID</dt>
+          <dd class="cb__value cb__value--id"><code data-cb-tenant></code></dd>
+        </div>
+      </dl>
+      <p class="cb__next">Reply to your YellowForce contact or email <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button> with this tenant ID so we can finish setup.</p>
+    </div>
+
+    <div class="cb__state" data-cb-state="error" hidden>
+      <h1 class="cb__title">The connection was<br>not completed.</h1>
+      <p class="cb__text">We could not confirm access to your Microsoft tenant.</p>
+      <dl class="cb__fields">
+        <div class="cb__field" data-cb-row="code" hidden>
+          <dt class="cb__key t-label">Error code</dt>
+          <dd class="cb__value"><code data-cb-code></code></dd>
+        </div>
+        <div class="cb__field" data-cb-row="desc" hidden>
+          <dt class="cb__key t-label">Details</dt>
+          <dd class="cb__value cb__value--text" data-cb-desc></dd>
+        </div>
+      </dl>
+      <p class="cb__next">Reply to your YellowForce contact or email <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button> with the details above so we can finish setup.</p>
+    </div>
+
+    <ul class="cb__links">
+      <li><a class="link-arrow" href="/integrations/">Integrations<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+      <li><a class="link-arrow" href="/privacy/">Privacy<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+    </ul>
+  </div>
+</section>

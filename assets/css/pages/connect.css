@@ -1,0 +1,157 @@
+/* Microsoft connection result (/connect/microsoft/callback/). Scoped under .page-connect.
+   One centered status card on paper (the contact page's quiet style), then the footer. connect-callback.js picks
+   the block to show (none | ok | error) and fills the values; the card waits for it (data-cb-ready) so the
+   generic block never flashes before a result, with a 1.5s failsafe if the script never runs. */
+
+.page-connect .cb {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 82vh;
+  min-height: 82svh;
+  padding-top: var(--sp-12);
+  padding-bottom: var(--sp-8);
+}
+
+.page-connect .cb__card {
+  width: 100%;
+  max-width: 46em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-25);
+  padding: var(--sp-3);
+  border-radius: var(--r-hero);
+  background: var(--white);
+  box-shadow: 0 0 0 1px var(--navy-08), 0 2em 4em -2em var(--navy-16);
+}
+
+/* label row: "( Microsoft connection )" left, result badge right */
+.page-connect .cb__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75em 1.5em;
+  padding-bottom: var(--sp-125);
+  border-bottom: 1px solid var(--line);
+}
+.page-connect .cb__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .75em;
+  color: var(--text);
+}
+.page-connect .cb__ring {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--navy);
+}
+.page-connect [hidden] { display: none !important; }
+
+.page-connect .cb__state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-15);
+}
+.page-connect .cb__title {
+  font-size: var(--fs-9xl);
+  line-height: var(--lh-104);
+}
+.page-connect .cb__text {
+  max-width: 30em;
+  font-size: var(--fs-l);
+  line-height: var(--lh-150);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+
+/* values from Microsoft: label over the value, on a soft navy panel */
+.page-connect .cb__fields {
+  display: flex;
+  flex-direction: column;
+  gap: .625em;
+  margin: 0;
+}
+.page-connect .cb__field {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  padding: 1em 1.25em 1.125em;
+  border-radius: var(--r-sm);
+  background: var(--card);
+  overflow: hidden; /* text from the URL never paints outside its panel (stacked accents, odd glyphs) */
+}
+.page-connect .cb__value {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--fs-ml);
+  line-height: var(--lh-140);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+/* IDs and codes in the site's Inter (no system mono), tabular figures so a GUID reads in even steps */
+.page-connect .cb__value code {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+/* one click selects the whole tenant ID */
+.page-connect .cb__value--id code { user-select: all; -webkit-user-select: all; }
+.page-connect .cb__value--text {
+  font-size: var(--fs-m);
+  color: var(--text-2);
+  white-space: pre-line;
+}
+
+.page-connect .cb__next {
+  font-size: var(--fs-m);
+  line-height: var(--lh-155);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.page-connect .cb__next a,
+.page-connect .cb__next .mail { color: var(--text); }
+.page-connect .cb__next a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .22em;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color var(--t-fast) var(--ease);
+}
+.page-connect .cb__next a:hover { text-decoration-color: currentColor; }
+.page-connect .cb__next .mail { white-space: nowrap; }
+
+.page-connect .cb__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75em 2em;
+  margin: 0;
+  padding: var(--sp-125) 0 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.page-connect .cb__links .link-arrow { color: var(--text); font-size: var(--fs-sm); }
+
+/* wait for connect-callback.js (it sets data-cb-ready); failsafe after 1.5s */
+.js .page-connect .cb__card:not([data-cb-ready]) .cb__state {
+  visibility: hidden;
+  animation: cb-failsafe 0s linear 1.5s forwards;
+}
+@keyframes cb-failsafe { to { visibility: visible; } }
+
+@media (max-width: 767px) {
+  .page-connect .cb { min-height: 0; padding-top: 10em; padding-bottom: var(--sp-6); }
+  .page-connect .cb__card { gap: var(--sp-2); padding: var(--sp-2); border-radius: var(--r-m); }
+  .page-connect .cb__title { font-size: var(--fs-7xl); }
+  .page-connect .cb__text { font-size: var(--fs-2xl); }
+  .page-connect .cb__value { font-size: var(--fs-xl); }
+  .page-connect .cb__value--text,
+  .page-connect .cb__next { font-size: var(--fs-l); }
+  .page-connect .cb__links .link-arrow { font-size: var(--fs-l); }
+}
+@media (max-width: 479px) {
+  .page-connect .cb__card { padding: var(--sp-2) var(--sp-15); }
+}

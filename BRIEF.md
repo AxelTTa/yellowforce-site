@@ -87,6 +87,7 @@ Every agent working on this site reads this file first. When it conflicts with a
 | Insight posts x3 | `/insights/<slug>/` | Journal note |
 | Contact | `/contact/` | Contact (no form: big copy-email button) |
 | Integrations | `/integrations/` | (protected: homepage URL of the Google, Microsoft and GitHub apps) |
+| Microsoft consent callback | `/connect/microsoft/callback/` | (protected: registered redirect URI of the Entra app; static, noindex, no-referrer; shows tenant ID or Microsoft AADSTS error only; see COMPONENTS.md) |
 | Privacy | `/privacy/` | (legal, protected) |
 | Terms | `/terms/` | (legal, protected) |
 | DPA | `/dpa/` (incl. `#subprocessors`) | (legal, protected) |

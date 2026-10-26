@@ -17,7 +17,10 @@ Pages: src/pages/**/*.html. Each starts with a front-matter block:
     ogtype: website                          (optional, "article" for insight posts)
     css: /assets/css/pages/services.css      (optional, comma separated)
     layout: default                          (optional: default | bare)
-    sitemap: true                            (optional)
+    sitemap: true                            (optional; false also sets robots noindex)
+    js: /assets/js/x.js                      (optional, comma separated: page-only scripts, deferred, end of <head>)
+    referrer: no-referrer                    (optional: swaps head.html's referrer meta; default strict-origin-when-cross-origin)
+    formatdetection: telephone=no            (optional: adds <meta name="format-detection"> so iOS does not turn text into links)
     ---
     <section>...</section>
 
@@ -69,7 +72,17 @@ DEFAULTS = {
     "css": "",
     "layout": "default",
     "sitemap": "true",
+    "js": "",
+    "referrer": "strict-origin-when-cross-origin",
+    "formatdetection": "",
 }
+# front-matter `referrer:` values (page_head swaps head.html's one <meta name="referrer">)
+REFERRER_POLICIES = {"no-referrer", "no-referrer-when-downgrade", "origin", "origin-when-cross-origin", "same-origin",
+                     "strict-origin", "strict-origin-when-cross-origin"}
+# front-matter `formatdetection:` (iOS data detectors), e.g. "telephone=no, email=no, address=no, date=no"
+FORMAT_DETECTION = re.compile(r"(telephone|email|address|date)=(no|yes)(, ?(telephone|email|address|date)=(no|yes))*")
+# front-matter `js:` paths: root-relative files on this site, nothing that a browser could read as another host
+PAGE_JS = re.compile(r"/[A-Za-z0-9_-][A-Za-z0-9._/-]*\.js")
 
 CSP_PROD = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; "
             "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; "
@@ -331,6 +344,37 @@ def css_links(css: str) -> str:
     return "\n".join(out)
 
 
+def page_head(doc: str, ctx: dict, name: str) -> str:
+    """Per-page <head> options, applied to the built document so head.html stays shared and unchanged:
+    `referrer:` swaps the content of head.html's one <meta name="referrer"> (one meta, so no second policy races it);
+    `formatdetection:` adds <meta name="format-detection"> right after it (iOS: no auto tel:/mailto: links);
+    `js:` adds page-only scripts (the CSP allows no inline script) at the end of <head>, deferred: they run after
+    the shared scripts. Pages without any of them come out byte-identical."""
+    policy = ctx.get("referrer", DEFAULTS["referrer"])
+    if policy not in REFERRER_POLICIES:
+        warn(f"{name}: unknown referrer policy {policy!r}, keeping the default")
+    elif policy != DEFAULTS["referrer"]:
+        doc, n = re.subn(r'<meta name="referrer" content="[^"]*">', f'<meta name="referrer" content="{policy}">', doc, count=1)
+        if not n:
+            warn(f"{name}: referrer: {policy} set, but the head has no <meta name=\"referrer\">")
+    fd = ctx.get("formatdetection", "")
+    if fd:
+        if not FORMAT_DETECTION.fullmatch(fd):
+            warn(f"{name}: bad formatdetection value {fd!r}")
+        else:
+            doc, n = re.subn(r'(<meta name="referrer" content="[^"]*">\n)',
+                             lambda m: m.group(1) + f'<meta name="format-detection" content="{fd}">\n', doc, count=1)
+            if not n:
+                warn(f"{name}: formatdetection set, but the head has no <meta name=\"referrer\"> to put it after")
+    tags = ""
+    for src in [s.strip() for s in ctx.get("js", "").split(",") if s.strip()]:
+        if not PAGE_JS.fullmatch(src) or ".." in src:
+            warn(f"{name}: js must be a root-relative .js path on this site: {src}")
+            continue
+        tags += f'<script src="{html.escape(src)}" defer></script>\n'
+    return doc.replace("</head>", tags + "</head>", 1) if tags else doc
+
+
 def lint(text: str, name: str) -> None:
     visible = re.sub(r"<script\b.*?</script>", "", text, flags=re.S)
     visible = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>', "", visible)
@@ -376,6 +420,7 @@ def build_page(src: Path, dev: bool) -> tuple[str, Path, dict]:
     doc = expand_inline_svg(doc)
     doc = expand_images(doc, name)
     doc = lcp_preload(doc)
+    doc = page_head(doc, ctx, name)
     doc = mark_nav(doc, url_path)
     doc = space_brackets(doc)
     lint(doc, name)
