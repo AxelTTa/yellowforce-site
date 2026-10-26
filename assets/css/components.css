@@ -339,21 +339,19 @@
 }
 .pill__brand:hover { transform: scale(.9); }
 .pill__brand .logo__mark { width: 2.05em; }
-.pill__tagline {
+/* Center of the bar: the wordmark (src/partials/logo-word.html), same place as the reference's page
+   title. 1em puts Inter's x-height on the reference's uppercase cap height; colors are the pill's
+   --logo-* tokens (Yellow white, Force slate-light). */
+.pill__word {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: var(--fs-xs);
-  line-height: var(--lh-112);
-  text-transform: uppercase;
+  display: flex;
+  font-size: var(--fs-m);
+  line-height: 1;
   white-space: nowrap;
-  font-weight: 500;
-  color: var(--paper);
   pointer-events: none;
-  max-width: calc(100% - 7em);
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .pill__toggle {
   position: relative;
@@ -556,21 +554,34 @@
   column-gap: var(--sp-3);
   row-gap: var(--sp-2);
 }
-/* 1.02, not the .9 of .t-h0: the "g" of "Fight" sits right above the "W" of "With" and at .9 they
-   overlap by .08em. Measured clearance at 1.02: .04em (5px at 1440, 2px at 390), so they never touch. */
+/* 1.02, not the .9 of .t-h0, so the two lines never touch (kept from "Fight AI." / "With AI."; "Your Security." /
+   "Handled." has no descender over the second line, and its only "y" sits past the end of "Handled.").
+   "Your Security." is about 6.5em wide. From 992px up the title is capped so it and the coverage card (--card-w
+   plus the 3em gap, 1em of insets and 6em of gutters, plus a scrollbar's worth) always share one row: the full H0
+   from about 1400px up, a little smaller below. 768-991: the card drops under the title. Phones: capped to the
+   width (13.4vw, 52px at 390), the card is hidden. */
+.hero { --card-w: clamp(340px, 26vw, 400px); }
 .hero__title { color: var(--paper); line-height: 1.02; }
+@media (min-width: 992px) {
+  .hero__title { font-size: min(var(--h0), calc((100vw - 10em - var(--card-w) - 24px) / 6.6)); }
+}
+@media (min-width: 1920px) {
+  .hero { --card-w: clamp(500px, 25vw, 580px); }
+}
 @media (max-width: 767px) {
   .hero { min-height: 40em; }
   .hero__inner { padding-bottom: var(--sp-125); }
+  .hero__title { font-size: min(var(--h0), 13.4vw); }
 }
 
-/* status card: the whole card is the "Under attack?" copy-email button (data-copy-email="urgent").
-   Dark frosted chip, label top, line + small address bottom, photo thumbnail right. Hidden <= 767 like
-   the reference (the menu keeps its "Under attack?" row on phones). */
+/* status card (Axel, 2026-10-26: Coverage, replaces "Under attack?"): the whole card links to /coverage/.
+   Dark frosted chip, label + small arrow top, "10 domains." and two short lines bottom (one sentence per line,
+   never broken inside), photo thumbnail right (42% of the card, so the text column keeps about 170px even at
+   1024). Hidden <= 767 like the reference. */
 .status {
   display: flex;
   gap: 1em;
-  width: clamp(300px, 25vw, 380px);
+  width: var(--card-w);
   padding: .375em .375em .375em 1.5em;
   border-radius: var(--r-m);
   /* borderless dark glass a step above the hero's navy-deep, like the reference's chip (which sits a little
@@ -580,68 +591,56 @@
   backdrop-filter: var(--blur-chip);
   color: var(--paper-82);
   text-align: left;
-  cursor: copy;
   transition: background-color var(--t-fast) var(--ease);
 }
 .status:hover { background: rgba(20, 32, 60, .66); }
 .status__body {
   flex: 1;
   min-width: 0;
-  min-height: 150px;
+  min-height: max(150px, 10em);
   padding: .75em 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 1em;
 }
+.status__head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75em; }
 .status__label {
-  display: flex;
-  align-items: center;
-  gap: .6em;
   font-size: var(--fs-xs);
   line-height: var(--lh-112);
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--paper-82);
 }
-.status__main { display: flex; flex-direction: column; gap: .625em; }
-.status__text {
-  font-size: var(--fs-ml);
-  line-height: var(--lh-130);
-  color: var(--paper);
-  text-wrap: pretty;
-}
-.status__mail {
-  display: inline-flex;
-  align-items: center;
-  gap: .45em;
-  font-size: var(--fs-xs);
-  line-height: var(--lh-112);
+.status__arrow {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  margin-top: -.1em;
   color: var(--slate-light);
-  transition: color var(--t-fast) var(--ease);
+  transition: color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
 }
-.status__icon { flex: none; width: 1.1em; height: 1.1em; }
-.status__icon--done { display: none; color: var(--amber); }
-.status:hover .status__mail { color: var(--paper); }
-.status.is-copied .status__icon { display: none; }
-.status.is-copied .status__icon--done { display: block; }
+.status:hover .status__arrow { color: var(--amber); transform: translate(2px, -2px); }
+.status__main { display: flex; flex-direction: column; gap: .4em; }
+.status__text {
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: var(--lh-120);
+  white-space: nowrap;
+  color: var(--paper);
+}
+.status__sub { font-size: var(--fs-s); line-height: var(--lh-140); color: var(--slate-light); }
+.status__sub > span { display: block; white-space: nowrap; }
 .status__thumb {
   flex: none;
   align-self: stretch;
-  width: 156px;
+  width: 42%;
   border-radius: var(--r-sm);
 }
-/* the thumb is the brightest point of the card, like the reference: a lit hand on a keyboard, lifted a touch */
-.status__thumb > img { object-position: 60% 50%; filter: brightness(1.18) contrast(1.06); transition: transform var(--t) var(--ease); }
+/* the thumb is the brightest point of the card, like the reference: the Coverage page's own photo, cropped on
+   the bright curve of light trails, lifted a touch */
+.status__thumb > img { object-position: 64% 70%; filter: brightness(1.15) contrast(1.06); transition: transform var(--t) var(--ease); }
 .status:hover .status__thumb > img { transform: scale(1.05); }
-@media (min-width: 1920px) {
-  .status { width: clamp(500px, 25vw, 580px); }
-  .status__thumb { width: 240px; }
-}
-@media (max-width: 767px) {
-  .status { width: 100%; padding-left: 1.25em; }
-  .status__body { min-height: 0; }
-  .status__thumb { width: 7.5em; }
-}
 
 /* ===== Statement + marquee ===== */
 .manifesto {
@@ -1011,8 +1010,15 @@ a.ledger__row:hover { padding-inline: .75em; }
 .carousel.is-start .carousel__btn--prev { opacity: 0; visibility: hidden; transition: opacity var(--t) var(--ease), visibility 0s linear var(--t); }
 .carousel__btn:focus-visible { outline: none; }
 .carousel__btn:focus-visible .carousel__arrow { outline: 2px solid var(--navy); outline-offset: 3px; }
-/* phones keep the desktop geometry, as on the reference: a 28em slide (298px at 390), the next card
-   peeking under the paper fade, the arrow chip over the gap */
+/* phones keep the desktop slide geometry (a 28em slide, the next card peeking under the paper fade),
+   but the arrows move to a row under the track: over the slide the prev chip covered the card text */
+@media (max-width: 767px) {
+  .carousel { padding-bottom: 4.25em; }
+  .carousel__btn { top: auto; bottom: 0; width: 44px; height: 44px; background: none; }
+  .carousel__btn--prev { left: auto; right: 52px; }
+  .carousel__btn--next { right: 0; }
+  .carousel__arrow { width: 36px; height: 36px; }
+}
 
 /* numbered practice card */
 .practice {
@@ -1044,18 +1050,21 @@ a.ledger__row:hover { padding-inline: .75em; }
   .practice__text { max-width: 95%; }
 }
 
-/* reason cards (why us), dark feature card */
+/* reason cards (why us), dark feature card. Axel, 2026-10-26: the tall cards (38em, a title at one end and a
+   line at the other) read as empty. Every card is now a top block (who + text, or the 24/7 figure + text) and a
+   bottom block behind a hairline (a short supporting line, or the crew row), at under 60% of the old height. */
 .reason {
-  min-height: 38em;
+  min-height: 22em;
   padding: 2em;
   border-radius: var(--r-ml);
   background: var(--card);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  row-gap: 3.5em;
+  row-gap: 1.5em;
 }
-.carousel__slide:nth-child(odd) .reason:not(.reason--feature) { flex-direction: column-reverse; }
+.reason__note,
+.reason__crew { margin-top: auto; padding-top: 1.25em; border-top: 1px solid var(--line); }
+.reason__note { font-size: var(--fs-sm); line-height: var(--lh-140); color: var(--text-2); text-wrap: pretty; }
 .reason__who { display: flex; align-items: center; gap: .75em; }
 .reason__icon {
   flex: none;
@@ -1075,12 +1084,13 @@ a.ledger__row:hover { padding-inline: .75em; }
 .reason__meta { font-size: var(--fs-xs); line-height: 1; text-transform: uppercase; color: var(--text-4); }
 .reason__text { font-size: var(--fs-l); font-weight: 500; line-height: var(--lh-130); color: var(--text); text-wrap: pretty; }
 .reason--feature { background: var(--navy); color: var(--paper); }
-.reason__score { display: flex; align-items: center; gap: 1.25em; }
+/* the lead card: a big 24/7 over a line set like the other cards' text, so its top block fills like theirs */
+.reason__score { display: flex; flex-direction: column; align-items: flex-start; row-gap: 1.25em; }
 .reason__figure {
   display: flex;
   align-items: baseline;
   flex: none;
-  font-size: var(--fs-9xl);
+  font-size: var(--fs-11xl);
   line-height: var(--lh-90);
   font-weight: 500;
   letter-spacing: var(--tr-3);
@@ -1088,7 +1098,7 @@ a.ledger__row:hover { padding-inline: .75em; }
   font-variant-numeric: tabular-nums;
 }
 .reason__figure small { font-size: .35em; letter-spacing: 0; color: var(--amber); }
-.reason__figure-text { font-family: var(--font-display); font-size: var(--fs-sm); line-height: var(--lh-140); color: var(--paper-82); text-wrap: pretty; }
+.reason__figure-text { font-family: var(--font-display); font-size: var(--fs-l); font-weight: 500; line-height: var(--lh-130); color: var(--paper-82); text-wrap: pretty; }
 .reason__crew { display: flex; align-items: center; gap: .75em; }
 .reason__stack { display: flex; }
 /* overlapping round chips (32px, 2px navy ring), like the reference's avatar row but without faces: three
@@ -1120,7 +1130,7 @@ a.ledger__row:hover { padding-inline: .75em; }
 .reason__chip .logo__mark { width: 18px; }
 .reason__chip--live .dot { width: 7px; height: 7px; }
 .reason__crew-label { font-size: var(--fs-xs); text-transform: uppercase; white-space: nowrap; color: var(--paper-82); line-height: 1.4; }
-@media (max-width: 767px) { .reason { min-height: 32em; } }
+@media (max-width: 767px) { .reason { min-height: 25em; } }
 
 /* ===== Reel frame with island control ===== */
 .reel {

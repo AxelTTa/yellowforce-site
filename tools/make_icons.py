@@ -431,7 +431,8 @@ def og_image():
     sub_base = H - 66 * S
     l2 = sub_base - 62 * S
     l1 = l2 - hs * 0.94
-    for line, yb in (("Fight AI.", l1), ("With AI.", l2)):
+    # the Home hero headline (Axel, 2026-10-26); the only descender ("y") sits past the end of "Handled."
+    for line, yb in (("Your Security.", l1), ("Handled.", l2)):
         draw_run(d, M - hs * 0.01, yb, line, INTER, 700, hs, -0.045, PAPER)
     ss = 30 * S
     draw_run(d, M, sub_base, "Fully managed cybersecurity. 24/7.", INTER, 450, ss, -0.015, SLATE_LIGHT)
@@ -463,7 +464,7 @@ def main():
     manifest = {
         "name": "YellowForce",
         "short_name": "YellowForce",
-        "description": "Fully managed cybersecurity. We fight AI with AI, plus our cyber experts, 24/7.",
+        "description": "We run your entire cybersecurity. Our AI and our experts stop every threat. 24/7.",
         "start_url": "/",
         "display": "browser",
         "background_color": "#071B3E",

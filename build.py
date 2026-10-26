@@ -11,7 +11,6 @@ Pages: src/pages/**/*.html. Each starts with a front-matter block:
     ---
     title: Services
     description: One sentence for search and link previews.
-    tagline: Six practices, one team        (centered text in the nav pill)
     bodyclass: page-services
     path: /services/                         (optional, derived from the file name)
     og: /assets/img/og.png                   (optional)
@@ -60,7 +59,6 @@ EMAIL = "info@yellow-force.com"
 DEFAULTS = {
     "title": "YellowForce",
     "description": "YellowForce runs your entire cybersecurity, A to Z. AI agents and cyber experts defend every domain, 24/7.",
-    "tagline": "Fight AI with AI",
     "bodyclass": "",
     "og": "/assets/img/og.png",
     "ogtype": "website",
@@ -305,7 +303,6 @@ def build_page(src: Path, dev: bool) -> tuple[str, Path, dict]:
     ctx["page_title"] = html.escape(title, quote=False)
     ctx["title_attr"] = html.escape(title)
     ctx["description_attr"] = html.escape(ctx["description"])
-    ctx["tagline"] = html.escape(ctx["tagline"], quote=False)
     ctx["canonical"] = SITE_URL + ("/404.html" if url_path == "/404.html" else url_path)
     og = ctx["og"]
     ctx["og_image"] = og if og.startswith("http") else SITE_URL + og

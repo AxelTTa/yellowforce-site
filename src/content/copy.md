@@ -7,7 +7,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 - `Label` lines are the small uppercase bracket labels. Write them exactly as given, spaces inside the brackets: `( 24/7 )`. CSS uppercases them.
 - `H0` = giant hero type (beats separated by periods; `/` marks the intended line break). `H1`, `H2`, `H3` = normal heading levels.
-- Case: Title Case only for the Home hero beats ("Fight AI. / With AI."). Every other heading on the site, inner H1s included, is sentence case ("Your security. / Run by us."), as on the reference.
+- Case: Title Case only for the Home hero beats ("Your Security. / Handled."). Every other heading on the site, inner H1s included, is sentence case ("Your security. / Run by us."), as on the reference.
 - `Meta L` / `Meta R` = the two short meta lines to the right of a section H2 (left one is the bracket label, right one the short fact).
 - `[copy-email]` = a `<button>` that copies `info@yellow-force.com` and shows the toast (see Global). Never a mailto link, never a form.
 - `-> /path/` = link target.
@@ -19,11 +19,11 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ## Core claim (Axel, 2026-10-26: every page says this the same way)
 
-- Site wording (use exactly, do not paraphrase): "We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7."
+- Site wording (use exactly, do not paraphrase): "We run your entire cybersecurity. Our AI and our experts stop every threat. 24/7."
 - Axel, 2026-10-26: the older long claim ("We stop every cyber threat, especially AI swarms. We fight AI with AI, plus our cyber experts. Fully managed, A to Z: ...") is too long, unclear and unpleasant to read. Do not bring it back, on Home or anywhere else.
 - Short sentences, one idea each. No long claim sentences stacked with commas and colons.
-- Allowed short variants: "Fight AI with AI" (hero, tagline), "Fully managed, A to Z", "every threat", "AI agents and cyber experts", "one team", "24/7".
-- Order matters: what we do (run all of it), who does it (our AI and our experts) and what they stop (every threat, AI swarms included), when (24/7).
+- Allowed short variants: "Your Security. Handled." (Home hero, Oct 26), "Fully managed, 24/7" (the menu's Home row, Oct 26), "Fight AI with AI" (the insight of that name only, no longer the hero or the menu), "Fully managed, A to Z", "every threat", "AI agents and cyber experts", "one team", "24/7".
+- Order matters: what we do (run all of it), who does it (our AI and our experts) and what they stop (every threat), when (24/7).
 
 ## Global
 
@@ -37,9 +37,9 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 ### Pill nav
 - Logo link aria-label: YellowForce home
 - Menu button aria-label: Open menu / Close menu
-- Center line: per-page tagline (each page below has its own `Nav tagline`)
+- Center: the YellowForce wordmark (**Yellow**Force, logo style), the same on every page (Axel, 2026-10-26). The per-page `Nav tagline` lines below are retired: not shown anywhere.
 - Menu rows (label / meta / target):
-  - Home / Fight AI with AI / -> /
+  - Home / Fully managed, 24/7 / -> /
   - Services / Six practices / expands:
     - All services -> /services/
     - Deploy and connect -> /services/#deploy
@@ -73,7 +73,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Button 2 (dark): How we work -> /services/
 
 ### Footer
-- Blurb: YellowForce is a fully managed cybersecurity company. We run your entire security, A to Z. Our AI and our experts stop every threat, AI swarms included. 24/7.
+- Blurb: YellowForce is a fully managed cybersecurity company. We run your entire security, A to Z. Our AI and our experts stop every threat. 24/7.
 - Email line: info@yellow-force.com [copy-email]
 - Big links: Home, Services, Coverage, About, Insights, Contact
 - Small links: Privacy -> /privacy/ · Security -> /security/ · security.txt -> /.well-known/security.txt
@@ -87,22 +87,23 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 - URL: /
 - Meta title: YellowForce | Fully managed cybersecurity, 24/7
-- Meta description: We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. Fully managed, 24/7.
-- Nav tagline: Fight AI with AI
+- Meta description: We run your entire cybersecurity. Our AI and our experts stop every threat. Fully managed, 24/7.
+- Nav tagline: Fully managed, 24/7
 
 ### 01 Hero (inset dark card)
 - Label (small, above or below the H0; keep it on mobile, the status card hides there): ( Fully managed cybersecurity · 24/7 )
-- H0: Fight AI. / With AI.
-- Status card (Axel, 2026-10-26: the whole card is a [copy-email] button with the Under attack toast; no "Status: live", no graphic):
-  - Label (with amber live dot): Under attack?
-  - Line: Write to us now. We answer 24/7.
-  - Small: info@yellow-force.com (+ copy icon)
-  - Thumb: real photo, photo/insight-2 (lit hand on a keyboard; brighter than about-strip-1 at thumb size)
-  - aria-label: Under attack? Copy email address info@yellow-force.com. We answer 24/7.
-  - Hidden on phones (<= 767) like the reference; the menu's "Under attack?" row covers phones.
+- H0 (Axel, 2026-10-26, replaces "Fight AI. / With AI.", which could read as "we build AI slop"): Your Security. / Handled.
+- Coverage card (Axel, 2026-10-26, replaces the "Under attack?" card; the whole card is a link, no copy-email):
+  - Label (+ small arrow): ( Coverage )
+  - Line: 10 domains.
+  - Small, one sentence per line: Network to AI agents. / One team, 24/7.
+  - Thumb: real photo, photo/coverage-hero (light trails into the city, the Coverage page's own hero)
+  - aria-label: Coverage: 10 domains. Network to AI agents. One team, 24/7.
+  - -> /coverage/
+  - Hidden on phones (<= 767) like the reference. "Under attack?" stays in the menu, the FAQ and on Contact.
 
 ### 02 Statement (scroll-filled) + marquee
-- Statement (Axel, 2026-10-26, exact): We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7.
+- Statement (Axel, 2026-10-26, exact): We run your entire cybersecurity. Our AI and our experts stop every threat. 24/7.
 - Marquee (text only, no logos; repeat the set for the loop): Network · Endpoint · Cloud · Identity · Email · Apps and APIs · Data · AI agents · OT and IoT · Governance
 
 ### 03 What we stop. (2x2 cards)
@@ -113,7 +114,8 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Cards (name / meta line 1 / meta line 2 / one line / target):
   1. AI swarms / Threat 01 / AI and agents / Many AI agents hitting you at once, sharing what they find. We meet them with our own. / -> /insights/ai-swarms/
   2. Hijacked agents / Threat 02 / AI and agents / Your own AI turned against you through prompt injection and poisoned tools. / -> /coverage/ai-agents/
-  3. Deepfakes / Threat 03 / Email and identity / Flawless emails, cloned voices, fake executives on video. Caught before anyone acts. / -> /coverage/email/
+  3. Account takeover / Threat 03 / Identity and payments / Stolen or AI-guessed logins used to move money and data. We lock them out before anything leaves. / -> /coverage/identity/
+  (Axel, 2026-10-26: no deepfakes on Home; this card speaks to SMBs and payment companies.)
   4. Ransomware / Threat 04 / Data and devices / Steal, encrypt, extort. We cut it off at the first move and keep your backups out of reach. / -> /coverage/data/
 
 ### 04 Coverage table (replaces the live projects table)
@@ -121,10 +123,10 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Meta L: ( 10 / 10 domains )
 - Meta R: Watched 24/7
 - Row layout: domain (H3) / what it covers / bar (full, all live) with meta "Watched 24/7" and "AI + experts" / what we do (3 words)
-- Three rows, like the reference table (2026-10-26, round 3: was five): AI first, identity and email (where the deepfakes land), then one row for the other seven (the marquee above names all ten). On phones a row is just domain | bar. Keep each "covers" line on one line at 1440 (about 30 characters).
+- Three rows, like the reference table (2026-10-26, round 3: was five): AI first, identity and email (where takeovers and payment fraud land), then one row for the other seven (the marquee above names all ten). On phones a row is just domain | bar. Keep each "covers" line on one line at 1440 (about 30 characters).
 - Rows (domain / covers / what we do / target):
   1. AI and agents / Swarms, agents, models / Stop swarms, hijacks / -> /coverage/ai-agents/
-  2. Identity and email / Takeovers, phishing, deepfakes / Stop impersonation / -> /coverage/identity/
+  2. Identity and email / Takeovers, phishing, fraud / Stop impersonation / -> /coverage/identity/
   3. Seven more domains / Network, cloud, data and more / See all 10 domains / -> /coverage/
 
 ### 05 What we do. (numbered slider)
@@ -144,23 +146,24 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Label: ( The reel )
 - H2: Defense at / machine speed.
 - Island pill: dot + "YellowForce reel" + live San Francisco time (SF 12:00:00) + play/pause
-- Picture (live canvas, no video): a filmic long exposure graded like the generated images. Deep navy edges (#030B1C) rising to at most #0B2350 behind the light, a diagonal river of soft amber trails, a warm amber bloom with a white core, grain. No blue-white light, no crisp lines, no comet heads.
+- Picture (live canvas, no video): a filmic long exposure graded like the generated images. Deep navy edges (#030B1C) rising to at most #0B2350 behind the light, a diagonal river of amber trails, a warm amber bloom with a white core, grain. Axel, 2026-10-26: it must look sharp (the trails are crisp at every screen density; the softness lives only in the glow around them). No blue-white light, no comet heads.
 - Play/pause aria-label: Play reel / Pause reel
 
 ### 07 Why YellowForce. (dark quote card + 5 cards, in the client quotes slot)
 - H2: Why YellowForce.
 - Meta L: ( Five reasons )
 - Meta R: One team, every domain
+- Card layout (Axel, 2026-10-26: no tall empty cards): every card is a top block and a bottom block behind a hairline, about two thirds of the old height. Same layout on every card, no top/bottom flip.
 - Dark card (first slide):
   - Big figure: 24/7
-  - Line next to it: AI agents on every signal. Experts on every call. Day and night, in every domain.
+  - Line under it: AI agents on every signal. Experts on every call. Day and night, in every domain.
   - Bottom: AI and experts / on watch now (two lines), next to a row of 4 overlapping round chips in place of faces: three close crops of our amber light imagery (gen/about-2 burst, gen/threat-swarm vortex, gen/status trail) and a paper chip with the mark
-- Cards (text / label 1 / label 2). Alternate top and bottom like the original layout:
-  1. You don't get software to manage. You get a team that runs your security from A to Z. / ( 01 ) / Fully managed
-  2. Attackers use AI to move at machine speed. Our agents match it. Our experts make the call. / ( 02 ) / AI + experts
-  3. Attacks don't keep office hours. We watch, answer and respond 24/7, weekends included. / ( 03 ) / Always on
-  4. Network to cloud, inbox to AI agents. One team covers it all, so nothing falls between vendors. / ( 04 ) / Every domain
-  5. We plug into the tools and workflows you already have. Nothing to rip out, nothing to relearn. / ( 05 ) / On top of your stack
+- Cards (text / label 1 / label 2 / bottom line). Top: icon, title, label, then the text. Bottom (behind a hairline): the short supporting line.
+  1. You don't get software to manage. You get a team that runs your security from A to Z. / ( 01 ) / Fully managed / No alerts to sort, no tools to babysit. We tell you what happened and what we did.
+  2. Attackers use AI to move at machine speed. Our agents match it. Our experts make the call. / ( 02 ) / AI + experts / Agents sort every alert the moment it lands. A person signs off on every big decision.
+  3. Attacks don't keep office hours. We watch, answer and respond 24/7, weekends included. / ( 03 ) / Always on / Write to us at 3 a.m. on a Sunday. Someone answers.
+  4. Network to cloud, inbox to AI agents. One team covers it all, so nothing falls between vendors. / ( 04 ) / Every domain / All ten domains, one team. One place to write when something looks wrong.
+  5. We plug into the tools and workflows you already have. Nothing to rip out, nothing to relearn. / ( 05 ) / On top of your stack / We work in your chat and your ticket queue. Your team keeps its tools.
 
 ### 08 FAQ
 - H2: Before you let us in.
@@ -245,7 +248,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - Line: We attack you first, with AI and human red teamers, to find every way in before anyone else does.
   - Includes:
     - Continuous AI red teaming of apps, APIs and cloud
-    - Phishing and deepfake drills on your people
+    - Phishing and fake invoice drills on your people
     - Swarm-style attacks against your defenses
 - ( 005 ) Harden. (#harden)
   - Line: We fix what we find. Patch, reconfigure and retest until the hole is closed.
@@ -316,7 +319,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - 02 / Endpoint / Laptops, servers and phones, isolated the moment they turn.
   - 03 / Cloud / Misconfigurations fixed, leaked keys revoked, every change watched.
   - 04 / Identity / Account takeovers stopped, sessions killed, access kept tight.
-  - 05 / Email / Phishing, invoice fraud and deepfakes, caught before anyone acts.
+  - 05 / Email / Phishing, invoice fraud and payroll scams, caught before anyone acts.
   - 06 / Apps and APIs / Attacked by us first, fixed, then watched 24/7.
   - 07 / Data / Ransomware stopped, leaks blocked, backups kept safe.
   - 08 / AI agents / Swarms stopped, and your own agents kept on a leash.
@@ -449,7 +452,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 - Intro: Attackers don't break in anymore. They sign in. We guard every account, every session and every access right, 24/7.
 
 ### The threat.
-- Text: Stolen passwords, phished one-time codes, push attacks that spam approval requests until someone taps yes, help desk calls that talk an agent into a reset. Once an attacker holds a valid account, every tool trusts them. AI makes this cheap. It runs password spraying across thousands of accounts, writes convincing reset requests and clones a manager's voice for a call to IT. Session tokens stolen from browsers skip multi-factor checks entirely. And service accounts or API keys with too much power are the quietest way in.
+- Text: Stolen passwords, phished one-time codes, push attacks that spam approval requests until someone taps yes, help desk calls that talk an agent into a reset. Once an attacker holds a valid account, every tool trusts them. AI makes this cheap. It runs password spraying across thousands of accounts, writes convincing reset requests and tries leaked passwords on every sign-in, from payroll to payments. Session tokens stolen from browsers skip multi-factor checks entirely. And service accounts or API keys with too much power are the quietest way in.
 
 ### What we do.
 | Label | Text | Tile |
@@ -471,17 +474,17 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 ## Domain: Email
 
 - URL: /coverage/email/
-- Meta title: Email security: phishing, BEC and deepfakes | YellowForce
-- Meta description: AI-written phishing, invoice fraud and deepfake executives. We scan every inbox 24/7 and pull malicious emails everywhere at once.
+- Meta title: Email security: phishing, BEC and invoice fraud | YellowForce
+- Meta description: AI-written phishing, invoice fraud and fake payroll changes. We scan every inbox 24/7 and pull malicious emails everywhere at once.
 - Nav tagline: That's not your CEO
 
 ### Hero
 - Label: Coverage 05 · Email security · 24/7
 - H1: Email.
-- Intro: Email is still where most attacks start. Now the sender can be an AI that writes like your CEO and talks like your CFO.
+- Intro: Email is still where most attacks start. Now the sender can be an AI that writes like your CEO and bills like your vendor.
 
 ### The threat.
-- Text: Phishing used to be easy to spot. Not anymore. AI writes flawless messages in any language, studies your people through their public profiles and replies in real time like a human would. Business email compromise hijacks a real vendor thread and swaps the bank details on an invoice. Deepfake voice and video calls impersonate executives to rush a payment or a password reset. QR codes, shared document links and fake sign-in pages carry the attack past basic filters. One click or one wire transfer is enough.
+- Text: Phishing used to be easy to spot. Not anymore. AI writes flawless messages in any language, studies your people through their public profiles and replies in real time like a human would. Business email compromise hijacks a real vendor thread and swaps the bank details on an invoice. Spoofed messages from executives or HR rush a wire, a payroll change or a password reset. QR codes, shared document links and fake sign-in pages carry the attack past basic filters. One click or one wire transfer is enough.
 
 ### What we do.
 | Label | Text | Tile |
@@ -820,7 +823,7 @@ Security is now a speed contest. Attackers adopted AI the way they adopt anythin
 #### What changed on the other side.
 
 - **Scale.** One attacker with agents can run hundreds of tailored campaigns at once.
-- **Quality.** Lures are well written, in any language, and personal. Voices and faces can be cloned.
+- **Quality.** Lures are well written, in any language, and personal. A fake invoice looks exactly like the real one.
 - **Speed.** New flaws get tested against exposed systems soon after they go public.
 - **Adaptation.** When something gets blocked, agents retry with a different approach.
 - **Cost.** Each attempt costs almost nothing, so attackers go after more targets, including smaller ones.

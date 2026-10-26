@@ -11,9 +11,13 @@ Every agent working on this site reads this file first. When it conflicts with a
 - The company is very early. Some vagueness is fine. It must still look like a serious, premium, established-feeling firm.
 
 ## Axel's direct decisions on the live site (2026-10-26, do not undo)
-- Home statement is exactly: "We run your entire cybersecurity. Our AI and our experts stop every threat, AI swarms included. 24/7." Long claim sentences read badly: keep every claim short and plain.
-- Hero status card: no "Status: live", no "On watch 24/7. Every domain covered.", no radar graphic (feels AI-written). It is an "Under attack?" card: "Write to us now. We answer 24/7." + info@yellow-force.com, whole card copies the email, real photo thumbnail.
-- Hero title "Fight AI. / With AI." must never have overlapping lines (descender of "g" vs "W").
+- Home statement is exactly: "We run your entire cybersecurity. Our AI and our experts stop every threat. 24/7." (Oct 26: ", AI swarms included" removed everywhere: statement, meta, JSON-LD, footer.) Long claim sentences read badly: keep every claim short and plain.
+- Home hero streaks run continuously, like the reel (Oct 26: no settle to a still frame). Reduced motion still gets one static frame.
+- The reel must look sharp: trails drawn at device resolution, softness only in the glow (Oct 26: "very blurry").
+- No deepfakes on Home (Oct 26). Threat 03 is "Account takeover" (identity and payments), fit for SMBs and payment companies.
+- "Why YellowForce." cards: no tall empty cards (Oct 26). Each card has a top block and a filled bottom block (hairline + short supporting line); the dark 24/7 card leads.
+- Hero headline is "Your Security. / Handled." (Oct 26, replaces "Fight AI. / With AI.", which could read as "we build AI slop"). Title Case here only. Its two lines must never overlap, and it never breaks inside a line: capped to the row from 992px up so the card stays beside it, capped to the screen width on phones. The nav pill center shows the YellowForce wordmark on every page, no per-page taglines (Axel, Oct 26). OG image says "Your Security. Handled." + "Fully managed cybersecurity. 24/7."
+- Hero card is a Coverage card (Oct 26, replaces "Under attack?"): label "( Coverage )" + small arrow, "10 domains.", "Network to AI agents. / One team, 24/7." (one sentence per line, never broken inside), real photo thumbnail (photo/coverage-hero), whole card links to /coverage/, no copy-email. Hidden on phones. Still no "Status: live", no radar graphic. "Under attack?" stays in the menu, the FAQ and on Contact.
 - Axel likes the rest of the site as it is ("website is great"). Refine, do not redesign.
 
 ## Hard rules for copy

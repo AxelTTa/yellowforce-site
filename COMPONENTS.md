@@ -14,7 +14,6 @@ Own markup only. Never paste Vantra HTML, class names or SVGs.
 ---
 title: Services | YellowForce fully managed cybersecurity   (" | YellowForce" is appended if the name is missing)
 description: One sentence.
-tagline: Six practices, one team        (centered line in the nav pill)
 bodyclass: page-services
 css: /assets/css/pages/services.css     (optional, comma separated)
 ogtype: article                         (optional, insight posts)
@@ -30,9 +29,9 @@ sitemap: false                          (optional)
 - URLs: `services.html` -> `/services/`, `coverage/network.html` -> `/coverage/network/`, `404.html` -> `/404.html`. Files or folders starting with `_` are skipped.
 - Directives: `<!-- include:NAME -->` (src/partials), `<!-- inline:assets/logo/mark.svg -->` (inline SVG, decorative), `{{email}}`, `{{site_url}}`, `{{canonical}}`, `{{year}}`, any front-matter key.
 - Always root-relative URLs: `/assets/...`, `/coverage/`.
-- Partials (shared-ui lane owns them): `head`, `nav`, `cta`, `footer`, `toast`, `logo`, `logo-mark`.
-- Nav pill (`nav.html`): `.pill` (navy 90% glass) > `.pill__bar` (mark, page tagline, 4-dot toggle) + `.pill__drawer` rows `.pill__row > .pill__label + .pill__note + .pill__icon`. Row labels are Instrument Sans **600** (our variable font at 600 renders like the reference's static 500 cut, checked at 1440 and 390); arrow and copy icons are scaled 1.22 to the reference's arrow size. The pill stays fixed and visible while scrolling, like the reference (it does not hide over the FAQ).
-- Logo: `<!-- include:logo -->` = the full lockup (inline SVG mark + live-text wordmark "**Yellow**Force" in our Inter, `.logo > .logo__mark + .logo__word > .logo__yellow + .logo__force`). `<!-- include:logo-mark -->` = the mark only (`.logo__mark`, inlines `assets/logo/mark.svg`). Never put the wordmark in an `<img>` (SVG text cannot load our font). Colors come from tokens, so the same markup works everywhere: on paper amber front + navy back, "Yellow" navy, "Force" slate; inside `.on-dark` and the nav pill the back turns white, "Yellow" white, "Force" slate-light. Size it with `font-size` on the parent (the mark is 3.17em wide). After a mark swap run `../.venv/bin/python tools/make_icons.py` (favicons, manifest icons, OG image).
+- Partials (shared-ui lane owns them): `head`, `nav`, `cta`, `footer`, `toast`, `logo`, `logo-mark`, `logo-word`.
+- Nav pill (`nav.html`): `.pill` (navy 90% glass) > `.pill__bar` (mark, centered wordmark `.pill__word` from `logo-word`, the same on every page (Axel, Oct 26: no per-page taglines), 4-dot toggle) + `.pill__drawer` rows `.pill__row > .pill__label + .pill__note + .pill__icon`. Row labels are Instrument Sans **600** (our variable font at 600 renders like the reference's static 500 cut, checked at 1440 and 390); arrow and copy icons are scaled 1.22 to the reference's arrow size. The pill stays fixed and visible while scrolling, like the reference (it does not hide over the FAQ).
+- Logo: `<!-- include:logo -->` = the full lockup (inline SVG mark + live-text wordmark "**Yellow**Force" in our Inter, `.logo > .logo__mark + .logo__word > .logo__yellow + .logo__force`). `<!-- include:logo-mark -->` = the mark only (`.logo__mark`, inlines `assets/logo/mark.svg`). `<!-- include:logo-word -->` = the wordmark only (`.logo__word`; `logo` and the nav pill both use it, so it is defined once). Never put the wordmark in an `<img>` (SVG text cannot load our font). Colors come from tokens, so the same markup works everywhere: on paper amber front + navy back, "Yellow" navy, "Force" slate; inside `.on-dark` and the nav pill the back turns white, "Yellow" white, "Force" slate-light. Size it with `font-size` on the parent (the mark is 3.17em wide). After a mark swap run `../.venv/bin/python tools/make_icons.py` (favicons, manifest icons, OG image).
 - Bracket labels: write `( 24/7 )` with single spaces; the build widens the inner spacing automatically.
 
 ## 2. Images
