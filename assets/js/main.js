@@ -1,6 +1,6 @@
 /* YellowForce site behaviour. Plain ES module, no build step.
-   Globals from /assets/js/vendor: gsap, ScrollTrigger, SplitText, Lenis (all optional: the site works without them). */
-import { initStreaks } from "./streaks.js";
+   Globals from /assets/js/vendor: gsap, ScrollTrigger, SplitText, Lenis (all optional: the site works without them).
+   The canvas engine (streaks.js) is imported on demand, only on pages that have a canvas (Home, 404). */
 
 const EMAIL = "info@yellow-force.com";
 const root = document.documentElement;
@@ -8,6 +8,12 @@ const reduceMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
 const { gsap, ScrollTrigger, SplitText, Lenis } = window;
 const hasGsap = Boolean(gsap && ScrollTrigger);
 const EASE = "power2.inOut";
+// reveals: decelerating, so content is mostly there within the first 150 ms of its entrance
+const EASE_IN = "power3.out";
+// weak machine (same test as the canvas engine): native scrolling, no smoothing on top
+const WEAK = (() => {
+  try { return (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4; } catch (e) { return false; }
+})();
 let lenis = null;
 
 const motionOn = () => !reduceMQ.matches && root.classList.contains("motion") && hasGsap;
@@ -71,14 +77,15 @@ function initCopyEmail() {
     if (!btn) return;
     e.preventDefault();
     const urgent = btn.getAttribute("data-copy-email") === "urgent";
-    const ok = await copyText(EMAIL);
+    const addr = btn.getAttribute("data-email") || EMAIL; // legal pages point at privacy@ / security@
+    const ok = await copyText(addr);
     if (ok) {
-      toast("Email copied", EMAIL, urgent ? URGENT_NOTE : "");
+      toast("Email copied", addr, urgent ? URGENT_NOTE : "");
       btn.classList.add("is-copied");
       setTimeout(() => btn.classList.remove("is-copied"), 2400);
     } else {
       // Clipboard blocked: show and select the address so the user can copy it.
-      toast("Press Cmd+C or Ctrl+C to copy", EMAIL, urgent ? URGENT_NOTE : "", 9000);
+      toast("Press Cmd+C or Ctrl+C to copy", addr, urgent ? URGENT_NOTE : "", 9000);
       const own = btn.querySelector("[data-email-text]");
       setTimeout(() => selectNode(own || document.querySelector("[data-toast-value]")), 40);
     }
@@ -94,7 +101,7 @@ function initMediaFallback() {
   });
 }
 
-/* ---------- nav pill ---------- */
+/* ---------- nav bar + menu card (src/partials/nav.html) ---------- */
 function initNav() {
   const shell = document.querySelector("[data-nav-shell]");
   if (!shell) return;
@@ -136,14 +143,16 @@ function initNav() {
       if (scrim) scrim.hidden = false;
       if (lenis) lenis.stop();
       document.addEventListener("keydown", onKey);
-      // focus before the rows fade in (rows tween opacity only, so they stay focusable)
-      const first = drawer.querySelector("a[href], button");
+      // focus the first visible row before the rows fade in (rows tween opacity only, so they stay focusable)
+      const first = focusables().find((el) => drawer.contains(el));
       if (first) first.focus({ preventScroll: true });
       if (motionOn()) {
         gsap.killTweensOf([drawer, scrim, ...rows]);
-        gsap.fromTo(drawer, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE });
-        gsap.fromTo(rows, { opacity: 0, y: emOf(drawer), scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: EASE, stagger: 0.06 });
-        if (scrim) gsap.fromTo(scrim, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45, ease: EASE });
+        gsap.fromTo(drawer, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE_IN });
+        // rows the bar already shows are display:none in the card from 768px up: no stagger slot for them
+        const shown = [...rows].filter((el) => el.offsetParent !== null);
+        gsap.fromTo(shown, { opacity: 0, y: emOf(drawer), scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: EASE_IN, stagger: 0.05 });
+        if (scrim) gsap.fromTo(scrim, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: EASE_IN });
       }
     } else {
       if (lenis) lenis.start();
@@ -156,8 +165,8 @@ function initNav() {
       };
       if (motionOn()) {
         gsap.killTweensOf([drawer, scrim, ...rows]);
-        gsap.to(drawer, { height: 0, duration: 0.45, ease: EASE, onComplete: done });
-        if (scrim) gsap.to(scrim, { autoAlpha: 0, duration: 0.45, ease: EASE });
+        gsap.to(drawer, { height: 0, duration: 0.4, ease: EASE_IN, onComplete: done });
+        if (scrim) gsap.to(scrim, { autoAlpha: 0, duration: 0.35, ease: EASE_IN });
       } else {
         done();
       }
@@ -185,11 +194,11 @@ function initNav() {
       if (exp) {
         panel.hidden = false;
         if (motionOn()) {
-          gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE });
-          gsap.fromTo(links, { opacity: 0, y: emOf(panel) * 0.5 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE, stagger: 0.04 });
+          gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE_IN });
+          gsap.fromTo(links, { opacity: 0, y: emOf(panel) * 0.5 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE_IN, stagger: 0.04 });
         }
       } else if (motionOn()) {
-        gsap.to(panel, { height: 0, duration: 0.45, ease: EASE, onComplete: () => { panel.hidden = true; panel.style.height = ""; } });
+        gsap.to(panel, { height: 0, duration: 0.4, ease: EASE_IN, onComplete: () => { panel.hidden = true; panel.style.height = ""; } });
       } else {
         panel.hidden = true;
       }
@@ -216,11 +225,11 @@ function initFaq() {
           gsap.killTweensOf([panel, inner]);
           if (open) {
             panel.hidden = false;
-            gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE, onComplete: refreshSoon });
-            gsap.fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: EASE });
+            gsap.fromTo(panel, { height: 0 }, { height: "auto", duration: 0.45, ease: EASE_IN, onComplete: refreshSoon });
+            gsap.fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: EASE_IN });
           } else {
-            gsap.to(inner, { opacity: 0, duration: 0.3, ease: EASE });
-            gsap.to(panel, { height: 0, duration: 0.45, ease: EASE, onComplete: () => { panel.hidden = true; panel.style.height = ""; refreshSoon(); } });
+            gsap.to(inner, { opacity: 0, duration: 0.25, ease: EASE_IN });
+            gsap.to(panel, { height: 0, duration: 0.4, ease: EASE_IN, onComplete: () => { panel.hidden = true; panel.style.height = ""; refreshSoon(); } });
           }
         } else {
           panel.hidden = !open;
@@ -351,31 +360,150 @@ function initCarousels() {
 function initClock() {
   const nodes = document.querySelectorAll("[data-clock]");
   if (!nodes.length) return;
-  let fmt;
-  try {
-    fmt = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
-  } catch (e) {
-    return;
-  }
+  // the time-zone formatter is costly to build (about 2 ms, 11 ms at 6x CPU): made when a clock first shows
+  let fmt = null;
   const tick = () => {
+    if (fmt === null) {
+      try {
+        fmt = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+      } catch (e) {
+        fmt = false;
+      }
+    }
+    if (!fmt) return;
     const s = `SF ${fmt.format(new Date())}`;
     nodes.forEach((n) => { n.textContent = s; });
   };
-  tick();
-  setInterval(tick, 1000);
+  // tick only while a clock is on screen (it lives in the reel, far down Home); it reads "Live" until then
+  let timer = 0;
+  const run = (on) => {
+    if (on && !timer) { tick(); timer = setInterval(tick, 1000); }
+    else if (!on && timer) { clearInterval(timer); timer = 0; }
+  };
+  if ("IntersectionObserver" in window) {
+    const seen = new Set();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) seen.add(e.target); else seen.delete(e.target); });
+      run(seen.size > 0);
+    }, { rootMargin: "50% 0px" });
+    nodes.forEach((n) => io.observe(n));
+  } else {
+    run(true);
+  }
+}
+
+/* ---------- canvas engine: loaded and started only when needed ---------- */
+function initCanvases() {
+  const all = [...document.querySelectorAll("canvas[data-streaks]")];
+  if (!all.length) return;
+  let engine = null;
+  const load = () => engine || (engine = import("./streaks.js"));
+  const start = (canvas) => {
+    if (canvas.dataset.streaksOn) return;
+    canvas.dataset.streaksOn = "1";
+    load().then(({ initStreaks }) => {
+      initStreaks([canvas], { reduced: reduceMQ.matches });
+      // shown only once the engine has sized it (the canvas is hidden until then: no layout shift from its crop)
+      canvas.classList.add("is-on");
+    }).catch(() => { /* engine failed: the static image stays */ });
+  };
+  const vh = window.innerHeight;
+  const near = [], far = [];
+  all.forEach((c) => {
+    const r = (c.parentElement || c).getBoundingClientRect();
+    (r.top < vh * 1.5 ? near : far).push(c);
+  });
+  // first screen: start after the first frame is on screen, so setting up the canvas never delays first paint
+  if (near.length) requestAnimationFrame(() => setTimeout(() => near.forEach(start), 0));
+  if (!far.length) return;
+  if (!("IntersectionObserver" in window)) { far.forEach(start); return; }
+  // further down (the reel): fetch the engine early, set the canvas up in idle time about two screens before it
+  // scrolls in (its set-up is one block of script: never in the middle of a scroll frame if it can be helped)
+  const idle = window.requestIdleCallback ? (fn) => window.requestIdleCallback(fn, { timeout: 400 }) : (fn) => setTimeout(fn, 1);
+  setTimeout(load, 1500);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      far.filter((c) => (c.parentElement || c) === e.target).forEach((c) => idle(() => start(c)));
+    });
+  }, { rootMargin: "200% 0px" });
+  far.forEach((c) => io.observe(c.parentElement || c));
+}
+
+/* ---------- prefetch internal pages on hover, focus or touch, so the next page opens at once ---------- */
+function initPrefetch() {
+  const conn = navigator.connection;
+  if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""))) return;
+  const done = new Set([location.pathname]);
+  const pageOf = (target) => {
+    const a = target && target.closest ? target.closest("a[href]") : null;
+    if (!a || a.target === "_blank" || a.hasAttribute("download")) return null;
+    let u;
+    try { u = new URL(a.href, location.href); } catch (e) { return null; }
+    if (u.origin !== location.origin || !/(\/|\.html)$/.test(u.pathname)) return null;
+    return done.has(u.pathname) ? null : u.pathname;
+  };
+  const add = (path) => {
+    if (!path || done.has(path)) return;
+    done.add(path);
+    const l = document.createElement("link");
+    l.rel = "prefetch";
+    l.href = path;
+    document.head.appendChild(l);
+  };
+  // a mouse resting on a link or keyboard focus staying on one for 65 ms (not every link the pointer or Tab passes);
+  // a press or a touch at once
+  let timer = 0;
+  const soon = (e) => {
+    const path = pageOf(e.target);
+    clearTimeout(timer);
+    if (path) timer = setTimeout(() => add(path), 65);
+  };
+  const cancel = () => clearTimeout(timer);
+  document.addEventListener("pointerover", (e) => { if (e.pointerType === "mouse") soon(e); }, { passive: true });
+  document.addEventListener("pointerout", cancel, { passive: true });
+  document.addEventListener("focusin", soon);
+  document.addEventListener("focusout", cancel);
+  document.addEventListener("pointerdown", (e) => add(pageOf(e.target)), { passive: true });
+  document.addEventListener("touchstart", (e) => add(pageOf(e.target)), { passive: true });
 }
 
 /* ---------- smooth scroll ---------- */
+/* Lenis only where it helps: a mouse or trackpad on a capable machine. Touch screens (Lenis leaves touch native
+   anyway) and weak machines keep the browser's own scrolling, which runs off the main thread and never stutters.
+   lerp .15 (Lenis default .1): a wheel tick lands in about 0.25 s instead of 0.4 s, still smooth.
+   If smooth-scroll frames run long anyway (median over 25 ms twice in a row), it hands back to native scrolling. */
 function initLenis() {
   if (!Lenis) return;
+  let touchOnly = false;
+  try { touchOnly = window.matchMedia("(hover: none) and (pointer: coarse)").matches; } catch (e) { /* keep false */ }
+  if (touchOnly || WEAK) return;
   lenis = new Lenis({
     autoRaf: false,
-    lerp: 0.1,
+    lerp: 0.15,
     anchors: true,
     prevent: (node) => Boolean(node && node.closest && node.closest("[data-lenis-prevent]")),
   });
   lenis.on("scroll", ScrollTrigger.update);
-  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  const win = [];
+  let slow = 0;
+  const tick = (time, delta) => {
+    if (!lenis) return;
+    lenis.raf(time * 1000);
+    if (lenis.isScrolling !== "smooth" || document.hidden) return;
+    win.push(delta);
+    if (win.length < 30) return;
+    win.sort((a, b) => a - b);
+    slow = win[15] > 25 ? slow + 1 : 0;
+    win.length = 0;
+    if (slow >= 2) {
+      gsap.ticker.remove(tick);
+      lenis.destroy();
+      lenis = null;
+    }
+  };
+  gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
 }
 
@@ -387,10 +515,19 @@ function spokenText(el) {
   return c.textContent.replace(/\s+/g, " ").trim();
 }
 
+/* Reveals start the moment an element's top enters the viewport (was 92% / 95% down: a block peeking at the bottom
+   edge stayed blank) and are short: .05 s delay (was .15), .5 s decelerating (was .45 s power2.inOut, whose slow
+   start made content feel late), list items .08 s apart (was .15). The first screen is not here: it plays from CSS
+   (base.css [data-intro]). */
+const IN = { delay: 0.05, duration: 0.5, ease: EASE_IN, start: "top bottom" };
+// a trigger on an element that is itself moved down by its from-state is measured there: start that much earlier,
+// so it fires the moment its real top edge enters (a block peeking in at the bottom never stays blank)
+const startAt = (px) => `top bottom+=${Math.ceil(px)}`;
+
 function revealLines(el) {
   gsap.set(el, { opacity: 1 });
   if (!SplitText) {
-    gsap.from(el, { opacity: 0, y: emOf(el) * 0.25, duration: 0.45, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+    gsap.from(el, { opacity: 0, y: emOf(el) * 0.25, duration: IN.duration, ease: IN.ease, delay: IN.delay, scrollTrigger: { trigger: el, start: startAt(emOf(el) * 0.25), once: true } });
     return;
   }
   const label = spokenText(el);
@@ -403,11 +540,11 @@ function revealLines(el) {
       return gsap.from(self.lines, {
         opacity: 0,
         y: emOf(el) * 0.25,
-        duration: 0.45,
-        ease: EASE,
-        delay: 0.15,
+        duration: IN.duration,
+        ease: IN.ease,
+        delay: IN.delay,
         stagger: 0.02,
-        scrollTrigger: { trigger: el, start: "top 92%", once: true },
+        scrollTrigger: { trigger: el, start: IN.start, once: true },
       });
     },
   });
@@ -426,45 +563,77 @@ function revealStatement(el) {
         opacity: 1,
         ease: "none",
         stagger: 0.1,
-        scrollTrigger: { trigger: el, start: "top bottom", end: "bottom 30%", scrub: 0.8 },
+        scrollTrigger: { trigger: el, start: "top bottom", end: "bottom 30%", scrub: 0.4 },
       });
     },
   });
 }
 
 function initReveals() {
-  document.querySelectorAll('[data-reveal="lines"]').forEach(revealLines);
-  document.querySelectorAll('[data-reveal="statement"]').forEach(revealStatement);
+  const sel = (kind) => `[data-reveal="${kind}"]:not([data-intro])`;
+  // data-delay is a choreography offset inside a group; it is halved like the CSS first screen's
+  const delayOf = (el, base) => (el.dataset.delay ? parseFloat(el.dataset.delay) / 2 : base);
+  const jobs = [];
+  const add = (selector, fn) => document.querySelectorAll(selector).forEach((el) => jobs.push([el, () => fn(el)]));
 
-  document.querySelectorAll('[data-reveal="fade"], [data-reveal="status"]').forEach((el) => {
-    const delay = parseFloat(el.dataset.delay || (el.dataset.reveal === "status" ? 0.54 : 0.15));
-    gsap.fromTo(el, { opacity: 0, y: emOf(el) * 0.5 }, { opacity: 1, y: 0, duration: 0.45, ease: EASE, delay, scrollTrigger: { trigger: el, start: "top 95%", once: true } });
+  add(sel("lines"), revealLines);
+  add('[data-reveal="statement"]', revealStatement);
+
+  add(`${sel("fade")}, ${sel("status")}`, (el) => {
+    const delay = delayOf(el, el.dataset.reveal === "status" ? 0.27 : IN.delay);
+    const em = emOf(el);
+    gsap.fromTo(el, { opacity: 0, y: em * 0.5 }, { opacity: 1, y: 0, duration: IN.duration, ease: IN.ease, delay, scrollTrigger: { trigger: el, start: startAt(em * 0.5), once: true } });
   });
 
-  document.querySelectorAll('[data-reveal="frame"]').forEach((el) => {
-    gsap.fromTo(el, { opacity: 0, scale: 0.95, y: emOf(el) * 2 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: EASE, delay: 0.15, scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+  add(sel("frame"), (el) => {
+    const shift = emOf(el) * 2 + el.offsetHeight * 0.025;
+    gsap.fromTo(el, { opacity: 0, scale: 0.95, y: emOf(el) * 2 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: IN.ease, delay: IN.delay, scrollTrigger: { trigger: el, start: startAt(shift), once: true } });
   });
 
   // opacity only (never visibility): hidden-until-scrolled content must stay reachable by Tab and screen readers
-  document.querySelectorAll('[data-reveal="stagger"]').forEach((list) => {
+  add(sel("stagger"), (list) => {
     const items = [...list.children];
     gsap.set(list, { opacity: 1 });
     gsap.fromTo(items, { opacity: 0, y: emOf(list) * 0.5 }, {
-      opacity: 1, y: 0, duration: 0.45, ease: EASE, delay: parseFloat(list.dataset.delay || 0.15), stagger: parseFloat(list.dataset.stagger || 0.15),
-      scrollTrigger: { trigger: list, start: "top 92%", once: true },
+      opacity: 1, y: 0, duration: IN.duration, ease: IN.ease, delay: delayOf(list, IN.delay), stagger: parseFloat(list.dataset.stagger || 0.08),
+      scrollTrigger: { trigger: list, start: IN.start, once: true },
     });
   });
 
   // gauges fill one row after the other over their navy-11 track, then each gets a slow light pass (CSS .is-live)
-  document.querySelectorAll("[data-bars]").forEach((wrap) => {
+  add("[data-bars]", (wrap) => {
     const bars = [...wrap.querySelectorAll(".ledger__fill")];
     bars.forEach((b, i) => b.style.setProperty("--i", i));
     gsap.fromTo(bars, { scaleX: 0 }, {
-      scaleX: 1, duration: 1.2, ease: "power2.inOut", stagger: 0.16, delay: 0.35,
-      scrollTrigger: { trigger: wrap, start: "top 80%", once: true },
+      scaleX: 1, duration: 1.2, ease: "power2.inOut", stagger: 0.16, delay: 0.15,
+      scrollTrigger: { trigger: wrap, start: "top 90%", once: true },
       onComplete: () => bars.forEach((b) => b.classList.add("is-live")),
     });
   });
+
+  /* Set up lazily: what is on screen or within 3/4 of a screen below it now (or already scrolled past), the rest when
+     it comes within 3/4 of a screen. Splitting every heading and building every trigger at once was the biggest
+     block of script at load (about 15 ms on a fast laptop, 80 to 95 ms at 6x CPU). The hidden state is CSS until a
+     reveal is set up, so nothing flashes. Reads first (all boxes), then writes. */
+  const vh = window.innerHeight;
+  const now = [], later = [];
+  jobs.forEach((job) => (job[0].getBoundingClientRect().top < vh * 1.75 ? now : later).push(job));
+  now.forEach(([, fn]) => fn());
+  if (!later.length) return;
+  if (!("IntersectionObserver" in window)) { later.forEach(([, fn]) => fn()); return; }
+  // one element can carry two reveals (a ledger is a stagger list with bars)
+  const pending = new Map();
+  later.forEach(([el, fn]) => { if (!pending.has(el)) pending.set(el, []); pending.get(el).push(fn); });
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting || !pending.has(e.target)) return;
+      io.unobserve(e.target);
+      const fns = pending.get(e.target);
+      pending.delete(e.target);
+      fns.forEach((fn) => fn());
+    });
+  }, { rootMargin: "0px 0px 75% 0px" });
+  pending.forEach((fns, el) => io.observe(el));
 }
 
 function showAll() {
@@ -480,7 +649,8 @@ function init() {
   initFaq();
   initCarousels();
   initClock();
-  initStreaks(document.querySelectorAll("canvas[data-streaks]"), { reduced: reduceMQ.matches });
+  initCanvases();
+  initPrefetch();
 
   if (motionOn()) {
     try {
@@ -488,8 +658,10 @@ function init() {
       if (SplitText) gsap.registerPlugin(SplitText);
       initLenis();
       const run = () => { initReveals(); root.classList.add("ready"); ScrollTrigger.refresh(); };
+      // headings split by line once the fonts are in (SplitText re-splits by itself if they land later); the first
+      // screen does not wait for this (CSS), so the cap is short
       if (document.fonts && document.fonts.ready) {
-        Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1200))]).then(run);
+        Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 500))]).then(run);
       } else {
         run();
       }

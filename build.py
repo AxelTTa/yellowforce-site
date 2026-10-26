@@ -26,10 +26,13 @@ Directives inside pages and partials:
     <!-- inline:assets/logo/mark.svg -->   inline an SVG file (decorative: aria-hidden)
     {{key}}                           front-matter value (also: site_url, canonical, year, email)
     <img src="/assets/img/gen/x.webp" data-variants sizes="50vw" alt="">
-                                      expands srcset from x-800.webp, x-1600.webp, x.webp (only files that exist),
+                                      expands srcset from x-800.webp, x-1200.webp, x-1600.webp, x.webp (only files
+                                      that exist; tools/make_1200.py makes the 1200 ones),
                                       adds loading="lazy" decoding="async" unless loading is set
     data-nav-path="/services/"        on a nav link: build adds is-current + aria-current="page" on the
                                       current page, is-section on its ancestors
+    data-reveal in the first <section> gets data-intro + --in-d: the first screen plays from CSS (base.css), not JS
+    the first <img fetchpriority="high"> is preloaded from <head> (<!--lcp-preload--> in head.html)
 
 Output: pretty URLs. services.html -> docs/services/index.html, coverage/network.html ->
 docs/coverage/network/index.html, index.html -> docs/index.html, 404.html -> docs/404.html.
@@ -96,7 +99,7 @@ BANNED = [
     (r"\bSaaS\b", "'SaaS'"),
     (r"\bsign[ -]?up\b", "'sign up'"),
     (r"\bfree trial\b", "'free trial'"),
-    (r"\bdashboard\b", "'dashboard'"),
+    # "dashboard" is allowed since 2026-10-26: every client gets a private client dashboard (BRIEF.md exception)
     (r"\blog ?in\b", "'log in'"),
     (r"\bPalantir\b", "'Palantir'"),
     (r"\bontology\b", "'ontology'"),
@@ -209,7 +212,7 @@ def expand_images(text: str, name: str) -> str:
             return tag.replace(" data-variants", "")
         src = src_m.group(1)
         stem, ext = src.rsplit(".", 1)
-        cands = [(f"{stem}-800.{ext}", 800), (f"{stem}-1600.{ext}", 1600), (src, 2400)]
+        cands = [(f"{stem}-800.{ext}", 800), (f"{stem}-1200.{ext}", 1200), (f"{stem}-1600.{ext}", 1600), (src, 2400)]
         found = [(u, w) for (u, w) in cands if (ROOT / u.lstrip("/")).exists()]
         new = tag.replace(" data-variants", "")
         if found:
@@ -270,6 +273,56 @@ def space_brackets(text: str) -> str:
     return "".join(out)
 
 
+INTRO_DELAY = {"lines": .15, "fade": .15, "status": .54, "frame": .15, "stagger": .15}  # main.js defaults
+
+
+def mark_intro(body: str) -> str:
+    """Reveals in the page's first <section> (the hero) play from CSS as soon as the fonts are in (base.css
+    [data-intro]), not after the JS bundle: data-intro + --in-d (half the JS delay) [+ --in-st for a stagger]."""
+    m = re.search(r"<section\b.*?</section>", body, re.S)
+    if not m:
+        return body
+
+    def rep(t: re.Match) -> str:
+        tag = t.group(0)
+        kind = re.search(r'\sdata-reveal="([^"]*)"', tag).group(1)
+        if kind not in INTRO_DELAY:
+            return tag
+        dm = re.search(r'\sdata-delay="([\d.]+)"', tag)
+        style = f"--in-d: {(float(dm.group(1)) if dm else INTRO_DELAY[kind]) / 2:.3g}s"
+        sm = re.search(r'\sdata-stagger="([\d.]+)"', tag)
+        if sm:
+            style += f"; --in-st: {float(sm.group(1)):.3g}s"
+        if ' style="' in tag:
+            tag = tag.replace(' style="', f' style="{style}; ', 1)
+        else:
+            end = -2 if tag.endswith("/>") else -1
+            tag = tag[:end] + f' style="{style}"' + tag[end:]
+        return tag.replace(" data-reveal=", " data-intro data-reveal=", 1)
+
+    sec = re.sub(r'<[a-zA-Z][^>]*\sdata-reveal="[^"]*"[^>]*>', rep, m.group(0))
+    return body[:m.start()] + sec + body[m.end():]
+
+
+def lcp_preload(doc: str) -> str:
+    """The first-screen image (the first <img fetchpriority="high"> in <main>) is preloaded from <head> (same
+    srcset/sizes, so it is one download): it starts with the stylesheets instead of after them.
+    Replaces the <!--lcp-preload--> marker in head.html."""
+    main = doc.find("<main")
+    img = re.search(r'<img\b[^>]*\sfetchpriority="high"[^>]*>', doc[main:]) if main > -1 else None
+    link = ""
+    if img:
+        tag = img.group(0)
+        attr = lambda n: (re.search(rf'\s{n}="([^"]*)"', tag) or [None, None])[1]
+        srcset, sizes, src = attr("srcset"), attr("sizes"), attr("src")
+        if srcset:
+            link = (f'<link rel="preload" as="image" imagesrcset="{srcset}" imagesizes="{sizes or "100vw"}" '
+                    f'fetchpriority="high">')
+        elif src:
+            link = f'<link rel="preload" as="image" href="{src}" fetchpriority="high">'
+    return doc.replace("<!--lcp-preload-->\n", link + "\n" if link else "", 1)
+
+
 def css_links(css: str) -> str:
     out = []
     for href in [c.strip() for c in css.split(",") if c.strip()]:
@@ -316,11 +369,12 @@ def build_page(src: Path, dev: bool) -> tuple[str, Path, dict]:
     if ctx.get("layout", "default") == "bare":
         doc = body
     else:
-        doc = LAYOUT.replace("{{__content__}}", body)
+        doc = LAYOUT.replace("{{__content__}}", mark_intro(body))
     doc = expand_includes(doc)
     doc = fill_vars(doc, ctx, name)
     doc = expand_inline_svg(doc)
     doc = expand_images(doc, name)
+    doc = lcp_preload(doc)
     doc = mark_nav(doc, url_path)
     doc = space_brackets(doc)
     lint(doc, name)

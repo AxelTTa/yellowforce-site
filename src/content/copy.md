@@ -25,6 +25,13 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Allowed short variants: "Your Security. Handled." (Home hero, Oct 26), "Fully managed, 24/7" (the menu's Home row, Oct 26), "Fight AI with AI" (the insight of that name only, no longer the hero or the menu), "Fully managed, A to Z", "every threat", "AI agents and cyber experts", "one team", "24/7".
 - Order matters: what we do (run all of it), who does it (our AI and our experts) and what they stop (every threat), when (24/7).
 
+## Client dashboard (Axel, 2026-10-26)
+
+- Every client gets a private dashboard: an overview of what's going on, the key information and a direct line to our team. It is there if they want it.
+- It supports the service, it is not the product. Say "your private dashboard" or "client dashboard". Never "platform", "log in", "sign up", and never imply the client has to run anything.
+- Day to day we still talk wherever the client prefers: Slack, Teams, email, phone or WhatsApp.
+- Where it appears: Home FAQ (Q1 + Q2), Services "How we work" line, Contact "What happens next" step 03, About "Our approach". One mention per place, no more.
+
 ## Global
 
 ### Toast (copy email)
@@ -167,19 +174,21 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 
 ### 08 FAQ
 - H2: Before you let us in.
-- Six questions (the reference has five; "Who does the work?" and "What does it cost?" were cut, the statement and the reasons cards answer the first).
+- Seven questions, no more (the reference has five; "Who does the work?" and "What does it cost?" were cut, the statement and the reasons cards answer the first). Axel, 2026-10-26: say clearly that every client gets a private dashboard (overview, key information, direct line to the team) while we talk on whatever channel they prefer.
 - Q/A:
   1. Q: Is this software?
-     A: No. We're a team, not a tool. We bring our own AI, run your security for you and answer 24/7.
-  2. Q: What do you cover?
-     A: All of it. Network, devices, cloud, identity, email, apps, data, AI agents, OT and compliance, with one team.
-  3. Q: Do we have to replace our tools?
+     A: No. We're a team, not a tool. We bring our own AI and run your security for you, 24/7. You get a private dashboard to see the work, not to do it.
+  2. Q: Will we see what you're doing?
+     A: Yes, whenever you want. Every client gets a private dashboard: what's going on, the key information and a direct line to our team. Day to day, we talk wherever you prefer: Slack, Teams, email, phone or WhatsApp.
+  3. Q: What do you cover?
+     A: All of it. Network, devices, cloud, identity, email, apps, data, AI agents, OT, IoT and governance, with one team.
+  4. Q: Do we have to replace our tools?
      A: No. We connect to what you already run and work on top of your workflows, your chat and your tickets.
-  4. Q: How fast can you start?
+  5. Q: How fast can you start?
      A: Right away. We go in, connect your systems and start defending from day one.
-  5. Q: Where does our data stay?
+  6. Q: Where does our data stay?
      A: In your environment wherever possible. We take only the access the job needs and log every action we take.
-  6. Q: We're under attack right now.
+  7. Q: We're under attack right now.
      A: Write to us now. Copy our email, put URGENT in the subject and send. We answer 24/7, nights and weekends included.
      Button: Copy email [copy-email, Under attack toast]
 
@@ -272,6 +281,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
   - 02 / Connect. / We plug into every system you run: cloud, devices, identity, email, code, logs and chat. Your workflows stay. / Step 02 / Day one
   - 03 / Defend. / Our AI agents and experts watch, hunt and respond across every domain. Attacks get shut down as they start. / Step 03 / 24/7
   - 04 / Improve. / We attack, fix and retest without stopping, so your defense gets harder to break every day. / Step 04 / Continuous
+- Line under the steps (label left, text right): ( Your dashboard ) / You see it all in your private dashboard: what's going on, the key information and a direct line to our team. Day to day, we talk wherever you prefer.
 
 ### 06 On top of your stack.
 - H2: On top of your stack.
@@ -292,7 +302,7 @@ If a line does not fit a layout, flag it to the copy lane instead of editing it 
 - Closing line: Running something else? If it has an API or writes logs, we can connect it. [copy-email] "Tell us what you run"
 
 ### 07 CTA band + footer
-- No FAQ on this page (2026-10-26, page length): Home carries the FAQ, incl. "Is this software?".
+- No FAQ on this page (2026-10-26, page length): Home carries the FAQ, incl. "Is this software?" and "Will we see what you're doing?" (the private dashboard).
 - Global.
 
 ---
@@ -676,7 +686,7 @@ Same skeleton for all ten, in this order: Hero (label, H1, intro) / The threat. 
 
 ### 02 Our approach. (+ 3 vertical images)
 - H2: Our approach.
-- Text: We don't sell you a tool and leave. We go inside your company, put our AI agents and cyber experts in your environment and connect to every system you already run. We work on top of your workflows, in your chat and your tickets, and run your security from A to Z, 24/7. Attackers now fight with AI. So do we, with people in charge of it.
+- Text: We don't sell you a tool and leave. We go inside your company, put our AI agents and cyber experts in your environment and connect to every system you already run. We work on top of your workflows, in your chat and your tickets, and run your security from A to Z, 24/7. You see it all in your private dashboard. Attackers now fight with AI. So do we, with people in charge of it.
 
 ### 03 Values (sticky stack, 4 rows)
 - ( Value 01 ) Go in, not around.
@@ -923,7 +933,7 @@ Doing this yourself means hiring specialists across ten areas and staffing them 
 - Bullets:
   1. We reply fast, day or night. A real expert, not a bot.
   2. We get on a call and look at what you run, the same day if you want.
-  3. We go in, connect and start defending. Coverage from day one.
+  3. We go in, connect and start defending from day one. You follow it all in your private dashboard.
 
 ### 03 Under attack?
 - Label: ( Urgent )

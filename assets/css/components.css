@@ -61,8 +61,28 @@
   border-radius: 50%;
   background: var(--amber);
 }
-.dot--live { animation: dot-pulse 2.4s var(--ease-out) infinite; }
+/* the live pulse is a ring on its own layer (transform + opacity: runs on the compositor). The old box-shadow pulse
+   repainted on the main thread every frame, forever, on every page (the footer has one). Same look: a 55% amber
+   disc grows 7px past a 6px dot and fades out over the first 70% of 2.4s. */
+.dot--live { position: relative; }
+.dot--live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--amber-55);
+  opacity: 0;
+  pointer-events: none;
+  animation: dot-ring 2.4s var(--ease-out) infinite;
+}
+@keyframes dot-ring {
+  0% { opacity: 1; transform: scale(1); }
+  70% { opacity: 0; transform: scale(3.33); }
+  100% { opacity: 0; transform: scale(1); }
+}
 .dot--ring { box-shadow: 0 0 0 1.5px var(--navy); }
+/* the old pulse overrode the ring while it ran, so a live ring dot showed no ring */
+@media (prefers-reduced-motion: no-preference) { .dot--live.dot--ring { box-shadow: none; } }
 @keyframes dot-pulse {
   0% { box-shadow: 0 0 0 0 var(--amber-55); }
   70% { box-shadow: 0 0 0 7px var(--amber-00); }
@@ -285,8 +305,26 @@
 @media (max-width: 767px) { .mail--xl { font-size: var(--fs-6xl); } }
 @media (max-width: 479px) { .mail--xl { font-size: var(--fs-3xl); } }
 
-/* ===== Floating pill nav ===== */
+/* ===== Floating nav (src/partials/nav.html) =====
+   Axel's pick (Oct 26, qa/nav/JUDGE.md): one compact glass bar, centered. The kit lockup, the four main links
+   (768px up: the bar is 611px wide there, so tablets get the same bar as desktop), a white Talk to us (the
+   site's btn--light) and a square 4-dot menu button. The full menu drops as a card of its own under the right
+   end of the bar and skips the rows the bar already shows. Under 768: lockup, Talk to us and the square,
+   across the gutters on phones (under 480). Under 360px: lockup and "Menu"; Talk to us moves to the menu.
+   Type floors: the bar 13px, the menu 14px (15px on phones), so neither shrinks to unreadable on tablets.
+   Glass: navy at 96% with a faint top highlight; over paper it stays brand navy, over the hero a dark chip.
+   Amber is light, not paint: at rest only the mark and the 4px current-page square; the Talk to us chip on
+   hover and the menu dots when open. No amber fills. */
 .topbar {
+  --page-fs: calc(var(--fluid-container) / (1440 / var(--fluid-unit)));
+  --nav-fs: max(var(--page-fs), 13px);
+  --nav-h: calc(var(--nav-fs) * 2.625);       /* inner controls, 39px at 1440 */
+  --nav-pad: calc(var(--nav-fs) * .375);      /* bar padding around them */
+  --nav-r: 14px;                              /* outer radius = 8px inner + 6px padding */
+  --nav-r-in: 8px;
+  --nav-glass: linear-gradient(180deg, rgba(12, 34, 74, .96), rgba(7, 27, 62, .96));
+  --nav-edge: rgba(244, 245, 247, .08);       /* 12% drew a washed ring over paper */
+  --nav-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 14px 34px -16px rgba(3, 11, 28, .6), 0 2px 8px -4px rgba(3, 11, 28, .35);
   position: fixed;
   top: 1.5em;
   left: 0;
@@ -297,25 +335,21 @@
   padding: 0 var(--page-x);
   pointer-events: none;
 }
+/* open-menu backdrop: a flat navy dim, no backdrop blur. A full-screen blur over the live hero canvas
+   halved the frame rate of the menu opening on a 4x CPU-throttled software-GPU run (11 vs 15 frames
+   in 600 ms; 23 vs 37 with the canvas hidden), and the menu reads just as clearly over a sharp dim. */
 .topbar__scrim {
   position: fixed;
   inset: 0;
-  background: var(--scrim-nav);
-  -webkit-backdrop-filter: var(--blur-backdrop);
-  backdrop-filter: var(--blur-backdrop);
+  background: rgba(3, 11, 28, .78);
   pointer-events: auto;
 }
 .pill {
   position: relative;
-  width: var(--nav-w);
+  width: max-content;
   max-width: 100%;
-  background: var(--pill-glass);
-  border: 1px solid var(--paper-16);
-  border-radius: var(--r-sm);
-  -webkit-backdrop-filter: var(--blur-nav);
-  backdrop-filter: var(--blur-nav);
+  font-size: var(--nav-fs);
   color: var(--paper);
-  overflow: hidden;
   pointer-events: auto;
   --logo-back: var(--white);
   --logo-yellow: var(--white);
@@ -324,48 +358,111 @@
 .pill__bar {
   position: relative;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  gap: 1em;
-  padding: .75em 1em;
+  gap: 2em;
+  padding: var(--nav-pad) var(--nav-pad) var(--nav-pad) calc(var(--nav-pad) + .25em);
+  border: 1px solid var(--nav-edge);
+  border-radius: var(--nav-r);
+  background: var(--nav-glass);
+  box-shadow: var(--nav-shadow);
+  -webkit-backdrop-filter: var(--blur-nav);
+  backdrop-filter: var(--blur-nav);
 }
+.pill__bar :focus-visible { outline-offset: 2px; border-radius: var(--nav-r-in); }
+/* the button and the square sit 6px from the bar's edge: their ring hugs them so it never meets the edge */
+.pill__actions :focus-visible { outline-offset: 0; }
+
+/* lockup: kit mark + live-text wordmark; on hover the two layers of the mark part a little.
+   No right padding: lockup to Services reads the same 42px as Insights to Talk to us. */
 .pill__brand {
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
-  height: 2em;
-  transition: transform var(--t-fast) var(--ease);
+  flex: none;
+  height: var(--nav-h);
+  padding-left: .375em;
+  border-radius: var(--nav-r-in);
 }
-.pill__brand:hover { transform: scale(.9); }
-.pill__brand .logo__mark { width: 2.05em; }
-/* Center of the bar: the wordmark (src/partials/logo-word.html), same place as the reference's page
-   title. 1em puts Inter's x-height on the reference's uppercase cap height; colors are the pill's
-   --logo-* tokens (Yellow white, Force slate-light). */
-.pill__word {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.pill__brand .logo { font-size: 1.0625em; gap: .5em; }
+.pill__brand .logo__mark { width: 2.6em; }
+.pill__brand .yf-front,
+.pill__brand .yf-back { transition: transform var(--t) var(--ease-out-quint); }
+@media (hover: hover) {
+  .pill__brand:hover .yf-front { transform: translate(-7px, -5px); }
+  .pill__brand:hover .yf-back { transform: translate(7px, 5px); }
+}
+
+/* main links (768px up) */
+.pill__links { display: none; }
+.pill__link-list { display: flex; align-items: center; gap: .125em; }
+.pill__link {
+  position: relative;
   display: flex;
-  font-size: var(--fs-m);
-  line-height: 1;
-  white-space: nowrap;
-  pointer-events: none;
+  align-items: center;
+  height: var(--nav-h);
+  padding: 0 .875em;
+  border-radius: var(--nav-r-in);
+  font-size: .9375em;
+  font-weight: 500;
+  letter-spacing: -.005em;
+  color: var(--paper-82);
+  transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
 }
+.pill__link:hover { color: var(--paper); background: var(--paper-07); }
+.pill__link.is-current,
+.pill__link.is-section { color: var(--paper); }
+/* current page: a small amber LED under the label (same square as the menu rows) */
+.pill__link.is-current::after,
+.pill__link.is-section::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: .42em;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 1px;
+  background: var(--amber);
+}
+
+/* actions: Talk to us (site button: text roll + arrow chip) + menu toggle */
+.pill__actions { display: flex; align-items: center; gap: .375em; flex: none; }
+.pill__talk { height: var(--nav-h); border-radius: var(--nav-r-in); }
+.pill .btn--light .btn__line { font-weight: 500; }
+@media (hover: hover) {
+  .pill .btn--light:hover .btn__chip { background: var(--amber); color: var(--navy); }
+}
+/* the square reads as an icon at rest; its tile shows on hover and while the menu is open */
 .pill__toggle {
   position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 1.25em;
-  height: 1.25em;
-  border-radius: var(--r-xs);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .625em;
+  width: var(--nav-h);
+  height: var(--nav-h);
+  border-radius: var(--nav-r-in);
+  color: var(--paper);
+  transition: background-color var(--t-fast) var(--ease);
 }
-.pill__toggle::before { content: ""; position: absolute; inset: -.75em; }
+.pill__toggle:hover,
+.pill.is-open .pill__toggle { background: var(--paper-07); }
+/* "Menu" rolls to "Close" when open, like the buttons (only under 360px) */
+.pill__toggle-text {
+  display: none;
+  flex-direction: column;
+  height: 1.25em;
+  overflow: hidden;
+  font-size: .9375em;
+  font-weight: 500;
+  line-height: 1.25em;
+}
+.pill__toggle-text > span { flex: none; transition: transform var(--t) var(--ease-strong); }
+.pill.is-open .pill__toggle-text > span { transform: translateY(-100%); }
 .pill__dots {
   position: relative;
   display: block;
+  flex: none;
   width: 12px;
   height: 12px;
   transition: width var(--t-fast) var(--ease), height var(--t-fast) var(--ease), transform var(--t) var(--ease);
@@ -382,32 +479,46 @@
 .pill__dots i:nth-child(2) { top: 0; right: 0; }
 .pill__dots i:nth-child(3) { bottom: 0; left: 0; }
 .pill__dots i:nth-child(4) { bottom: 0; right: 0; }
-.pill__toggle:hover .pill__dots { width: 16px; height: 16px; }
+.pill__toggle:hover .pill__dots { width: 14px; height: 14px; }
 .pill.is-open .pill__dots { transform: rotate(45deg); }
 .pill.is-open .pill__dots i { background: var(--amber); }
-@media (min-width: 1920px) {
-  .pill__dots { width: 20px; height: 20px; }
-  .pill__dots i { width: 6px; height: 6px; }
-  .pill__toggle:hover .pill__dots { width: 26px; height: 26px; }
+
+/* ---- menu: a card of its own under the right end of the bar ----
+   Same navy glass as the bar but no backdrop blur: it sits over the dim, where a blur shows nothing and
+   only costs frames while the card grows. Its own type floor: 14px (15px on phones). */
+.pill__drawer {
+  position: absolute;
+  top: calc(100% + .5rem);
+  right: 0;
+  width: max(30em, 380px);
+  max-width: calc(100vw - var(--page-x) * 2);
+  overflow: hidden;
+  --row-x: 1.25em;                            /* row side padding; the LEDs hang centered in it */
+  font-size: max(var(--page-fs), 14px);
+  border: 1px solid var(--nav-edge);
+  border-radius: var(--nav-r);
+  background: var(--nav-glass);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 30px 60px -24px rgba(3, 11, 28, .7);
 }
-.pill__drawer { overflow: hidden; }
 .pill__drawer-inner {
-  max-height: calc(100vh - 7em);
-  max-height: calc(100dvh - 7em);
+  max-height: calc(100vh - 7.5rem);
+  max-height: calc(100dvh - 7.5rem);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-bottom: .5em;
   scrollbar-width: none;
 }
 .pill__drawer-inner::-webkit-scrollbar { display: none; }
+.pill__list > li:first-child > .pill__row { border-top: 0; }
 .pill__row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr auto 1em;
   align-items: center;
   gap: 1em;
   width: 100%;
   min-height: 3em;
-  padding: .875em 1em;
+  padding: .875em var(--row-x);
   border-top: 1px solid var(--paper-07);
   color: var(--paper);
   text-align: left;
@@ -420,7 +531,6 @@
 .pill__label {
   display: flex;
   align-items: center;
-  gap: .55em;
   font-size: var(--fs-ml);
   font-weight: 600;
   letter-spacing: var(--tr-2);
@@ -441,14 +551,22 @@
 .pill__icon:not(.pill__icon--plus) { transform: scale(1.22); stroke-width: 1.6; }
 .pill__row:hover .pill__icon { color: var(--amber); }
 .pill__row[aria-expanded="true"] .pill__icon--plus { transform: rotate(135deg); }
-.pill__row.is-current .pill__label::before,
-.pill__row.is-section .pill__label::before {
+/* the current-page square and the live Under attack dot hang in the row's left padding, centered in it,
+   so every label starts on one edge */
+.pill__row.is-current::before,
+.pill__row.is-section::before,
+.pill__row--alert::before {
   content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(var(--row-x) / 2);
   width: 6px;
   height: 6px;
+  margin: -3px 0 0 -3px;
   border-radius: 1px;
   background: var(--amber);
 }
+.pill__row--alert::before { border-radius: 50%; animation: dot-pulse 2.4s var(--ease-out) infinite; }
 .pill__row--alert .pill__label { color: var(--paper); }
 .pill__row--alert .pill__note { color: var(--paper-82); }
 @media (hover: hover) and (min-width: 992px) {
@@ -466,7 +584,7 @@
   display: flex;
   flex-direction: column;
   gap: .375em;
-  padding: .5em 1.5em 1em 3em;
+  padding: .5em var(--row-x) 1em 3em;
 }
 .pill__sublink {
   display: flex;
@@ -483,27 +601,37 @@
 .pill__sublink:hover,
 .pill__sublink.is-current { color: var(--paper); }
 .pill__sublink:hover .icon { transform: translateX(.25em); color: var(--amber); }
-.pill__cta { padding: .875em 1em; border-top: 1px solid var(--paper-07); }
-.pill__cta-btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: .5em;
-  width: 100%;
-  padding: .5em 0;
-  border: 1px solid var(--paper-16);
-  border-radius: var(--r-xs);
-  background: var(--paper-07);
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  color: var(--paper);
-  transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+/* the menu's own Talk to us: only under 360px, where the bar has none. Same white button as the bar. */
+.pill__cta { display: none; padding: .875em var(--row-x) .375em; border-top: 1px solid var(--paper-07); }
+.pill__cta .btn { height: 48px; border-radius: var(--nav-r-in); }
+
+/* 768px up: the bar shows the links, so the card keeps only what the bar does not:
+   the Services and Coverage submenus, Contact and Under attack? */
+@media (min-width: 768px) {
+  .pill__links { display: block; }
+  .pill__item--bar { display: none; }
+  .pill__list > .pill__item--bar:first-child + li > .pill__row { border-top: 0; }
 }
-.pill__cta-btn:hover { background: var(--amber); border-color: var(--amber); color: var(--navy); }
-@media (max-width: 767px) { .pill__cta-btn { padding: 1em 0; } }
+/* under 768: lockup, Talk to us and the square. 480-767 the bar keeps hugging its content (a full-width bar
+   there is the empty slab again) and the menu opens exactly under it, at its width */
+@media (max-width: 767px) {
+  .topbar { --nav-fs: calc(var(--page-fs) * 1.25); }
+  .pill__drawer { left: 0; right: 0; width: auto; max-width: none; font-size: max(var(--page-fs), 15px); }
+}
+/* phones: the bar runs across the gutters and the menu opens full width under it */
 @media (max-width: 479px) {
-  .pill__bar, .pill__row { padding: 1em; }
-  .pill__cta-btn { padding: 1.25em 0; }
+  .pill { width: 100%; }
+  .pill__row { padding-block: 1em; }
+}
+/* under 360px there is no room for Talk to us in the bar: the square becomes "Menu" (with its own tile,
+   so it reads as a control) and the white button moves to the bottom of the menu */
+@media (max-width: 359px) {
+  .pill__talk { display: none; }
+  .pill__toggle { width: auto; padding: 0 1em; background: var(--paper-07); }
+  .pill__toggle:hover,
+  .pill.is-open .pill__toggle { background: var(--paper-14); }
+  .pill__toggle-text { display: flex; }
+  .pill__cta { display: block; }
 }
 
 /* ===== Home hero (inset dark card) ===== */
@@ -975,7 +1103,7 @@ a.ledger__row:hover { padding-inline: .75em; }
 .carousel__track {
   display: flex;
   gap: 1em;
-  transition: transform .5s ease;
+  transition: transform .5s cubic-bezier(.215, .61, .355, 1);
   will-change: transform;
 }
 .carousel.is-dragging .carousel__track { transition: none; user-select: none; -webkit-user-select: none; }
@@ -1141,11 +1269,18 @@ a.ledger__row:hover { padding-inline: .75em; }
   min-height: 24em;
   border-radius: var(--r-m);
   overflow: hidden;
-  /* the canvas paints over this; without JS or canvas the frame is still the film's navy base */
-  background: radial-gradient(62% 60% at 50% 50%, #0B2350, var(--navy-abyss));
+  /* the shield's static light (streaks.js sets --shield-* once per resize): a narrow warm rim on the arc and the
+     navy lifted around its apex, deep navy at the edges. The SVG hairlines and the live canvas sit on top. */
+  --sx: var(--shield-x, 150%);
+  --sy: var(--shield-y, 50%);
+  --sr: var(--shield-r, 62vw);
+  background:
+    radial-gradient(circle at var(--sx) var(--sy), rgba(255, 190, 60, 0) calc(var(--sr) - 16px), rgba(255, 196, 70, .11) calc(var(--sr) - 1px), rgba(255, 196, 70, .07) calc(var(--sr) + 1px), rgba(255, 196, 70, 0) calc(var(--sr) + 12px)),
+    radial-gradient(75% 90% at var(--shield-ax, 66%) var(--shield-ay, 50%), #0B2250 0, #081A3D 30%, #050F29 66%, var(--navy-abyss) 100%);
   isolation: isolate;
 }
-.reel__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.reel__canvas, .reel__shield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.reel__shield { fill: none; overflow: visible; }
 .reel__media { position: absolute; inset: 0; z-index: -1; }
 .reel__island {
   position: absolute;

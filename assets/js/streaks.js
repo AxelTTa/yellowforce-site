@@ -1,42 +1,24 @@
-/* Live long-exposure light streaks on a <canvas>.
-   <canvas data-streaks="reel"> (full frame, filmic, on deep navy) or data-streaks="accent" (transparent, softer,
-   for hero overlays). Brand: amber #FFBF00 and warm white light on navy shadows #030B1C / #071B3E (never neutral
-   black, never royal blue). Optional controls: a [data-streaks-scope] ancestor with a [data-streaks-toggle]
-   button; the scope gets .is-paused. Both variants run continuously while on screen. DPR-aware (capped at 2, sized
-   from the layout box so a reveal transform never shrinks the backing store), pauses offscreen / hidden tab / on
-   toggle, one static frame under reduced motion. */
+/* Crisp live light on <canvas>, vector only (canvas 2D strokes and rects, plain source-over: 'lighter' doubles the
+   raster cost on machines without a GPU).
+   <canvas data-streaks="reel">   the reel: a swarm of amber tracers rushing a precise shield arc; each one is stopped
+                                   at the line, flares white for a moment and dies. The shield's hairlines and ticks
+                                   are an SVG and its base and rim light are CSS gradients (set once per resize).
+   <canvas data-streaks="hero">   over the home hero image: a swarm of crisp sparks flying along the image's own spark
+                                   streaks into its arc of light and winking out there, fine tracers riding the arc;
+                                   the dark bottom left (headline) stays clean.
+                                   ("accent" is an alias.)
+   <canvas data-streaks="pinch">  over the 404 image: tracers converging into the pinch and stopping there.
+   Crisp by construction (Axel, 2026-10-26: the long-exposure reel "gives the illusion that it's blurry"): every
+   moving line is a hard-edged stroke 1 to 2 device px wide, no blur, no per-frame pixel work (no getImageData /
+   putImageData, no JS pixel loops). Soft light is static only (CSS gradients).
+   Light on cheap hardware: DPR capped at 2 (1.5 on weak devices); quality steps down (DPR, then density, then
+   30 fps) when frames run long, measured as script time per frame and main-thread time from rAF to the end of the
+   frame; pauses offscreen, in hidden tabs and on the reel toggle; one static frame under reduced motion.
+   Optional controls: a [data-streaks-scope] ancestor with a [data-streaks-toggle] button; the scope gets
+   .is-paused and the button aria-pressed. Optional data-seed changes the layout. */
 
-const PALETTE = [
-  [255, 191, 0],   // brand amber #FFBF00
-  [255, 162, 26],  // warm amber (glow)
-  [255, 218, 128], // pale gold
-  [255, 245, 226], // warm white
-];
-const FILM_PALETTE = [
-  [240, 142, 18],  // deep amber (outer trails)
-  [255, 162, 26],  // warm amber
-  [255, 191, 0],   // brand amber #FFBF00
-  [255, 218, 128], // pale gold
-  [255, 245, 226], // warm white
-];
-
-/* reel: a filmic long exposure, graded like the generated image family. Deep navy edges (#030B1C) rising to at
-   most #0B2350 behind the light, a river of amber trails pinched through the middle, drawn at device resolution
-   so every trail is crisp (Axel, 2026-10-26: the half resolution trails read as blurry), with the softness kept
-   in the light around them: a smooth two-radius halation, a warm amber bloom with a warm white core (#FFE9C2), a
-   navy vignette and film grain. The light and the trails are summed with a tone map (core: how close the core
-   gets to #FFE9C2; trailPeak: a trail's peak over its local mean; trailWhite: how much of the light a trail
-   cannot add as amber comes back as warm white). Mean luma about 58 at 1440.
-   accent: transparent overlay for the hero, runs continuously like the reel (Axel, 2026-10-26). */
-const VARIANTS = {
-  reel: { film: true, lanes: 72, comets: 44, fast: 10, ribbons: 6, spread: 1.4, pinch: 0.48, tilt: 0.3, focus: 0.5, center: 0.5, swell: 0.8, laneAlpha: 1, cometAlpha: 1, centerBias: 2, exposure: 1.05, shade: 0.85, lightGain: 1, bloom: 1.25, glow: 1.8, vignette: 0.5, grain: 0.1, speed: 0.85, core: 1, lift: 0.35, trailPeak: 2.75, trailWhite: 1.4 },
-  accent: { lanes: 22, comets: 14, fast: 4, spread: 1.1, pinch: 0.45, focus: 0.62, center: 0.42, swell: 0.8, laneAlpha: 0.75, cometAlpha: 0.8, centerBias: 0, haze: 0.05, speed: 0.8 },
-};
-
-const EDGE = [3, 11, 28];    // #030B1C navy-deep
-const CORE = [11, 35, 80];   // #0B2350, the brightest the base gets
-const WARM = [1, 233 / 255, 194 / 255]; // #FFE9C2, the warm white the hottest light rolls into (never lemon)
-const LW = 0.299 * WARM[0] + 0.587 * WARM[1] + 0.114 * WARM[2];
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const outCubic = (p) => 1 - (1 - p) * (1 - p) * (1 - p);
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -47,76 +29,760 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${Math.max(0, Math.min(1, a)).toFixed(3)})`;
+// a tail drawn as k hard-edged pieces, alpha rising to the head (one stroke per piece for every tracer at once)
+const ramp = (c, a, k, pow = 1.7) => Array.from({ length: k }, (_, i) => rgba(c, a * Math.pow((i + 1) / k, pow)));
 
-function mix(a, b, t) { return a + (b - a) * t; }
-function color(h, alpha, pal = PALETTE) {
-  const x = Math.max(0, Math.min(0.999, h)) * (pal.length - 1);
-  const i = Math.floor(x), f = x - i;
-  const p = pal[i], q = pal[i + 1];
-  return `rgba(${mix(p[0], q[0], f) | 0},${mix(p[1], q[1], f) | 0},${mix(p[2], q[2], f) | 0},${Math.max(0, alpha).toFixed(3)})`;
+const AMBER = [255, 191, 0];     // brand #FFBF00
+const DEEP = [255, 166, 32];     // warm amber
+const GOLD = [255, 216, 128];    // pale gold
+const HOT = [255, 247, 228];     // warm white heads
+const WHITE = [255, 255, 255];
+
+const WEAK = (() => {
+  try {
+    return (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  } catch (e) { return false; }
+})();
+// quality ladder: start at 0 (1 on weak devices), step down when frames run long, never up
+const LEVELS = [
+  { dpr: 2, density: 1, half: false },
+  { dpr: 1.5, density: 0.8, half: false },
+  { dpr: 1.25, density: 0.62, half: false },
+  { dpr: 1, density: 0.5, half: false },
+  { dpr: 1, density: 0.4, half: true }, // 30 fps
+];
+
+/* ---------- tracks: polylines resampled every STEP px, O(1) lookup by arc length ---------- */
+const STEP = 4;
+function makeTrack(flat) {
+  const n0 = flat.length / 2, cum = new Float32Array(n0);
+  for (let i = 1; i < n0; i++) cum[i] = cum[i - 1] + Math.hypot(flat[i * 2] - flat[i * 2 - 2], flat[i * 2 + 1] - flat[i * 2 - 1]);
+  const len = cum[n0 - 1], n = Math.max(2, Math.ceil(len / STEP) + 1);
+  const xs = new Float32Array(n), ys = new Float32Array(n);
+  let j = 0;
+  for (let i = 0; i < n; i++) {
+    const s = Math.min(len, i * STEP);
+    while (j < n0 - 2 && cum[j + 1] < s) j++;
+    const f = (s - cum[j]) / Math.max(1e-6, cum[j + 1] - cum[j]);
+    xs[i] = flat[j * 2] + (flat[j * 2 + 2] - flat[j * 2]) * f;
+    ys[i] = flat[j * 2 + 1] + (flat[j * 2 + 3] - flat[j * 2 + 1]) * f;
+  }
+  return { xs, ys, n, len };
 }
-/* blur of an RGB float image (w x h x 3): three separable box passes of radius r, edges clamped (about a
-   Gaussian of sigma 1.2 r). dst gets the result; tmp is scratch; src is left as is. */
-function boxPass(src, dst, w, h, r, horizontal) {
-  const k = 1 / (2 * r + 1);
-  const len = horizontal ? w : h, lines = horizontal ? h : w;
-  const step = horizontal ? 3 : w * 3;
-  for (let l = 0; l < lines; l++) {
-    const base = horizontal ? l * w * 3 : l * 3;
-    for (let c = 0; c < 3; c++) {
-      const o = base + c;
-      let acc = 0;
-      for (let i = -r; i <= r; i++) acc += src[o + Math.min(len - 1, Math.max(0, i)) * step];
-      for (let i = 0; i < len; i++) {
-        dst[o + i * step] = acc * k;
-        acc += src[o + Math.min(len - 1, i + r + 1) * step] - src[o + Math.max(0, i - r) * step];
+function trackAt(t, s, out) {
+  const u = clamp(s, 0, t.len) / STEP, i = Math.min(t.n - 2, u | 0), f = u - i;
+  out[0] = t.xs[i] + (t.xs[i + 1] - t.xs[i]) * f;
+  out[1] = t.ys[i] + (t.ys[i + 1] - t.ys[i]) * f;
+  return out;
+}
+const P = [0, 0];
+function trackRange(ctx, t, s0, s1) {
+  s0 = Math.max(0, s0); s1 = Math.min(t.len, s1);
+  if (s1 <= s0) return;
+  trackAt(t, s0, P); ctx.moveTo(P[0], P[1]);
+  for (let i = Math.ceil(s0 / STEP), e = Math.floor(s1 / STEP); i <= e; i++) ctx.lineTo(t.xs[i], t.ys[i]);
+  trackAt(t, s1, P); ctx.lineTo(P[0], P[1]);
+}
+// Catmull-Rom through [x, y] points, as a flat dense polyline
+function spline(pts, per = 10) {
+  const out = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    for (let k = 0; k < per; k++) {
+      const t = k / per, t2 = t * t, t3 = t2 * t;
+      for (let c = 0; c < 2; c++) {
+        out.push(0.5 * (2 * p1[c] + (-p0[c] + p2[c]) * t + (2 * p0[c] - 5 * p1[c] + 4 * p2[c] - p3[c]) * t2 + (-p0[c] + 3 * p1[c] - 3 * p2[c] + p3[c]) * t3));
       }
     }
   }
-}
-function blur3(src, dst, tmp, w, h, r) {
-  boxPass(src, tmp, w, h, r, true); boxPass(tmp, dst, w, h, r, false);
-  boxPass(dst, tmp, w, h, r, true); boxPass(tmp, dst, w, h, r, false);
-  boxPass(dst, tmp, w, h, r, true); boxPass(tmp, dst, w, h, r, false);
+  const last = pts[pts.length - 1];
+  out.push(last[0], last[1]);
+  return out;
 }
 
-function layer(w, h) {
-  const c = document.createElement("canvas");
-  c.width = Math.max(1, Math.round(w));
-  c.height = Math.max(1, Math.round(h));
-  return c;
+/* ================= the reel: the shield ================= */
+// tracer classes: far (thin, dim: depth), amber, gold
+const THREAT = [
+  { w: 1.25, ramp: ramp(DEEP, 0.6, 5), head: rgba(GOLD, 0.6), hw: 1.25 },
+  { w: 1.75, ramp: ramp(AMBER, 1, 8), head: rgba(HOT, 1), hw: 2 },
+  { w: 1.75, ramp: ramp([255, 208, 96], 1, 8), head: rgba(WHITE, 1), hw: 2 },
+];
+const SPARK_RAMP = ramp(GOLD, 0.9, 4, 1.2);
+// a small warm halo for impacts, drawn once into a 64 px sprite
+let HALO = null;
+function haloSprite() {
+  if (HALO) return HALO;
+  HALO = document.createElement("canvas");
+  HALO.width = HALO.height = 64;
+  const g = HALO.getContext("2d"), r = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  r.addColorStop(0, "rgba(255,236,190,0.9)");
+  r.addColorStop(0.18, "rgba(255,196,64,0.35)");
+  r.addColorStop(0.5, "rgba(255,170,30,0.08)");
+  r.addColorStop(1, "rgba(255,170,30,0)");
+  g.fillStyle = r;
+  g.fillRect(0, 0, 64, 64);
+  return HALO;
 }
 
-class Streaks {
+class Shield {
+  constructor(stage) {
+    this.st = stage;
+    this.r = mulberry32(0x5e1d + (stage.c.dataset.seed | 0));
+    this.T = []; this.F = []; this.S = []; this.L = [];
+    this.clock = 0; this.nextFar = 0; this.nextLone = 0.1; this.nextWave = 0.35; this.nextScan = 1.2; this.scan = -1;
+    this.host = stage.c.parentElement;
+    this.svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    this.svg.setAttribute("class", "reel__shield");
+    this.svg.setAttribute("aria-hidden", "true");
+    this.svg.setAttribute("focusable", "false");
+    stage.c.before(this.svg);
+  }
+
+  resize(w, h, dpr, density) {
+    const ow = this.w, oh = this.h;
+    this.w = w; this.h = h; this.dpr = dpr; this.density = density;
+    const portrait = h > w;
+    this.portrait = portrait;
+    const A = portrait ? h : w, B = portrait ? w : h;
+    this.B = B;
+    this.s = clamp(A / 1200, 0.5, 1.4);
+    // the shield: an arc of a large circle whose centre sits beyond the far edge; threats come from the near edge
+    const R = portrait ? B * 0.98 : Math.max(B * 0.92, A * 0.38);
+    const a0 = A * (portrait ? 0.58 : 0.66);
+    this.R = R;
+    this.cx = portrait ? w / 2 : a0 + R;
+    this.cy = portrait ? a0 + R : h / 2;
+    this.phc = portrait ? -Math.PI / 2 : Math.PI;
+    this.half = Math.asin(Math.min(0.999, (B / 2) / R));
+    if (ow !== w || oh !== h) this.drawShield();
+    // the live canvas stops just past the arc: nothing moves on the protected side (less to clear and composite)
+    const far = Math.min(A, a0 + R * (1 - Math.cos(this.half)) + 34 * this.s);
+    return portrait ? { x: 0, y: 0, w, h: Math.ceil(far) } : { x: 0, y: 0, w: Math.ceil(far), h };
+  }
+
+  /* the static shield: base and rim light as CSS gradients on the frame, hairlines and ticks as one SVG */
+  drawShield() {
+    const { w, h, R, cx, cy, phc } = this, s = this.host.style;
+    s.setProperty("--shield-x", `${cx.toFixed(1)}px`);
+    s.setProperty("--shield-y", `${cy.toFixed(1)}px`);
+    s.setProperty("--shield-r", `${R.toFixed(1)}px`);
+    s.setProperty("--shield-ax", `${(cx + R * Math.cos(phc)).toFixed(1)}px`);
+    s.setProperty("--shield-ay", `${(cy + R * Math.sin(phc)).toFixed(1)}px`);
+    // a hairline: one device pixel, never under half a CSS pixel (one device px at 3x would vanish on a phone)
+    const dev = Math.max(0.5, 1 / (window.devicePixelRatio || 1));
+    const span = this.half + 0.08;
+    const a0 = phc - span, a1 = phc + span;
+    const pt = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+    const arc = (r) => `M${pt(r, a0)}A${r.toFixed(2)} ${r.toFixed(2)} 0 0 1 ${pt(r, a1)}`;
+    const minor = R < 520 ? 2 : 1;
+    let ticks = "", major = "";
+    const deg = Math.PI / 180, k = this.s;
+    for (let d = Math.ceil(-span / deg); d <= span / deg; d++) {
+      if (d % minor) continue;
+      const a = phc + d * deg;
+      if (d % 5 === 0) major += `M${pt(R + 11 * k, a)}L${pt(R + 22 * k, a)}`;
+      else ticks += `M${pt(R + 11 * k, a)}L${pt(R + 15 * k, a)}`;
+    }
+    this.svg.setAttribute("viewBox", `0 0 ${w.toFixed(1)} ${h.toFixed(1)}`);
+    this.svg.innerHTML =
+      `<path d="${arc(R - 46 * k)}" stroke="#A3AABF" stroke-opacity=".2" stroke-width="${dev}" stroke-dasharray="${(2 * dev).toFixed(3)} ${(6 * k).toFixed(2)}"/>` +
+      `<path d="${arc(R - 120 * k)}" stroke="#A3AABF" stroke-opacity=".1" stroke-width="${dev}"/>` +
+      `<path d="${arc(R - 240 * k)}" stroke="#A3AABF" stroke-opacity=".07" stroke-width="${dev}"/>` +
+      `<path d="${arc(R + 6 * k)}" stroke="#FFE7B0" stroke-opacity=".22" stroke-width="${dev}"/>` +
+      `<path d="${ticks}" stroke="#FFE7B0" stroke-opacity=".2" stroke-width="${dev}"/>` +
+      `<path d="${major}" stroke="#FFE7B0" stroke-opacity=".42" stroke-width="${dev}"/>` +
+      `<path d="${arc(R)}" stroke="#FFE7B0" stroke-opacity=".78" stroke-width="${(1.5 * dev).toFixed(3)}"/>`;
+  }
+
+  spawn(c, th, lat, v, len, delay) {
+    const phi = this.phc + th;
+    const px = this.cx + this.R * Math.cos(phi), py = this.cy + this.R * Math.sin(phi);
+    const back = len + 12;
+    const sx = this.portrait ? px + lat : -back, sy = this.portrait ? -back : py + lat;
+    const dx = px - sx, dy = py - sy, d = Math.hypot(dx, dy);
+    this.T.push({ c, x: sx, y: sy, dx: dx / d, dy: dy / d, d, pos: -delay * v, v, len, phi, px, py, hit: false });
+  }
+
+  wave() {
+    const r = this.r, s = this.s;
+    const n = Math.max(4, Math.round((10 + r() * 12) * this.density));
+    const thc = (r() * 2 - 1) * this.half * 0.8, spread = 0.02 + r() * 0.045;
+    const latc = (r() - 0.5) * this.B * 0.9, latS = this.B * (0.025 + r() * 0.05);
+    const v = (1000 + r() * 500) * s, len = (150 + r() * 140) * s;
+    let eta = 0;
+    for (let i = 0; i < n; i++) {
+      const g = (r() + r() + r() - 1.5) * 1.4;
+      this.spawn(r() < 0.35 ? 2 : 1, thc + g * spread, latc + (r() + r() - 1) * latS, v * (0.94 + r() * 0.12), len * (0.8 + r() * 0.4), i * 0.035 + r() * 0.16);
+      const q = this.T[this.T.length - 1];
+      eta = Math.max(eta, (q.d - q.pos) / q.v);
+    }
+    // the shield sees it coming: a bracket arms over the impact zone before the swarm lands
+    this.L.push({ phi: this.phc + thc, half: spread * 2.2 + 0.012, age: 0, eta });
+  }
+
+  step(dt) {
+    const r = this.r, s = this.s, den = this.density;
+    this.clock += dt;
+    if (this.clock >= this.nextFar) {
+      this.nextFar = this.clock + (0.035 + r() * 0.05) / den;
+      this.spawn(0, (r() * 2 - 1) * this.half * 1.05, (r() - 0.5) * this.B * 0.7, (460 + r() * 320) * s, (50 + r() * 90) * s, 0);
+    }
+    if (this.clock >= this.nextLone) {
+      this.nextLone = this.clock + (0.1 + r() * 0.2) / den;
+      this.spawn(r() < 0.3 ? 2 : 1, (r() * 2 - 1) * this.half * 1.02, (r() - 0.5) * this.B * 0.6, (850 + r() * 550) * s, (110 + r() * 170) * s, 0);
+    }
+    if (this.clock >= this.nextWave) {
+      this.nextWave = this.clock + 0.8 + r() * 0.9;
+      this.wave();
+    }
+    if (this.clock >= this.nextScan) {
+      this.nextScan = this.clock + 4.2 + r() * 2;
+      this.scan = 0; this.scanDir = r() < 0.5 ? 1 : -1;
+    }
+    if (this.scan >= 0) { this.scan += dt / 1.5; if (this.scan > 1) this.scan = -1; }
+
+    const T = this.T;
+    for (let i = T.length - 1; i >= 0; i--) {
+      const q = T[i];
+      q.pos += q.v * dt;
+      if (!q.hit && q.pos >= q.d) { q.hit = true; this.impact(q); }
+      if (q.pos - q.len >= q.d) { T[i] = T[T.length - 1]; T.pop(); }
+    }
+    const F = this.F;
+    for (let i = F.length - 1; i >= 0; i--) {
+      const f = F[i];
+      f.age += dt;
+      if (f.age >= f.life) { F[i] = F[F.length - 1]; F.pop(); }
+    }
+    const S = this.S, drag = Math.exp(-5 * dt);
+    for (let i = S.length - 1; i >= 0; i--) {
+      const p = S[i];
+      p.age += dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vx *= drag; p.vy *= drag;
+      if (p.age >= p.life) { S[i] = S[S.length - 1]; S.pop(); }
+    }
+    const L = this.L;
+    for (let i = L.length - 1; i >= 0; i--) {
+      const l = L[i];
+      l.age += dt;
+      if (l.age > l.eta + 0.9) { L[i] = L[L.length - 1]; L.pop(); }
+    }
+  }
+
+  impact(q) {
+    const r = this.r, big = q.c > 0;
+    // tangent of the shield at the impact
+    const tx = -Math.sin(q.phi), ty = Math.cos(q.phi);
+    this.F.push({ x: q.px, y: q.py, phi: q.phi, tx, ty, age: 0, life: big ? 0.6 + r() * 0.25 : 0.3, k: big ? 1 : 0.45, big, ring: big && r() < 0.3 });
+    if (!big || this.S.length > 90) return;
+    // a couple of sparks thrown back off the shield
+    const nx = Math.cos(q.phi), ny = Math.sin(q.phi); // outward normal (towards the threats)
+    for (let i = 0, n = 1 + ((r() * 2.5) | 0); i < n; i++) {
+      const a = (r() - 0.5) * 2.2, sp = (140 + r() * 220) * this.s;
+      const ca = Math.cos(a), sa = Math.sin(a);
+      this.S.push({ x: q.px, y: q.py, vx: (nx * ca - ny * sa) * sp, vy: (nx * sa + ny * ca) * sp, age: 0, life: 0.22 + r() * 0.2 });
+    }
+  }
+
+  draw(ctx) {
+    const dpr = this.dpr, T = this.T, R = this.R, cx = this.cx, cy = this.cy, s = this.s;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "miter";
+
+    // armed brackets over the zones a swarm is about to hit
+    ctx.lineWidth = 1 / dpr;
+    ctx.strokeStyle = rgba(AMBER, 1);
+    const rl = R + 30 * s;
+    for (const l of this.L) {
+      const a = Math.min(1, l.age / 0.25) * (l.age > l.eta + 0.2 ? Math.max(0, 1 - (l.age - l.eta - 0.2) / 0.7) : 1);
+      if (a <= 0.01) continue;
+      ctx.globalAlpha = 0.6 * a;
+      ctx.beginPath();
+      ctx.arc(cx, cy, rl, l.phi - l.half, l.phi + l.half);
+      for (const e of [l.phi - l.half, l.phi + l.half]) {
+        ctx.moveTo(cx + (rl - 5 * s) * Math.cos(e), cy + (rl - 5 * s) * Math.sin(e));
+        ctx.lineTo(cx + (rl + 5 * s) * Math.cos(e), cy + (rl + 5 * s) * Math.sin(e));
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // tracers: each class in k pieces of rising alpha, one stroke per piece for all of them
+    for (let c = 0; c < 3; c++) {
+      const cls = THREAT[c], K = cls.ramp.length;
+      ctx.lineWidth = cls.w / dpr;
+      for (let k = 0; k < K; k++) {
+        ctx.beginPath();
+        let any = false;
+        for (let i = 0; i < T.length; i++) {
+          const q = T[i];
+          if (q.c !== c) continue;
+          const head = Math.min(q.pos, q.d), tail = Math.max(0, q.pos - q.len);
+          if (head <= tail) continue;
+          const s0 = tail + ((head - tail) * k) / K, s1 = tail + ((head - tail) * (k + 1)) / K;
+          ctx.moveTo(q.x + q.dx * s0, q.y + q.dy * s0);
+          ctx.lineTo(q.x + q.dx * s1, q.y + q.dy * s1);
+          any = true;
+        }
+        if (any) { ctx.strokeStyle = cls.ramp[k]; ctx.stroke(); }
+      }
+      // heads: a short hot segment on every tracer still in flight
+      ctx.lineWidth = cls.hw / dpr;
+      ctx.beginPath();
+      let any = false;
+      const hl = (c ? 9 : 5) * s;
+      for (let i = 0; i < T.length; i++) {
+        const q = T[i];
+        if (q.c !== c || q.hit || q.pos <= 0) continue;
+        const h0 = Math.max(0, q.pos - hl);
+        ctx.moveTo(q.x + q.dx * h0, q.y + q.dy * h0);
+        ctx.lineTo(q.x + q.dx * q.pos, q.y + q.dy * q.pos);
+        any = true;
+      }
+      if (any) { ctx.strokeStyle = cls.head; ctx.stroke(); }
+    }
+
+    // impacts: the shield lights up where it is hit, a white glint along it, now and then a ring, a hot point with a
+    // small halo (a sprite drawn once, never a per-frame blur). Added with 'lighter' so a swarm landing in one spot
+    // builds a hot stretch of the arc (small areas only: 'lighter' is slow to raster without a GPU)
+    ctx.globalCompositeOperation = "lighter";
+    const halo = haloSprite();
+    for (const f of this.F) {
+      if (!f.big) continue;
+      const p = f.age / f.life, hr = 14 * s * (0.7 + 0.3 * outCubic(Math.min(1, p * 3)));
+      ctx.globalAlpha = 0.5 * (1 - p) * (1 - p);
+      ctx.drawImage(halo, f.x - hr, f.y - hr, hr * 2, hr * 2);
+    }
+    for (const f of this.F) {
+      const p = f.age / f.life, fade = (1 - p) * (1 - p);
+      ctx.strokeStyle = rgba(GOLD, 1);
+      ctx.globalAlpha = fade * f.k;
+      ctx.lineWidth = 2 / dpr;
+      ctx.beginPath();
+      const d = (f.big ? 0.03 : 0.014) * (0.5 + 0.5 * outCubic(Math.min(1, p * 4)));
+      ctx.arc(cx, cy, R, f.phi - d, f.phi + d);
+      ctx.stroke();
+      ctx.strokeStyle = "#fff";
+      if (f.big) {
+        const g = (4 + 16 * outCubic(Math.min(1, p * 3))) * s;
+        ctx.globalAlpha = Math.pow(1 - p, 3);
+        ctx.lineWidth = 2 / dpr;
+        ctx.beginPath();
+        ctx.moveTo(f.x - f.tx * g, f.y - f.ty * g);
+        ctx.lineTo(f.x + f.tx * g, f.y + f.ty * g);
+        ctx.stroke();
+      }
+      if (f.ring) {
+        ctx.globalAlpha = 0.55 * fade;
+        ctx.lineWidth = 1 / dpr;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, (2 + 10 * outCubic(p)) * s, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const dot = (f.big ? 3 : 2) / dpr;
+      ctx.globalAlpha = Math.pow(1 - p, 4) * (f.big ? 1 : 0.7);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(f.x - dot / 2, f.y - dot / 2, dot, dot);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = "source-over";
+
+    // sparks thrown back: short streaks along their velocity, bucketed by age
+    if (this.S.length) {
+      ctx.lineWidth = 1 / dpr;
+      for (let k = 0; k < SPARK_RAMP.length; k++) {
+        ctx.beginPath();
+        let any = false;
+        for (const p of this.S) {
+          const b = Math.min(SPARK_RAMP.length - 1, ((1 - p.age / p.life) * SPARK_RAMP.length) | 0);
+          if (b !== k) continue;
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x - p.vx * 0.03, p.y - p.vy * 0.03);
+          any = true;
+        }
+        if (any) { ctx.strokeStyle = SPARK_RAMP[k]; ctx.stroke(); }
+      }
+    }
+
+    // the shield scans itself: a short bright segment sweeping along the arc
+    if (this.scan >= 0) {
+      const span = this.half * 1.05, p = this.scan;
+      const phi = this.phc + this.scanDir * (-span + 2 * span * p);
+      const a = Math.sin(Math.PI * p);
+      ctx.lineWidth = 2 / dpr;
+      ctx.strokeStyle = "#fff";
+      ctx.globalAlpha = 0.8 * a;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, Math.min(phi, phi - this.scanDir * 0.012), Math.max(phi, phi - this.scanDir * 0.012));
+      ctx.stroke();
+      ctx.strokeStyle = rgba(AMBER, 1);
+      ctx.globalAlpha = 0.35 * a;
+      ctx.beginPath();
+      const e = phi - this.scanDir * 0.09;
+      ctx.arc(cx, cy, R, Math.min(phi, e), Math.max(phi, e));
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+}
+
+/* ================= hero: a swarm drawn into the image's arc of light, tracers riding it ================= */
+// the arc's light ridge in hero.webp (2400 x 1350), measured from the image (brightness-weighted centre line)
+const HERO_IMG = [2400, 1350];
+const HERO_RIDGE = [[1100, -60], [1133, 40], [1155, 80], [1177, 120], [1199, 160], [1224, 200], [1254, 240], [1287, 280], [1324, 320],
+  [1365, 360], [1413, 400], [1467, 440], [1528, 480], [1600, 528], [1700, 574], [1800, 607], [1900, 629], [2000, 643], [2100, 650],
+  [2200, 651], [2300, 646], [2400, 641], [2520, 636]];
+/* the direction of the image's own spark streaks (structure tensor of hero.webp, 100 px cells, 24 x 14), in degrees,
+   signed towards the arc; -1 where the image has no clear streaks. Sparks fly along it into the arc and die there. */
+const FLOW_COLS = 24, FLOW_CELL = 100;
+const HERO_FLOW = [-1,-1,-1,-1,-1,321,-1,-1,315,292,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,322,319,316,316,301,277,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,327,318,316,314,309,284,258,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,319,314,313,314,306,281,-1,-1,-1,43,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,331,321,319,311,313,316,329,1,32,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,329,328,316,311,313,320,326,340,1,-1,-1,-1,-1,-1,-1,13,-1,165,162,-1,-1,-1,-1,-1,-1,325,319,312,311,318,323,332,339,352,10,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,311,-1,316,325,332,332,331,337,348,356,0,358,-1,-1,-1,347,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,333,331,327,325,331,337,340,338,332,327,329,330,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,326,324,326,332,336,331,319,315,315,322,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,329,-1,326,332,333,331,323,313,314,316,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,331,325,-1,315,314,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,324,326,-1,-1,326,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1];
+const FLOW_CELLS = HERO_FLOW.reduce((a, d, i) => (d >= 0 && a.push(i), a), []);
+const RIDE = [ramp(GOLD, 0.75, 6, 1.8), ramp(HOT, 0.9, 6, 2)];
+const SWARM = [ramp(AMBER, 0.9, 5, 1.1), ramp([255, 214, 110], 0.95, 5, 1.1)];
+const GRID = 16; // css px cells of the distance-to-arc grid
+
+class Rider {
+  constructor(stage) {
+    this.st = stage;
+    this.r = mulberry32(0x4e70 + (stage.c.dataset.seed | 0));
+    this.R = []; this.S = []; this.acc = 0;
+  }
+
+  resize(w, h, dpr, density) {
+    const same = this.w === w && this.h === h;
+    this.w = w; this.h = h; this.dpr = dpr; this.density = density;
+    this.s = clamp(Math.max(w, h) / 1400, 0.45, 1.3);
+    this.portrait = h > w;
+    if (same && this.tracks) return this.box;
+    // cover transform of the image box (object-fit: cover, 50% 50%)
+    const k = Math.max(w / HERO_IMG[0], h / HERO_IMG[1]);
+    this.k = k; this.ox = (w - HERO_IMG[0] * k) / 2; this.oy = (h - HERO_IMG[1] * k) / 2;
+    const dense = spline(HERO_RIDGE.map(([x, y]) => [this.ox + x * k, this.oy + y * k]), 12);
+    const n = dense.length / 2;
+    // normals pointing to the arc's outer (convex, lower left) side, and the light band's half width along it
+    const nx = new Float32Array(n), ny = new Float32Array(n), hw = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const a = Math.max(0, i - 1), b = Math.min(n - 1, i + 1);
+      const tx = dense[b * 2] - dense[a * 2], ty = dense[b * 2 + 1] - dense[a * 2 + 1], l = Math.hypot(tx, ty) || 1;
+      nx[i] = -ty / l; ny[i] = tx / l;
+      hw[i] = (14 + 34 * (i / (n - 1))) * k;
+    }
+    // riders keep to the outer fibres, where the band is amber rather than white
+    this.tracks = [];
+    for (let j = 0; j < 10; j++) {
+      const f = 0.55 + (1.4 * j) / 9;
+      const flat = new Array(n * 2);
+      for (let i = 0; i < n; i++) {
+        flat[i * 2] = dense[i * 2] + nx[i] * hw[i] * f;
+        flat[i * 2 + 1] = dense[i * 2 + 1] + ny[i] * hw[i] * f;
+      }
+      this.tracks.push(makeTrack(flat));
+    }
+    // the live canvas only covers the arc and the swarm's field (less to clear and composite)
+    let x0 = w, y0 = h, x1 = 0, y1 = 0;
+    for (let i = 0; i < n; i++) {
+      const x = dense[i * 2], y = dense[i * 2 + 1];
+      if (x < -50 || x > w + 50 || y < -50 || y > h + 50) continue;
+      x0 = Math.min(x0, x - hw[i] * 2); x1 = Math.max(x1, x + hw[i] * 2);
+      y0 = Math.min(y0, y - hw[i] * 2); y1 = Math.max(y1, y + hw[i] * 2);
+    }
+    for (const c of FLOW_CELLS) {
+      const x = this.ox + ((c % FLOW_COLS) + 0.5) * FLOW_CELL * k, y = this.oy + (Math.floor(c / FLOW_COLS) + 0.5) * FLOW_CELL * k;
+      if (x < 0 || x > w || y < 0 || y > h || this.zone(x, y) < 0.3) continue;
+      x0 = Math.min(x0, x - FLOW_CELL * k * 0.6); x1 = Math.max(x1, x + FLOW_CELL * k * 0.6);
+      y0 = Math.min(y0, y - FLOW_CELL * k * 0.6); y1 = Math.max(y1, y + FLOW_CELL * k * 0.6);
+    }
+    x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0));
+    x1 = Math.min(w, Math.ceil(x1)); y1 = Math.min(h * (this.portrait ? 0.62 : 0.76), Math.ceil(y1));
+    this.box = x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : { x: 0, y: 0, w, h };
+    // distance from each 16 px cell of the box to the edge of the light band (once per resize)
+    const b = this.box, gw = Math.ceil(b.w / GRID) + 1, gh = Math.ceil(b.h / GRID) + 1, edge = new Float32Array(gw * gh);
+    for (let j = 0; j < gh; j++) {
+      for (let i = 0; i < gw; i++) {
+        const x = b.x + i * GRID, y = b.y + j * GRID;
+        let best = 1e9;
+        for (let q = 0; q < n; q += 3) {
+          const d = Math.hypot(dense[q * 2] - x, dense[q * 2 + 1] - y) - hw[q] * 0.8;
+          if (d < best) best = d;
+        }
+        edge[j * gw + i] = best;
+      }
+    }
+    this.edge = edge; this.gw = gw; this.gh = gh;
+    for (const q of this.R) q.t = this.tracks[q.ti];
+    this.S.length = 0;
+    return this.box;
+  }
+
+  edgeAt(x, y) {
+    const b = this.box, i = Math.round((x - b.x) / GRID), j = Math.round((y - b.y) / GRID);
+    if (i < 0 || j < 0 || i >= this.gw || j >= this.gh) return 1e9;
+    return this.edge[j * this.gw + i];
+  }
+
+  // keep the headline zone (bottom left on wide frames, bottom on phones) clean
+  zone(x, y) {
+    const w = this.w, h = this.h;
+    const fy = clamp((0.58 * h - y) / (0.12 * h), 0, 1);
+    if (this.portrait) return fy;
+    return Math.max(fy, clamp((x - 0.44 * w) / (0.14 * w), 0, 1));
+  }
+
+  rider() {
+    const r = this.r, ti = (r() * this.tracks.length) | 0, t = this.tracks[ti], len = (150 + r() * 220) * this.s;
+    return { ti, t, len, pos: -r() * t.len * 0.5, v: (360 + r() * 380) * this.s, c: r() < 0.4 ? 1 : 0 };
+  }
+
+  // one spark of the incoming swarm: somewhere the image has streaks, flying along them into the arc
+  launch() {
+    const r = this.r, k = this.k, b = this.box;
+    for (let tries = 0; tries < 4; tries++) {
+      const c = FLOW_CELLS[(r() * FLOW_CELLS.length) | 0];
+      const x = this.ox + ((c % FLOW_COLS) + r()) * FLOW_CELL * k, y = this.oy + (Math.floor(c / FLOW_COLS) + r()) * FLOW_CELL * k;
+      if (x < b.x || y < b.y || x > b.x + b.w || y > b.y + b.h) continue;
+      if (this.zone(x, y) < 0.25 || this.edgeAt(x, y) < 24 * this.s) continue;
+      const a = ((HERO_FLOW[c] + (r() - 0.5) * 10) * Math.PI) / 180;
+      this.S.push({ x, y, dx: Math.cos(a), dy: Math.sin(a), v: (55 + r() * 150) * this.s, age: 0, life: 1.4 + r() * 1.4, hit: -1, c: r() < 0.3 ? 1 : 0 });
+      return;
+    }
+  }
+
+  step(dt) {
+    const want = Math.round(7 * this.density);
+    while (this.R.length < want) this.R.push(this.rider());
+    for (let i = this.R.length - 1; i >= 0; i--) {
+      const q = this.R[i];
+      q.pos += q.v * dt;
+      if (q.pos - q.len > q.t.len) { if (this.R.length > want) this.R.splice(i, 1); else this.R[i] = Object.assign(this.rider(), { pos: -this.r() * 200 * this.s }); }
+    }
+    // about 80 sparks in the air at full density
+    this.acc += dt * 46 * this.density;
+    while (this.acc >= 1) { this.acc -= 1; this.launch(); }
+    const S = this.S;
+    for (let i = S.length - 1; i >= 0; i--) {
+      const p = S[i];
+      p.age += dt;
+      if (p.hit < 0) {
+        p.x += p.dx * p.v * dt; p.y += p.dy * p.v * dt;
+        if (this.edgeAt(p.x, p.y) <= 0) p.hit = 0; // reached the arc: stopped there
+      } else p.hit += dt;
+      if (p.hit > 0.3 || (p.hit < 0 && p.age >= p.life)) { S[i] = S[S.length - 1]; S.pop(); }
+    }
+  }
+
+  draw(ctx) {
+    const dpr = this.dpr;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 1.5 / dpr;
+    for (let c = 0; c < 2; c++) {
+      const rp = RIDE[c], K = rp.length;
+      for (let k = 0; k < K; k++) {
+        ctx.beginPath();
+        let any = false;
+        for (const q of this.R) {
+          if (q.c !== c) continue;
+          const tail = q.pos - q.len, s0 = tail + (q.len * k) / K, s1 = tail + (q.len * (k + 1)) / K;
+          if (s1 <= 0 || s0 >= q.t.len) continue;
+          trackRange(ctx, q.t, s0, s1);
+          any = true;
+        }
+        if (any) { ctx.strokeStyle = rp[k]; ctx.stroke(); }
+      }
+    }
+    // the swarm: crisp short streaks, alpha by age and the headline zone in 5 buckets; a spark that reaches the
+    // arc stops, its tail drains into the point and it winks out white
+    ctx.lineWidth = 1.25 / dpr;
+    for (let c = 0; c < 2; c++) {
+      const rp = SWARM[c], K = rp.length;
+      for (let k = 0; k < K; k++) {
+        ctx.beginPath();
+        let any = false;
+        for (const p of this.S) {
+          if (p.c !== c) continue;
+          const left = p.life - p.age;
+          const a = Math.min(1, p.age / 0.3) * (p.hit < 0 ? Math.min(1, left / 0.4) : 1) * this.zone(p.x, p.y);
+          const bk = Math.min(K - 1, (a * K) | 0);
+          if (bk !== k || a < 0.05) continue;
+          let l = Math.min(p.age * p.v, p.v * 0.14 + 3 * this.s);
+          if (p.hit >= 0) l *= Math.max(0, 1 - p.hit / 0.12);
+          if (l < 0.5) continue;
+          ctx.moveTo(p.x - p.dx * l, p.y - p.dy * l);
+          ctx.lineTo(p.x, p.y);
+          any = true;
+        }
+        if (any) { ctx.strokeStyle = rp[k]; ctx.stroke(); }
+      }
+    }
+    ctx.fillStyle = "#fff";
+    const dot = 2.5 / dpr;
+    for (const p of this.S) {
+      if (p.hit < 0) continue;
+      ctx.globalAlpha = Math.pow(Math.max(0, 1 - p.hit / 0.3), 2) * this.zone(p.x, p.y);
+      ctx.fillRect(p.x - dot / 2, p.y - dot / 2, dot, dot);
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+/* ================= 404: tracers converging into the pinch and stopping there ================= */
+const PINCH_IMG = [1600, 1600];
+const PINCH_AT = [0.527, 0.5]; // the pinch of threat-breach.webp, mirrored like the page shows it
+
+class Pinch {
+  constructor(stage) {
+    this.st = stage;
+    this.r = mulberry32(0x9e11 + (stage.c.dataset.seed | 0));
+    this.Q = []; this.F = [];
+  }
+
+  resize(w, h, dpr, density) {
+    const same = this.w === w && this.h === h;
+    this.w = w; this.h = h; this.dpr = dpr; this.density = density;
+    this.s = clamp(Math.max(w, h) / 1400, 0.45, 1.3);
+    if (same && this.tracks) return null;
+    // where the pinch really is: object-fit cover in the image's own box, then that box as transformed by the page
+    // CSS (mirrored, and scaled from the top on phones), read from the layout once per resize
+    const host = this.st.host, img = host.querySelector(".cover__media img, .media img");
+    let bx = 0, by = 0, sx = 1, sy = 1, iw = w, ih = h;
+    const hr = host.getBoundingClientRect();
+    if (img && img.offsetWidth) {
+      const ir = img.getBoundingClientRect();
+      iw = img.offsetWidth; ih = img.offsetHeight;
+      sx = ir.width / iw; sy = ir.height / ih; bx = ir.left - hr.left; by = ir.top - hr.top;
+    }
+    const k = Math.max(iw / PINCH_IMG[0], ih / PINCH_IMG[1]);
+    const px = bx + ((iw - PINCH_IMG[0] * k) / 2 + PINCH_AT[0] * PINCH_IMG[0] * k) * sx;
+    const py = by + ((ih - PINCH_IMG[1] * k) / 2 + PINCH_AT[1] * PINCH_IMG[1] * k) * sy;
+    this.px = px; this.py = py;
+    // the copy block: tracers fade out over it
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    host.querySelectorAll(".cover__inner > *").forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (!r.width) return;
+      x0 = Math.min(x0, r.left - hr.left); y0 = Math.min(y0, r.top - hr.top);
+      x1 = Math.max(x1, r.right - hr.left); y1 = Math.max(y1, r.bottom - hr.top);
+    });
+    this.copy = x1 > x0 ? [x0 - 16, y0 - 16, x1 + 16, y1 + 16] : null;
+    const r = mulberry32(7);
+    this.tracks = [];
+    for (let j = 0; j < 22; j++) {
+      const side = j % 2 ? 1 : -1;
+      const ex = side < 0 ? -40 : w + 40, ey = py + (r() - 0.5) * h * 1.3;
+      const c1x = ex + (px - ex) * 0.5, c1y = ey + (py - ey) * 0.1;
+      const c2x = px + (ex - px) * 0.28, c2y = py + (ey - py) * 0.04;
+      const flat = [];
+      for (let i = 0; i <= 48; i++) {
+        const t = i / 48, u = 1 - t;
+        flat.push(u * u * u * ex + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * px,
+          u * u * u * ey + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * py);
+      }
+      this.tracks.push(makeTrack(flat));
+    }
+    for (const q of this.Q) q.t = this.tracks[q.ti];
+    return null;
+  }
+
+  // nothing crosses the copy: 0 over it, back to 1 within 60 px around it
+  zone(x, y) {
+    const c = this.copy;
+    if (!c) return 1;
+    return clamp(Math.max(c[0] - x, x - c[2], c[1] - y, y - c[3]) / 60, 0, 1);
+  }
+
+  step(dt) {
+    const r = this.r, want = Math.round(9 * this.density);
+    while (this.Q.length < want) {
+      const ti = (r() * this.tracks.length) | 0, t = this.tracks[ti];
+      this.Q.push({ ti, t, pos: -r() * t.len, len: (120 + r() * 160) * this.s, v: (520 + r() * 420) * this.s, c: r() < 0.35 ? 1 : 0, hit: false });
+    }
+    for (let i = this.Q.length - 1; i >= 0; i--) {
+      const q = this.Q[i];
+      q.pos += q.v * dt;
+      if (!q.hit && q.pos >= q.t.len) { q.hit = true; this.F.push({ age: 0, life: 0.5 }); }
+      if (q.pos - q.len >= q.t.len) this.Q.splice(i, 1);
+    }
+    for (let i = this.F.length - 1; i >= 0; i--) if ((this.F[i].age += dt) >= this.F[i].life) this.F.splice(i, 1);
+  }
+
+  draw(ctx) {
+    const dpr = this.dpr;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 1.5 / dpr;
+    // few tracers here: one alpha each (faded where the head crosses the copy), k pieces per tracer
+    for (const q of this.Q) {
+      const head = Math.min(q.pos, q.t.len), tail = Math.max(0, q.pos - q.len);
+      if (head <= tail) continue;
+      trackAt(q.t, head, P);
+      const a = this.zone(P[0], P[1]);
+      if (a < 0.02) continue;
+      ctx.globalAlpha = a;
+      const rp = RIDE[q.c], K = rp.length;
+      for (let k = 0; k < K; k++) {
+        ctx.beginPath();
+        trackRange(ctx, q.t, tail + ((head - tail) * k) / K, tail + ((head - tail) * (k + 1)) / K);
+        ctx.strokeStyle = rp[k];
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = "#fff";
+    ctx.lineWidth = 1 / dpr;
+    for (const f of this.F) {
+      const p = f.age / f.life;
+      ctx.globalAlpha = 0.6 * (1 - p) * (1 - p) * this.zone(this.px, this.py);
+      ctx.beginPath();
+      ctx.arc(this.px, this.py, (3 + 18 * outCubic(p)) * this.s, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+}
+
+const SCENES = { reel: Shield, hero: Rider, accent: Rider, pinch: Pinch };
+
+/* ================= stage: sizing, the loop, pausing, adaptive quality ================= */
+class Stage {
   constructor(canvas, reduced) {
     this.c = canvas;
-    this.v = VARIANTS[canvas.dataset.streaks] || VARIANTS.reel;
-    this.film = !!this.v.film;
-    this.ctx = canvas.getContext("2d", { alpha: !this.film });
+    this.ctx = canvas.getContext("2d");
+    if (!this.ctx) throw new Error("no 2d context");
     this.reduced = reduced;
     this.visible = false;
     this.paused = reduced;
     this.raf = 0;
-    this.t = 7.3;
-    this.last = 0;
-    this.frame = 0;
-    this.rnd = mulberry32(0x59f0 + (canvas.dataset.seed | 0));
+    this.level = WEAK ? 1 : 0;
+    this.host = canvas.parentElement;
     this.scope = canvas.closest("[data-streaks-scope]");
     this.toggle = this.scope ? this.scope.querySelector("[data-streaks-toggle]") : null;
-    this.build();
+    this.scene = new (SCENES[canvas.dataset.streaks] || Shield)(this);
+    this.loop = (now) => this.tick(now);
+    this.stats = { n: 0, skip: 45, script: 0, busy: 0, iv: [], bad: 0, at: 0 };
+    this.half = false;
+    // main-thread time of a frame: from the rAF timestamp to a message posted in it (runs after style, layout,
+    // paint and the canvas flush)
+    if ("MessageChannel" in window) {
+      this.mc = new MessageChannel();
+      this.mc.port1.onmessage = () => { if (this.frameAt) { this.stats.busy += performance.now() - this.frameAt; this.frameAt = 0; } };
+    }
     this.resize();
+    // a few seconds already in flight, so the first frame is never empty
+    for (let i = 0; i < 75; i++) this.scene.step(1 / 30);
     this.syncUi();
 
     if ("ResizeObserver" in window) {
-      new ResizeObserver(() => { this.resize(); if (!this.raf) this.draw(); }).observe(canvas);
+      new ResizeObserver(() => { if (this.resize() && !this.raf) this.draw(); }).observe(this.host);
     } else {
-      window.addEventListener("resize", () => { this.resize(); if (!this.raf) this.draw(); });
+      window.addEventListener("resize", () => { if (this.resize() && !this.raf) this.draw(); });
     }
     if ("IntersectionObserver" in window) {
       new IntersectionObserver((entries) => {
         this.visible = entries[entries.length - 1].isIntersecting;
         this.update();
-      }, { rootMargin: "80px" }).observe(canvas);
+      }, { rootMargin: "80px" }).observe(this.host);
     } else {
       this.visible = true;
     }
@@ -132,196 +798,29 @@ class Streaks {
     this.update();
   }
 
-  build() {
-    const r = this.rnd, v = this.v, film = this.film;
-    // phones draw fewer lanes and comets (same look, less work)
-    const k = film && (this.c.clientWidth || this.c.getBoundingClientRect().width || 1200) < 640 ? 0.75 : 1;
-    this.nLanes = Math.max(12, Math.round(v.lanes * k));
-    this.nComets = Math.round(v.comets * k);
-    this.nFast = Math.round(v.fast * k);
-    this.lanes = Array.from({ length: this.nLanes }, (_, i) => {
-      const kk = (i / (this.nLanes - 1)) * 2 - 1;
-      const l = {
-        off: kk * (0.36 + r() * 0.1) + (r() - 0.5) * 0.06,
-        amp: 0.01 + r() * 0.045,
-        freq: 0.5 + r() * 1.3,
-        phase: r() * Math.PI * 2,
-        drift: (r() - 0.5) * 0.35,
-      };
-      if (film) {
-        // mostly fine trails, a few thick soft ones; varied width and opacity, brighter toward the middle
-        const q = r();
-        const c = 1 - Math.abs(kk);
-        l.width = 0.7 + q * q * 4.2;
-        l.hue = Math.min(0.95, 0.02 + r() * 0.5 + c * 0.25);
-        l.alpha = (0.05 + r() * 0.16) * (0.6 + c * 0.35) * (1.1 - q * 0.5) * v.exposure;
-      } else {
-        l.width = 0.45 + r() * 1.0;
-        l.hue = r() * 0.85;
-        l.alpha = (0.04 + r() * 0.1) * v.laneAlpha;
-      }
-      return l;
-    });
-    this.comets = [];
-    for (let i = 0; i < this.nComets; i++) this.comets.push(this.spawn(true, false));
-    for (let i = 0; i < this.nFast; i++) this.comets.push(this.spawn(true, true));
-    // ribbons: wide soft bands of light that ride the center lanes (the river of the long exposure)
-    const mid = (this.nLanes - 1) / 2;
-    this.ribbons = Array.from({ length: v.ribbons || 0 }, (_, i) => ({
-      lane: Math.round(mid + (i - ((v.ribbons || 1) - 1) / 2) * (this.nLanes / 16) + (r() - 0.5) * 2),
-      width: 24 + r() * 70,
-      alpha: 0.035 + r() * 0.05,
-      hue: 0.12 + r() * 0.4,
-    }));
-  }
-
-  pickLane() {
-    const r = this.rnd, n = this.lanes.length, b = this.v.centerBias;
-    if (!b) return Math.floor(r() * n);
-    // average of several uniforms: most comets travel the middle lanes, a few the outer ones
-    let a = 0;
-    for (let i = 0; i <= b; i++) a += r();
-    return Math.min(n - 1, Math.floor((a / (b + 1)) * n));
-  }
-
-  spawn(initial, fast) {
-    const r = this.rnd;
-    const c = {
-      lane: this.pickLane(),
-      u: initial ? r() * 1.3 - 0.15 : -0.1 - r() * 0.5,
-      speed: (fast ? 0.7 + r() * 0.7 : 0.07 + r() * 0.22) * this.v.speed,
-      len: fast ? 0.28 + r() * 0.3 : 0.1 + r() * 0.3,
-      width: fast ? 0.8 + r() * 0.8 : 1 + r() * 1.8,
-      hue: fast ? 0.7 + r() * 0.3 : r(),
-      bright: (0.45 + r() * 0.55) * this.v.cometAlpha,
-      fast,
-    };
-    if (this.film) {
-      // film: longer, softer trails with a wider spread of widths (a few thick, most fine)
-      const q = r();
-      c.len += fast ? 0 : 0.04;
-      c.width = fast ? 0.8 + q * 1.4 : 0.9 + q * q * 3.2;
-      c.hue = 0.2 + c.hue * 0.8;
-      c.bright *= this.v.exposure;
-    }
-    return c;
-  }
-
+  /* the layout box (not getBoundingClientRect: the reel enters with a scale(.95) reveal, and a backing store sized
+     while it is scaled would stay 5% soft); returns true when the backing store changed */
   resize() {
-    // the layout box, not getBoundingClientRect(): the reel enters with a scale(.95) reveal, and a backing store
-    // sized while it is scaled stays 5% too small (upscaled, soft) once the transform is gone
-    let cw = this.c.clientWidth, ch = this.c.clientHeight;
-    if (!cw || !ch) {
-      const rect = this.c.getBoundingClientRect();
-      cw = rect.width; ch = rect.height;
+    const cw = this.host.clientWidth, ch = this.host.clientHeight;
+    if (!cw || !ch) return false;
+    const L = LEVELS[this.level];
+    const dpr = Math.min(window.devicePixelRatio || 1, WEAK ? Math.min(1.5, L.dpr) : L.dpr);
+    this.half = L.half;
+    const crop = this.scene.resize(cw, ch, dpr, L.density);
+    const box = crop || { x: 0, y: 0, w: cw, h: ch };
+    this.box = box;
+    const st = this.c.style;
+    if (crop) {
+      st.left = `${box.x}px`; st.top = `${box.y}px`; st.width = `${box.w}px`; st.height = `${box.h}px`;
+      st.right = st.bottom = "auto";
+    } else {
+      st.left = st.top = st.width = st.height = st.right = st.bottom = "";
     }
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.w = Math.max(1, cw);
-    this.h = Math.max(1, ch);
+    const W = Math.max(1, Math.round(box.w * dpr)), H = Math.max(1, Math.round(box.h * dpr));
+    const changed = this.c.width !== W || this.c.height !== H;
+    if (changed) { this.c.width = W; this.c.height = H; }
     this.dpr = dpr;
-    const W = Math.round(this.w * dpr), H = Math.round(this.h * dpr);
-    if (this.c.width !== W || this.c.height !== H) {
-      this.c.width = W;
-      this.c.height = H;
-    }
-    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.scale = Math.min(1.6, Math.max(0.6, this.w / 1200));
-    if (this.film) {
-      // soft: the trail layer, at device resolution so the trails stay crisp; half: a half CSS resolution copy (two
-      // even steps down to the glow, so fine trails never shimmer in it); glow: the trails' 1/8 mean; light: the
-      // 1/8 frame where the halation (blurred on the CPU), base, bloom and vignette are combined
-      this.soft = layer(this.w * dpr, this.h * dpr);
-      this.half = layer(this.w * 0.5, this.h * 0.5);
-      this.glow = layer(this.w / 8, this.h / 8);
-      this.light = layer(this.w / 8, this.h / 8);
-      const n3 = this.light.width * this.light.height * 3;
-      this.gSrc = new Float32Array(n3);
-      this.gWide = new Float32Array(n3);
-      this.gMid = new Float32Array(n3);
-      this.gTmp = new Float32Array(n3);
-      this.gHas = false; // new, empty glow layer: the next frame reads its own
-      // trail compositing: the trails scaled by how much room the light under them has left (amber part and
-      // warm white part), at the soft layer's (device) resolution
-      this.trail = layer(this.soft.width, this.soft.height);
-      this.trailW = layer(this.soft.width, this.soft.height);
-      this.roomA = layer(this.light.width, this.light.height);
-      this.roomW = layer(this.light.width, this.light.height);
-      this.field();
-      if (!this.noise) this.makeNoise();
-    }
-  }
-
-  /* static per-pixel field at 1/8 resolution (recomputed on resize only): the navy base, the warm bloom
-     (as a screen colour and amount) and the vignette amount */
-  field() {
-    const v = this.v, w = this.w, h = this.h, T = this.light, tw = T.width, th = T.height;
-    const portrait = h > w;
-    const fx = this.x(v.focus), fy = h * v.center;
-    const n = tw * th;
-    const base = new Float32Array(n * 3), bloom = new Float32Array(n * 3), vig = new Float32Array(n);
-    // base: elliptical radial gradient, #0B2350 (CORE) at the centre to #030B1C (EDGE)
-    const R0 = portrait ? h * 0.62 : w * 0.62, sy0 = portrait ? 0.9 : 0.6;
-    const MID = [mix(EDGE[0], CORE[0], 0.55), mix(EDGE[1], CORE[1], 0.55), mix(EDGE[2], CORE[2], 0.55)];
-    // bloom: amber falling off from a warm white core (#FFE9C2), a wide flat ellipse
-    const sy1 = portrait ? 0.55 : Math.max(0.26, Math.min(0.5, (h / w) * 0.6));
-    const R1 = portrait ? Math.max(w * 0.72, h * 0.4) : w * 0.44;
-    const k = v.bloom;
-    const stops = [
-      [0, 255, 233, 194, 0.75 * k], [0.06, 255, 222, 168, 0.42 * k], [0.16, 255, 186, 64, 0.22 * k],
-      [0.36, 255, 156, 30, 0.15 * k], [0.62, 236, 130, 14, 0.07 * k], [1, 236, 130, 14, 0],
-    ];
-    // vignette: clear inside 0.32 of the short side, navy-deep at v.vignette in the corners
-    const r0 = Math.min(w, h) * 0.32, r1 = Math.hypot(w, h) * 0.55;
-    for (let j = 0; j < th; j++) {
-      const y = ((j + 0.5) / th) * h;
-      for (let i = 0; i < tw; i++) {
-        const x = ((i + 0.5) / tw) * w, q = j * tw + i;
-        let d = Math.min(1, Math.hypot(x - fx, (y - fy) / sy0) / R0);
-        const c = d < 0.4 ? [CORE, MID, d / 0.4] : [MID, EDGE, (d - 0.4) / 0.6];
-        for (let ch = 0; ch < 3; ch++) base[q * 3 + ch] = mix(c[0][ch], c[1][ch], c[2]) / 255;
-        d = Math.min(1, Math.hypot(x - fx, (y - fy) / sy1) / R1);
-        let si = 0;
-        while (si < stops.length - 2 && d > stops[si + 1][0]) si++;
-        const A = stops[si], B = stops[si + 1], f = Math.min(1, (d - A[0]) / (B[0] - A[0]));
-        const a = mix(A[4], B[4], f);
-        for (let ch = 0; ch < 3; ch++) bloom[q * 3 + ch] = (mix(A[ch + 1], B[ch + 1], f) / 255) * a;
-        const rv = Math.hypot(x - w / 2, y - h / 2);
-        vig[q] = Math.max(0, Math.min(1, (rv - r0) / (r1 - r0))) * v.vignette;
-      }
-    }
-    this.fBase = base; this.fBloom = bloom; this.fVig = vig;
-  }
-
-  makeNoise() {
-    const n = document.createElement("canvas");
-    n.width = n.height = 192;
-    const g = n.getContext("2d");
-    const img = g.createImageData(192, 192);
-    const r = mulberry32(99);
-    for (let i = 0; i < img.data.length; i += 4) {
-      const v = ((r() + r() + r()) / 3 * 255) | 0; // soft (triangular-ish) distribution around mid grey
-      img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
-      img.data[i + 3] = 255;
-    }
-    g.putImageData(img, 0, 0);
-    this.noise = this.ctx.createPattern(n, "repeat");
-  }
-
-  x(u) { return (u * 1.12 - 0.06) * this.w; }
-
-  y(l, u, t) {
-    const v = this.v, H = this.h;
-    const d = (u - v.focus) / 0.3;
-    const spread = 1 - v.pinch * Math.exp(-d * d);
-    // tall (phone) frames: the river spreads further and crosses more steeply, so the light fills the frame
-    const tall = this.film && H > this.w;
-    const base = H * (v.center + l.off * spread * v.spread * (tall ? 0.62 : 0.5));
-    // amplitudes follow the frame's short side, so tall (phone) frames do not turn wavy
-    const A = Math.min(H, this.w * 0.62);
-    const wave = Math.sin(u * l.freq * Math.PI * 2 + l.phase + t * l.drift) * l.amp * A;
-    const swell = Math.sin(u * Math.PI * 1.15 + t * 0.11) * A * 0.05 * v.swell;
-    const tilt = v.tilt ? (v.focus - u) * v.tilt * (tall ? H * 1.1 : A) : 0;
-    return base + wave * (0.35 + 0.65 * spread) + swell + tilt;
+    return true;
   }
 
   syncUi() {
@@ -333,308 +832,56 @@ class Streaks {
   update() {
     const run = this.visible && !this.paused && !document.hidden;
     if (run && !this.raf) {
-      this.last = performance.now();
-      this.raf = requestAnimationFrame((n) => this.tick(n));
+      this.last = 0;
+      this.stats.skip = 30;
+      this.raf = requestAnimationFrame(this.loop);
     } else if (!run && this.raf) {
       cancelAnimationFrame(this.raf);
       this.raf = 0;
     }
   }
 
-  tick(now) {
-    const dt = Math.min(0.05, (now - this.last) / 1000);
-    this.last = now;
-    this.t += dt;
-    for (let i = 0; i < this.comets.length; i++) {
-      const c = this.comets[i];
-      c.u += c.speed * dt;
-      if (c.u - c.len > 1.08) this.comets[i] = this.spawn(false, c.fast);
-    }
-    this.draw();
-    this.raf = requestAnimationFrame((n) => this.tick(n));
-  }
-
-  lanePath(l, t, u0 = 0, u1 = 1, n = 56) {
-    const p = new Path2D();
-    for (let i = 0; i <= n; i++) {
-      const u = u0 + ((u1 - u0) * i) / n;
-      if (i === 0) p.moveTo(this.x(u), this.y(l, u, t)); else p.lineTo(this.x(u), this.y(l, u, t));
-    }
-    return p;
-  }
-
   draw() {
-    if (this.film) this.drawFilm(); else this.drawAccent();
+    const ctx = this.ctx, b = this.box, d = this.dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.c.width, this.c.height);
+    ctx.setTransform(d, 0, 0, d, -b.x * d, -b.y * d);
+    this.scene.draw(ctx);
   }
 
-  /* the trails' 1/8 mean (G over black), read back to the CPU */
-  readGlow() {
-    const T = this.light, tx = T.getContext("2d", { willReadFrequently: true });
-    tx.globalCompositeOperation = "source-over";
-    tx.globalAlpha = 1;
-    tx.fillStyle = "#000";
-    tx.fillRect(0, 0, T.width, T.height);
-    tx.drawImage(this.glow, 0, 0, T.width, T.height);
-    return tx.getImageData(0, 0, T.width, T.height).data;
+  tick(now) {
+    this.raf = requestAnimationFrame(this.loop);
+    if (!this.last) { this.last = now; return; }
+    const iv = now - this.last;
+    if (this.half && (this.odd = !this.odd)) return; // 30 fps: every other frame
+    this.last = now;
+    const t0 = performance.now();
+    this.scene.step(Math.min(0.05, iv / 1000));
+    this.draw();
+    const ms = performance.now() - t0;
+    if (this.mc) { this.frameAt = now; this.mc.port2.postMessage(0); }
+    this.adapt(ms, iv);
   }
 
-  /* ---------- reel: filmic long exposure ---------- */
-  drawFilm() {
-    const ctx = this.ctx, w = this.w, h = this.h, v = this.v, t = this.t, s = this.scale;
-    const portrait = h > w;
-    // while it runs, the light is built from the previous frame's mean (read before this frame's trails are
-    // queued, so the read never waits on the GPU drawing them; one frame late is invisible in a glow). A static
-    // frame (first draw, resize, reduced motion) reads its own.
-    let gm = this.raf && this.gHas ? this.readGlow() : null;
-
-    // 1. trail layer at device resolution: lanes and comets, varied width and opacity, no heads
-    const S = this.soft, sx = S.getContext("2d");
-    sx.setTransform(S.width / w, 0, 0, S.height / h, 0, 0);
-    sx.globalCompositeOperation = "source-over";
-    sx.clearRect(0, 0, w, h);
-    sx.globalCompositeOperation = "lighter";
-    sx.lineCap = "round";
-    sx.lineJoin = "round";
-    // ribbons: wide bands along the center lanes, faded at both ends
-    for (const rb of this.ribbons) {
-      const l = this.lanes[Math.max(0, Math.min(this.lanes.length - 1, rb.lane))];
-      const g = sx.createLinearGradient(0, 0, w, 0);
-      g.addColorStop(0, color(rb.hue, 0, FILM_PALETTE));
-      g.addColorStop(0.2, color(rb.hue, rb.alpha * 0.25, FILM_PALETTE));
-      g.addColorStop(0.5, color(rb.hue, rb.alpha, FILM_PALETTE));
-      g.addColorStop(0.8, color(rb.hue, rb.alpha * 0.25, FILM_PALETTE));
-      g.addColorStop(1, color(rb.hue, 0, FILM_PALETTE));
-      sx.strokeStyle = g;
-      sx.lineWidth = rb.width * s * (portrait ? 0.7 : 1);
-      sx.stroke(this.lanePath(l, t));
+  /* every 40 frames: mean script time, mean main-thread frame time and the median frame interval. Two bad windows
+     in a row step quality down one level (a steady ~33 ms cadence with an idle main thread is a 30 Hz cap, not
+     overload, and is left alone). */
+  adapt(ms, iv) {
+    const S = this.stats;
+    if (S.skip > 0) { S.skip--; S.script = 0; S.busy = 0; S.iv.length = 0; S.n = 0; return; }
+    S.script += ms; S.iv.push(iv); S.n++;
+    if (S.n < 40) return;
+    const script = S.script / S.n, busy = S.busy / S.n;
+    const sorted = S.iv.slice().sort((a, b) => a - b), med = sorted[sorted.length >> 1];
+    const capped = sorted[4] > 30 && sorted[sorted.length - 5] < 37 && busy < 8;
+    const bad = script > 6 || busy > 12 || (med > (this.half ? 40 : 24) && !capped);
+    S.bad = bad ? S.bad + 1 : 0;
+    S.script = 0; S.busy = 0; S.iv.length = 0; S.n = 0;
+    if ((S.bad >= 2 || script > 12) && this.level < LEVELS.length - 1) {
+      this.level++;
+      S.bad = 0; S.skip = 30;
+      this.resize();
     }
-    // exposure lanes: persistent trails, brighter toward the middle of the frame
-    for (const l of this.lanes) {
-      const g = sx.createLinearGradient(0, 0, w, 0);
-      g.addColorStop(0, color(l.hue * 0.7, l.alpha * 0.35, FILM_PALETTE));
-      g.addColorStop(0.5, color(l.hue, l.alpha, FILM_PALETTE));
-      g.addColorStop(1, color(l.hue * 0.7, l.alpha * 0.35, FILM_PALETTE));
-      sx.strokeStyle = g;
-      sx.lineWidth = l.width * s;
-      sx.stroke(this.lanePath(l, t));
-    }
-    // moving light: a wide dim pass and a core pass, fading in from the tail and easing off at the front
-    for (const c of this.comets) {
-      const l = this.lanes[c.lane];
-      const u1 = c.u, u0 = c.u - c.len;
-      if (u1 < -0.08 || u0 > 1.08) continue;
-      const path = this.lanePath(l, t, u0, u1, 18);
-      const g = sx.createLinearGradient(this.x(u0), this.y(l, u0, t), this.x(u1), this.y(l, u1, t));
-      g.addColorStop(0, color(c.hue, 0, FILM_PALETTE));
-      g.addColorStop(0.75, color(c.hue, 0.5 * c.bright, FILM_PALETTE));
-      g.addColorStop(0.93, color(Math.min(1, c.hue + 0.15), 0.75 * c.bright, FILM_PALETTE));
-      g.addColorStop(1, color(c.hue, 0.2 * c.bright, FILM_PALETTE));
-      sx.strokeStyle = g;
-      sx.lineWidth = c.width * 3.2 * s;
-      sx.globalAlpha = 0.3;
-      sx.stroke(path);
-      sx.globalAlpha = 1;
-      sx.lineWidth = c.width * s;
-      sx.stroke(path);
-    }
-
-    // 2. the trails averaged down to 1/2, then 1/8 (G): their local mean, the source of the halation
-    const Hf = this.half, fx2 = Hf.getContext("2d");
-    fx2.globalCompositeOperation = "copy";
-    fx2.imageSmoothingQuality = "high";
-    fx2.drawImage(S, 0, 0, Hf.width, Hf.height);
-    const G = this.glow, gx = G.getContext("2d");
-    gx.globalCompositeOperation = "copy";
-    gx.imageSmoothingQuality = "high";
-    gx.drawImage(Hf, 0, 0, G.width, G.height);
-
-    // 3. the 1/8 frame, on the CPU (about 15k pixels). First the trail layer's local mean (G), which says how
-    //    bright the trails over each pixel get. The halation is G blurred twice on the CPU, wide (sigma about
-    //    5 px of this frame) and medium (about 1.4 px), three box passes each: a smooth falloff where the old
-    //    1/24 and 1/64 layers scaled back up drew blotchy blocks. Then the glow summed at half gain and per pixel:
-    //    a filmic shoulder on luma with the hue kept; the navy base pulled down under the light so amber stays
-    //    amber (no khaki); the warm bloom (screen); the navy vignette; the highlights graded toward warm white
-    //    #FFE9C2 (never lemon). Last, the additive sum with the sharp trails is tone mapped: added as is, amber
-    //    on amber clips red first and then green, and the hottest light turns lemon. So each pixel keeps two
-    //    room masks: how much of a trail can stay amber before the sum reaches the warm white ceiling (roomA,
-    //    from the trails' local peak), and what is left of the ceiling for the rest of its light, added as warm
-    //    white (roomW). A trail crossing the core lifts it toward #FFE9C2, never past it. Everything smooth
-    //    lives here, so the full-size frame takes only a few more passes: this frame scaled up, the trails
-    //    through the two masks (at device resolution, 1:1 with the canvas) and the grain.
-    const T = this.light, tx = T.getContext("2d", { willReadFrequently: true }), tw = T.width, th = T.height;
-    if (!gm) gm = this.readGlow();
-    this.gHas = true;
-    const gs = this.gSrc, gw = this.gWide, gd = this.gMid, gt = this.gTmp;
-    for (let i = 0, q = 0; i < gm.length; i += 4, q += 3) { gs[q] = gm[i]; gs[q + 1] = gm[i + 1]; gs[q + 2] = gm[i + 2]; }
-    blur3(gs, gw, gt, tw, th, 4);
-    blur3(gs, gd, gt, tw, th, 1);
-    if (!this.roomImg || this.roomImg[0].width !== tw || this.roomImg[0].height !== th) {
-      this.roomImg = [tx.createImageData(tw, th), tx.createImageData(tw, th), tx.createImageData(tw, th)];
-    }
-    const img = this.roomImg[2], d = img.data;
-    // the glow at half gain, as the old additive passes summed it (3 x wide + medium + .55 x the mean, clipped)
-    for (let i = 0, q = 0; i < d.length; i += 4, q += 3) {
-      d[i] = Math.min(255, 0.5 * (3 * gw[q] + gd[q] + 0.55 * gs[q]));
-      d[i + 1] = Math.min(255, 0.5 * (3 * gw[q + 1] + gd[q + 1] + 0.55 * gs[q + 1]));
-      d[i + 2] = Math.min(255, 0.5 * (3 * gw[q + 2] + gd[q + 2] + 0.55 * gs[q + 2]));
-    }
-    const ra = this.roomImg[0].data, rw = this.roomImg[1].data;
-    const fb = this.fBase, fl = this.fBloom, fv = this.fVig;
-    const E = 2 * v.glow, sh = v.shade, eR = EDGE[0] / 255, eG = EDGE[1] / 255, eB = EDGE[2] / 255;
-    const wR = WARM[0], wG = WARM[1], wB = WARM[2], top = v.core, kP = v.trailPeak / 255, kW = v.trailWhite;
-    // the ceiling the trails lift the light to: #FFE9C2 lifted toward white by v.lift (a trail still reads over the core)
-    const cR = wR + (1 - wR) * v.lift, cG = wG + (1 - wG) * v.lift, cB = wB + (1 - wB) * v.lift;
-    for (let i = 0, q = 0; i < d.length; i += 4, q++) {
-      let r = (d[i] / 255) * E, g = (d[i + 1] / 255) * E, b = (d[i + 2] / 255) * E;
-      const L = 0.299 * r + 0.587 * g + 0.114 * b;
-      let o = 1;
-      if (L > 0.002) {
-        const Lt = 1 - Math.exp(-L * 1.15);
-        const k = Lt / L;
-        r *= k; g *= k; b *= k;
-        let u = (Lt - 0.42) / 0.5;
-        if (u > 0) {
-          u = Math.min(1, u); u *= u;
-          const c = Lt / LW;
-          r += (wR * c - r) * u; g += (wG * c - g) * u; b += (wB * c - b) * u;
-        }
-        o = 1 - Math.min(1, Lt * 1.6) * sh;
-      }
-      const q3 = q * 3;
-      r = Math.min(1, fb[q3] * o + r); g = Math.min(1, fb[q3 + 1] * o + g); b = Math.min(1, fb[q3 + 2] * o + b);
-      r += fl[q3] * (1 - r); g += fl[q3 + 1] * (1 - g); b += fl[q3 + 2] * (1 - b);
-      const a = fv[q];
-      r += (eR - r) * a; g += (eG - g) * a; b += (eB - b) * a;
-      // highlights graded toward warm white: the core settles just under #FFE9C2 (v.core), mids stay amber
-      let s = (0.299 * r + 0.587 * g + 0.114 * b - 0.5) * 2;
-      if (s > 0) {
-        s = Math.min(1, s); s *= s * (3 - 2 * s);
-        r *= 1 + (wR * top - 1) * s; g *= 1 + (wG * top - 1) * s; b *= 1 + (wB * top - 1) * s;
-      }
-      d[i] = r * 255; d[i + 1] = g * 255; d[i + 2] = b * 255;
-      d[i + 3] = 255;
-      // room for the trails: their local peak is about trailPeak x their local mean
-      const pr = Math.min(1, gm[i] * kP), pg = Math.min(1, gm[i + 1] * kP), pb = Math.min(1, gm[i + 2] * kP);
-      const hr = cR - r, hg = cG - g, hb = cB - b;
-      let m = 1;
-      if (pr > 0.004) m = Math.min(m, hr / pr);
-      if (pg > 0.004) m = Math.min(m, hg / pg);
-      if (pb > 0.004) m = Math.min(m, hb / pb);
-      if (m < 0) m = 0;
-      const n = (1 - m) * kW * 255;
-      ra[i] = ra[i + 1] = ra[i + 2] = m * 255;
-      rw[i] = Math.max(0, hr - m * pr) * n; rw[i + 1] = Math.max(0, hg - m * pg) * n; rw[i + 2] = Math.max(0, hb - m * pb) * n;
-      ra[i + 3] = rw[i + 3] = 255;
-    }
-    tx.putImageData(img, 0, 0);
-    this.roomA.getContext("2d").putImageData(this.roomImg[0], 0, 0);
-    this.roomW.getContext("2d").putImageData(this.roomImg[1], 0, 0);
-
-    ctx.globalAlpha = 1;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "medium";
-    ctx.globalCompositeOperation = "copy";
-    ctx.drawImage(T, 0, 0, w, h);
-    // the trails through the room masks, at device resolution: the amber part (trails x roomA) plus the warm
-    // white part (the trails' luminance x roomW), then added to the frame in one 1:1 pass (no upscale, so crisp)
-    const Q = this.trail, qx = Q.getContext("2d"), P = this.trailW, px = P.getContext("2d"), qw = Q.width, qh = Q.height;
-    qx.imageSmoothingEnabled = px.imageSmoothingEnabled = true;
-    qx.imageSmoothingQuality = px.imageSmoothingQuality = "high";
-    qx.globalCompositeOperation = "source-over";
-    qx.fillStyle = "#000";
-    qx.fillRect(0, 0, qw, qh);
-    qx.drawImage(S, 0, 0, qw, qh);
-    px.globalCompositeOperation = "copy";
-    px.drawImage(Q, 0, 0);
-    px.globalCompositeOperation = "saturation";
-    px.fillStyle = "#808080";
-    px.fillRect(0, 0, qw, qh);
-    px.globalCompositeOperation = "multiply";
-    px.drawImage(this.roomW, 0, 0, qw, qh);
-    qx.globalCompositeOperation = "multiply";
-    qx.drawImage(this.roomA, 0, 0, qw, qh);
-    qx.globalCompositeOperation = "lighter";
-    qx.drawImage(P, 0, 0);
-    ctx.globalCompositeOperation = "lighter";
-    ctx.drawImage(Q, 0, 0, w, h);
-
-    // 4. grain: overlay for the mids, a faint veil for the shadows; it moves every other frame (a 24-30 fps
-    //    feel) and stays put on the static frame
-    if (v.grain && this.noise) {
-      if (this.frame++ % 2 === 0 || !this.grainAt) this.grainAt = [(Math.random() * 192) | 0, (Math.random() * 192) | 0];
-      const [ox, oy] = this.grainAt;
-      ctx.save();
-      ctx.translate(-ox, -oy);
-      ctx.fillStyle = this.noise;
-      ctx.globalCompositeOperation = "overlay";
-      ctx.globalAlpha = v.grain;
-      ctx.fillRect(0, 0, w + 192, h + 192);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = v.grain * 0.22;
-      ctx.fillRect(0, 0, w + 192, h + 192);
-      ctx.restore();
-    }
-    ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = 1;
-  }
-
-  /* ---------- accent: transparent streaks over the hero image ---------- */
-  drawAccent() {
-    const ctx = this.ctx, w = this.w, h = this.h, v = this.v, t = this.t, s = this.scale;
-    ctx.globalCompositeOperation = "source-over";
-    ctx.globalAlpha = 1;
-    ctx.clearRect(0, 0, w, h);
-    const fx = this.x(v.focus), fy = h * v.center;
-
-    // warm amber haze around the focus point
-    const haze = ctx.createRadialGradient(fx, fy, 0, fx, fy, Math.max(w, h) * 0.55);
-    haze.addColorStop(0, `rgba(255,176,20,${v.haze})`);
-    haze.addColorStop(0.45, `rgba(255,150,10,${v.haze * 0.35})`);
-    haze.addColorStop(1, "rgba(255,150,10,0)");
-    ctx.fillStyle = haze;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.globalCompositeOperation = "lighter";
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-
-    for (const l of this.lanes) {
-      ctx.strokeStyle = color(l.hue, l.alpha);
-      ctx.lineWidth = l.width * s;
-      ctx.stroke(this.lanePath(l, t));
-    }
-
-    for (const c of this.comets) {
-      const l = this.lanes[c.lane];
-      const u1 = c.u, u0 = c.u - c.len;
-      if (u1 < -0.08 || u0 > 1.08) continue;
-      const path = this.lanePath(l, t, u0, u1, 18);
-      const x0 = this.x(u0), y0 = this.y(l, u0, t), x1 = this.x(u1), y1 = this.y(l, u1, t);
-
-      const glow = ctx.createLinearGradient(x0, y0, x1, y1);
-      glow.addColorStop(0, color(c.hue * 0.6, 0));
-      glow.addColorStop(1, color(c.hue * 0.6, 0.2 * c.bright));
-      ctx.strokeStyle = glow;
-      ctx.lineWidth = c.width * 8 * s;
-      ctx.stroke(path);
-
-      const core = ctx.createLinearGradient(x0, y0, x1, y1);
-      core.addColorStop(0, color(c.hue, 0));
-      core.addColorStop(0.7, color(c.hue, Math.min(1, 0.62 * c.bright)));
-      core.addColorStop(1, color(Math.min(1, c.hue + 0.3), Math.min(1, 1 * c.bright)));
-      ctx.strokeStyle = core;
-      ctx.lineWidth = c.width * s;
-      ctx.stroke(path);
-
-      const r = (c.fast ? 5 : 8) * c.width * s;
-      const head = ctx.createRadialGradient(x1, y1, 0, x1, y1, r);
-      head.addColorStop(0, `rgba(255,247,230,${0.85 * c.bright})`);
-      head.addColorStop(0.35, `rgba(255,191,0,${0.22 * c.bright})`);
-      head.addColorStop(1, "rgba(255,162,26,0)");
-      ctx.fillStyle = head;
-      ctx.fillRect(x1 - r, y1 - r, r * 2, r * 2);
-    }
-    ctx.globalCompositeOperation = "source-over";
   }
 }
 
@@ -642,7 +889,7 @@ export function initStreaks(nodes, { reduced = false } = {}) {
   const list = [];
   nodes.forEach((canvas) => {
     if (!canvas.getContext) return;
-    try { list.push(new Streaks(canvas, reduced)); } catch (e) { /* canvas unsupported: fallback gradient stays */ }
+    try { list.push(new Stage(canvas, reduced)); } catch (e) { /* canvas unsupported: the static frame stays */ }
   });
   return list;
 }

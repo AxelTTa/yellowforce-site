@@ -86,6 +86,7 @@
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/legal.css">
 <script src="/assets/js/boot.js"></script>
+<link rel="preload" as="image" imagesrcset="/assets/img/gen/threat-breach-800.webp 800w, /assets/img/gen/threat-breach-1200.webp 1200w, /assets/img/gen/threat-breach-1600.webp 1600w, /assets/img/gen/threat-breach.webp 2400w" imagesizes="100vw" fetchpriority="high">
 <script src="/assets/js/vendor/gsap.min.js" defer></script>
 <script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/js/vendor/SplitText.min.js" defer></script>
@@ -99,17 +100,31 @@
   <div class="topbar__scrim" data-nav-scrim hidden></div>
   <div class="pill" data-nav-shell>
     <div class="pill__bar">
-      <a class="pill__brand" href="/" aria-label="YellowForce home"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
-</a>
-      <span class="pill__word" aria-hidden="true"><span class="logo__word"><span class="logo__yellow">Yellow</span><span class="logo__force">Force</span></span>
+      <a class="pill__brand" href="/" aria-label="YellowForce home"><span class="logo"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
+<span class="logo__word"><span class="logo__yellow">Yellow</span><span class="logo__force">Force</span></span>
 </span>
-      <button class="pill__toggle" type="button" data-nav-toggle data-qa="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu"><span class="pill__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+</a>
+      <nav class="pill__links" aria-label="Primary">
+        <ul class="pill__link-list">
+          <li><a class="pill__link" href="/services/" data-nav-path="/services/">Services</a></li>
+          <li><a class="pill__link" href="/coverage/" data-nav-path="/coverage/">Coverage</a></li>
+          <li><a class="pill__link" href="/about/" data-nav-path="/about/">About</a></li>
+          <li><a class="pill__link" href="/insights/" data-nav-path="/insights/">Insights</a></li>
+        </ul>
+      </nav>
+      <div class="pill__actions">
+        <a class="btn btn--light pill__talk" href="/contact/">
+          <span class="btn__roll"><span class="btn__line">Talk to us</span><span class="btn__line" aria-hidden="true">Talk to us</span></span>
+          <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <button class="pill__toggle" type="button" data-nav-toggle data-qa="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu"><span class="pill__toggle-text" aria-hidden="true"><span>Menu</span><span>Close</span></span><span class="pill__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+      </div>
     </div>
     <div class="pill__drawer" id="site-menu" hidden>
       <div class="pill__drawer-inner" data-lenis-prevent>
         <nav aria-label="Main">
           <ul class="pill__list">
-            <li data-nav-anim><a class="pill__row" href="/" data-nav-path="/"><span class="pill__label">Home</span><span class="pill__note">Fully managed, 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/" data-nav-path="/"><span class="pill__label">Home</span><span class="pill__note">Fully managed, 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
             <li data-nav-anim>
               <button class="pill__row" type="button" data-nav-sub data-nav-path="/services/" aria-expanded="false" aria-controls="menu-services"><span class="pill__label">Services</span><span class="pill__note">Six practices</span><svg class="pill__icon pill__icon--plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>
               <div class="pill__sub" id="menu-services" hidden>
@@ -142,13 +157,18 @@
                 </ul>
               </div>
             </li>
-            <li data-nav-anim><a class="pill__row" href="/about/" data-nav-path="/about/"><span class="pill__label">About</span><span class="pill__note">San Francisco</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
-            <li data-nav-anim><a class="pill__row" href="/insights/" data-nav-path="/insights/"><span class="pill__label">Insights</span><span class="pill__note">Notes from the front</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/about/" data-nav-path="/about/"><span class="pill__label">About</span><span class="pill__note">San Francisco</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/insights/" data-nav-path="/insights/"><span class="pill__label">Insights</span><span class="pill__note">Notes from the front</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
             <li data-nav-anim><a class="pill__row" href="/contact/" data-nav-path="/contact/"><span class="pill__label">Contact</span><span class="pill__note">Always on</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
-            <li data-nav-anim><button class="pill__row pill__row--alert" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="pill__label"><span class="dot dot--live" aria-hidden="true"></span>Under attack?</span><span class="pill__note pill__note--keep">We answer 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button></li>
+            <li data-nav-anim><button class="pill__row pill__row--alert" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="pill__label">Under attack?</span><span class="pill__note pill__note--keep">We answer 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button></li>
           </ul>
         </nav>
-        <div class="pill__cta" data-nav-anim><a class="pill__cta-btn" href="/contact/">Talk to us<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>
+        <div class="pill__cta" data-nav-anim>
+          <a class="btn btn--light btn--block" href="/contact/">
+            <span class="btn__roll"><span class="btn__line">Talk to us</span><span class="btn__line" aria-hidden="true">Talk to us</span></span>
+            <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -158,14 +178,14 @@
 <!-- Hero (inset dark card, full height, no footer) -->
 <section class="cover cover--full on-dark nf" aria-labelledby="nf-title">
   <div class="cover__media media nf__media" aria-hidden="true">
-    <img decoding="async" src="/assets/img/gen/threat-breach-1600.webp" srcset="/assets/img/gen/threat-breach-800.webp 800w, /assets/img/gen/threat-breach-1600.webp 1600w, /assets/img/gen/threat-breach.webp 2400w" sizes="100vw" alt="" loading="eager" fetchpriority="high">
+    <img decoding="async" src="/assets/img/gen/threat-breach-1600.webp" srcset="/assets/img/gen/threat-breach-800.webp 800w, /assets/img/gen/threat-breach-1200.webp 1200w, /assets/img/gen/threat-breach-1600.webp 1600w, /assets/img/gen/threat-breach.webp 2400w" sizes="100vw" alt="" loading="eager" fetchpriority="high">
   </div>
-  <canvas class="cover__streaks" data-streaks="accent" data-seed="11" aria-hidden="true"></canvas>
+  <canvas class="cover__streaks" data-streaks="pinch" data-seed="11" aria-hidden="true"></canvas>
   <div class="cover__inner nf__inner gutter">
-    <p class="t-label cover__label" data-reveal="fade" data-delay=".2">(    Error / 404    )</p>
-    <h1 class="cover__title nf__title" id="nf-title" data-reveal="lines">Nothing here<br>to defend.</h1>
-    <p class="cover__text nf__text" data-reveal="fade" data-delay=".35">This page moved or never existed. Everything we protect is still exactly where it should be.</p>
-    <div class="btn-row nf__actions" data-reveal="stagger" data-delay=".45">
+    <p class="t-label cover__label" data-intro data-reveal="fade" data-delay=".2" style="--in-d: 0.1s">(    Error / 404    )</p>
+    <h1 class="cover__title nf__title" id="nf-title" data-intro data-reveal="lines" style="--in-d: 0.075s">Nothing here<br>to defend.</h1>
+    <p class="cover__text nf__text" data-intro data-reveal="fade" data-delay=".35" style="--in-d: 0.175s">This page moved or never existed. Everything we protect is still exactly where it should be.</p>
+    <div class="btn-row nf__actions" data-intro data-reveal="stagger" data-delay=".45" style="--in-d: 0.225s">
       <a class="btn btn--light" href="/">
         <span class="btn__roll"><span class="btn__line">Back to home</span><span class="btn__line" aria-hidden="true">Back to home</span></span>
         <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
@@ -203,6 +223,8 @@
         </ul>
         <ul class="foot__small">
           <li><a class="foot__link" href="/privacy/" data-nav-path="/privacy/">Privacy</a></li>
+          <li><a class="foot__link" href="/terms/" data-nav-path="/terms/">Terms</a></li>
+          <li><a class="foot__link" href="/dpa/" data-nav-path="/dpa/">DPA</a></li>
           <li><a class="foot__link" href="/security/" data-nav-path="/security/">Security</a></li>
           <li><a class="foot__link" href="/.well-known/security.txt">security.txt</a></li>
           <li><button class="foot__link" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="dot dot--live" aria-hidden="true"></span>Under attack?</button></li>

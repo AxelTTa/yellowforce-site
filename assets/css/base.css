@@ -171,6 +171,35 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 .motion [data-reveal] { opacity: 0; }
 .motion [data-reveal="statement"] { opacity: 1; }
 
+/* first screen (the build marks the reveals of each page's first section data-intro): CSS keyframes that start as soon
+   as the fonts are in (boot.js adds html.fonts-in, 700 ms cap), so the hero never waits for the JS bundle. They use
+   the independent translate/scale properties, so a design transform on the same element is never overridden.
+   --in-d is the build's delay (half the JS reveal's data-delay), --in-k the child index of a stagger. */
+.motion.fonts-in [data-intro] {
+  opacity: 1;
+  animation: yf-in .55s cubic-bezier(.215, .61, .355, 1) var(--in-d, .05s) backwards;
+}
+.motion.fonts-in [data-intro][data-reveal="lines"] { --in-y: .25em; }
+.motion.fonts-in [data-intro][data-reveal="frame"] { --in-y: 2em; --in-s: .95; animation-duration: .65s; }
+.motion.fonts-in [data-intro][data-reveal="stagger"] { animation: none; }
+.motion.fonts-in [data-intro][data-reveal="stagger"] > * {
+  animation: yf-in .55s cubic-bezier(.215, .61, .355, 1) calc(var(--in-d, .05s) + var(--in-k, 0) * var(--in-st, .08s)) backwards;
+}
+[data-intro][data-reveal="stagger"] > :nth-child(2) { --in-k: 1; }
+[data-intro][data-reveal="stagger"] > :nth-child(3) { --in-k: 2; }
+[data-intro][data-reveal="stagger"] > :nth-child(4) { --in-k: 3; }
+[data-intro][data-reveal="stagger"] > :nth-child(5) { --in-k: 4; }
+[data-intro][data-reveal="stagger"] > :nth-child(6) { --in-k: 5; }
+[data-intro][data-reveal="stagger"] > :nth-child(n+7) { --in-k: 6; }
+/* starts at 1% opacity, not 0: Chrome only counts a composited fade from 0 as painted (LCP) when it ends */
+@keyframes yf-in {
+  from { opacity: .01; translate: 0 var(--in-y, .5em); scale: var(--in-s, 1); }
+}
+
+/* live canvases stay hidden until main.js has started the engine on them (it sizes and crops them first: no layout
+   shift on load; it starts them after first paint, the reel only when it comes near) */
+.js canvas[data-streaks]:not(.is-on) { visibility: hidden; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

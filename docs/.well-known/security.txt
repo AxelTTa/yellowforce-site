@@ -1,4 +1,4 @@
-Contact: mailto:info@yellow-force.com
+Contact: mailto:security@yellow-force.com
 Expires: 2027-04-24T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://yellow-force.com/.well-known/security.txt
