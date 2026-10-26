@@ -6,7 +6,7 @@ same names, then composites you can read slice by slice.
 All commands run from the site folder:
 
 ```sh
-cd /Users/axelcassou/life/scratch/yellowforce-website/site
+cd /Users/axelcassou/life/yellowforce/website
 PY=../.venv/bin/python          # Python 3.12 with Playwright 1.64.1 + headless Chromium 156
 ```
 
