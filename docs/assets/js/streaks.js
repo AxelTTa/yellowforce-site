@@ -239,6 +239,7 @@ class Streaks {
       this.gWide = new Float32Array(n3);
       this.gMid = new Float32Array(n3);
       this.gTmp = new Float32Array(n3);
+      this.gHas = false; // new, empty glow layer: the next frame reads its own
       // trail compositing: the trails scaled by how much room the light under them has left (amber part and
       // warm white part), at the soft layer's (device) resolution
       this.trail = layer(this.soft.width, this.soft.height);
@@ -381,6 +382,10 @@ class Streaks {
   drawFilm() {
     const ctx = this.ctx, w = this.w, h = this.h, v = this.v, t = this.t, s = this.scale;
     const portrait = h > w;
+    // while it runs, the light is built from the previous frame's mean (read before this frame's trails are
+    // queued, so the read never waits on the GPU drawing them; one frame late is invisible in a glow). A static
+    // frame (first draw, resize, reduced motion) reads its own.
+    let gm = this.raf && this.gHas ? this.readGlow() : null;
 
     // 1. trail layer at device resolution: lanes and comets, varied width and opacity, no heads
     const S = this.soft, sx = S.getContext("2d");
@@ -457,7 +462,8 @@ class Streaks {
     //    lives here, so the full-size frame takes only a few more passes: this frame scaled up, the trails
     //    through the two masks (at device resolution, 1:1 with the canvas) and the grain.
     const T = this.light, tx = T.getContext("2d", { willReadFrequently: true }), tw = T.width, th = T.height;
-    const gm = this.readGlow();
+    if (!gm) gm = this.readGlow();
+    this.gHas = true;
     const gs = this.gSrc, gw = this.gWide, gd = this.gMid, gt = this.gTmp;
     for (let i = 0, q = 0; i < gm.length; i += 4, q += 3) { gs[q] = gm[i]; gs[q + 1] = gm[i + 1]; gs[q + 2] = gm[i + 2]; }
     blur3(gs, gw, gt, tw, th, 4);
