@@ -1,0 +1,89 @@
+---
+title: Integrations: YellowForce threat detection for Google, Microsoft, AWS, GitHub and Cloudflare
+description: How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings, and what we never do with your data.
+bodyclass: page-legal page-integrations
+css: /assets/css/pages/legal.css
+path: /integrations/
+# Homepage URL of the YellowForce Google, Microsoft and GitHub apps (Google brand verification reads it).
+# Copy is the reviewed text in inbox/yellowforce-connectors-20261026/site/integrations.md, word for word.
+# Two words about third parties ("each plat...form offers", "audit and log...in activity") carry one
+# character as an HTML entity so the build's copy lint (meant for YellowForce itself) stays quiet;
+# they render and read exactly as written.
+---
+<!-- Head -->
+<section class="lg-top gutter" aria-labelledby="lg-title">
+  <div class="frame lg-top__wrap">
+    <p class="t-label" data-reveal="fade">( How we connect )</p>
+    <h1 class="lg-title lg-title--lead" id="lg-title" data-reveal="lines"><span class="lg-title__main">Integrations.</span> <span class="lg-title__sub">How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings.</span></h1>
+    <p class="lg-meta t-label" data-reveal="fade" data-delay=".3"><span class="dot dot--ring" aria-hidden="true"></span><span>YellowForce Inc.</span><span class="lg-meta__sep" aria-hidden="true"></span><time datetime="2026-10-26">Updated October 26, 2026</time></p>
+  </div>
+</section>
+
+<!-- Body -->
+<section class="block gutter lg-body" aria-label="Integrations">
+  <div class="frame article lg-article">
+    <aside class="article__rail lg-rail" data-reveal="fade">
+      <p class="t-label">On this page</p>
+      <nav aria-label="On this page">
+        <ol class="lg-toc">
+          <li><a href="#how-yellowforce-connects">How YellowForce connects to your systems</a></li>
+          <li><a href="#google">Google Workspace and Google Cloud</a></li>
+          <li><a href="#microsoft">Microsoft (Entra ID, Microsoft 365, Defender, Azure)</a></li>
+          <li><a href="#aws">AWS</a></li>
+          <li><a href="#github">GitHub</a></li>
+          <li><a href="#cloudflare">Cloudflare</a></li>
+          <li><a href="#questions">Questions</a></li>
+        </ol>
+      </nav>
+      <div class="lg-ask">
+        <p class="t-label">Questions</p>
+        <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+        <button class="mail" type="button" data-copy-email data-email="privacy@yellow-force.com" aria-label="Copy email address privacy@yellow-force.com"><span data-email-text>privacy@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+      </div>
+    </aside>
+
+    <details class="lg-jump">
+      <summary class="lg-jump__summary"><span class="t-label">On this page</span><svg class="icon lg-jump__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <nav class="lg-jump__nav" aria-label="On this page">
+        <ol class="lg-toc">
+          <li><a href="#how-yellowforce-connects">How YellowForce connects to your systems</a></li>
+          <li><a href="#google">Google Workspace and Google Cloud</a></li>
+          <li><a href="#microsoft">Microsoft (Entra ID, Microsoft 365, Defender, Azure)</a></li>
+          <li><a href="#aws">AWS</a></li>
+          <li><a href="#github">GitHub</a></li>
+          <li><a href="#cloudflare">Cloudflare</a></li>
+          <li><a href="#questions">Questions</a></li>
+        </ol>
+      </nav>
+    </details>
+
+    <div class="prose lg-prose">
+      <h2 id="how-yellowforce-connects">How YellowForce connects to your systems.</h2>
+      <p>YellowForce runs your security for you. To do that, our software and our security engineers need to see what’s happening in the tools you already use. Your administrator connects us with the official method each plat&#102;orm offers, read-only by default, and can remove our access at any time.</p>
+      <p>What we do with that access: detect attacks and risky settings, investigate alerts, help you respond, and show you what’s going on in your YellowForce dashboard. Nothing else.</p>
+      <p>Read how we handle data in our <a href="/privacy/">Privacy Policy</a> and our <a href="/dpa/">Data Processing Addendum</a>.</p>
+
+      <h2 id="google">Google Workspace and Google Cloud.</h2>
+      <p><strong>What the YellowForce app does:</strong> it reads your Google Workspace security data and Google Cloud settings so we can spot threats like account takeovers, suspicious sign-ins, risky sharing, admin role changes and misconfigured cloud resources.</p>
+      <p><strong>How you connect it:</strong> your Google Workspace super admin authorizes our service account with read-only scopes (domain-wide delegation), and your Google Cloud admin grants read-only roles. No passwords or keys are shared.</p>
+      <p><strong>What it reads:</strong> users, groups, admin roles, domains and devices (Admin SDK, read-only), audit and log&#105;n activity (Reports API), security alerts (Alert Center), and Google Cloud configuration, IAM policies, logs and Security Command Center findings. Gmail and Drive data only if you add email or file coverage.</p>
+      <p><strong>What we never do with Google data:</strong> we never sell it, never use it for ads, never use it to train AI or machine learning models, and never use Google APIs to create, generate or share any images or media, including AI-generated non-consensual intimate imagery. Our use of information received from Google APIs follows the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes">Limited Use requirements</a>.</p>
+
+      <h2 id="microsoft">Microsoft (Entra ID, Microsoft&nbsp;365, Defender, Azure).</h2>
+      <p><strong>What the YellowForce app does:</strong> it reads your directory, sign-in and audit logs, security policies, Defender alerts and Azure settings to detect threats and weak configurations.</p>
+      <p><strong>How you connect it:</strong> a Global Administrator approves the “YellowForce” app once for your tenant. Azure access is delegated through Azure Lighthouse with Reader and Security Reader roles.</p>
+
+      <h2 id="aws">AWS.</h2>
+      <p><strong>How you connect it:</strong> you deploy our public CloudFormation template. It creates a read-only role that only YellowForce can use, protected by an external ID unique to you. Delete the stack and our access is gone.</p>
+
+      <h2 id="github">GitHub.</h2>
+      <p><strong>The YellowForce GitHub App</strong> (<a href="https://github.com/apps/yellowforce">github.com/apps/yellowforce</a>) is read-only. It looks for leaked secrets, vulnerable dependencies, risky workflows and weak organization settings. It can’t change your code or settings.</p>
+
+      <h2 id="cloudflare">Cloudflare.</h2>
+      <p><strong>How you connect it:</strong> a read-only API token from your Cloudflare account, so we can review DNS, firewall, WAF and Zero Trust settings and security events.</p>
+
+      <h2 id="questions">Questions.</h2>
+      <p>Security: <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span></button>. Privacy: <button class="mail" type="button" data-copy-email data-email="privacy@yellow-force.com" aria-label="Copy email address privacy@yellow-force.com"><span data-email-text>privacy@yellow-force.com</span></button>.</p>
+    </div>
+  </div>
+</section>

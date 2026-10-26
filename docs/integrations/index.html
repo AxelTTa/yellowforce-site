@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Integrations: YellowForce threat detection for Google, Microsoft, AWS, GitHub and Cloudflare</title>
+<meta name="description" content="How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings, and what we never do with your data.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://yellow-force.com/integrations/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="YellowForce">
+<meta property="og:title" content="Integrations: YellowForce threat detection for Google, Microsoft, AWS, GitHub and Cloudflare">
+<meta property="og:description" content="How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings, and what we never do with your data.">
+<meta property="og:url" content="https://yellow-force.com/integrations/">
+<meta property="og:image" content="https://yellow-force.com/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="YellowForce. Your Security. Handled. Fully managed cybersecurity. 24/7.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Integrations: YellowForce threat detection for Google, Microsoft, AWS, GitHub and Cloudflare">
+<meta name="twitter:description" content="How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings, and what we never do with your data.">
+<meta name="twitter:image" content="https://yellow-force.com/assets/img/og.png">
+<meta name="twitter:image:alt" content="YellowForce. Your Security. Handled. Fully managed cybersecurity. 24/7.">
+<meta name="theme-color" content="#071B3E">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yellow-force.com/#organization",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://yellow-force.com/icon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://yellow-force.com/assets/img/og.png",
+      "email": "info@yellow-force.com",
+      "description": "Fully managed cybersecurity. Our AI and our experts stop every threat. 24/7.",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "San Francisco",
+        "addressRegion": "CA",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "info@yellow-force.com",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "00:00",
+          "closes": "23:59"
+        }
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yellow-force.com/#website",
+      "name": "YellowForce",
+      "url": "https://yellow-force.com/",
+      "publisher": { "@id": "https://yellow-force.com/#organization" },
+      "inLanguage": "en-US"
+    }
+  ]
+}
+</script>
+<link rel="preload" href="/assets/fonts/inter-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/js/vendor/lenis.css">
+<link rel="stylesheet" href="/assets/css/components.css">
+<link rel="stylesheet" href="/assets/css/pages/legal.css">
+<script src="/assets/js/boot.js"></script>
+<script src="/assets/js/vendor/gsap.min.js" defer></script>
+<script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
+<script src="/assets/js/vendor/SplitText.min.js" defer></script>
+<script src="/assets/js/vendor/lenis.min.js" defer></script>
+<script src="/assets/js/main.js" type="module"></script>
+
+</head>
+<body class="page-legal page-integrations">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="topbar">
+  <div class="topbar__scrim" data-nav-scrim hidden></div>
+  <div class="pill" data-nav-shell>
+    <div class="pill__bar">
+      <a class="pill__brand" href="/" aria-label="YellowForce home"><span class="logo"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
+<span class="logo__word"><span class="logo__yellow">Yellow</span><span class="logo__force">Force</span></span>
+</span>
+</a>
+      <nav class="pill__links" aria-label="Primary">
+        <ul class="pill__link-list">
+          <li><a class="pill__link" href="/services/" data-nav-path="/services/">Services</a></li>
+          <li><a class="pill__link" href="/coverage/" data-nav-path="/coverage/">Coverage</a></li>
+          <li><a class="pill__link" href="/about/" data-nav-path="/about/">About</a></li>
+          <li><a class="pill__link" href="/insights/" data-nav-path="/insights/">Insights</a></li>
+        </ul>
+      </nav>
+      <div class="pill__actions">
+        <a class="btn btn--light pill__talk" href="/contact/">
+          <span class="btn__roll"><span class="btn__line">Talk to us</span><span class="btn__line" aria-hidden="true">Talk to us</span></span>
+          <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+        </a>
+        <button class="pill__toggle" type="button" data-nav-toggle data-qa="menu-toggle" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu"><span class="pill__toggle-text" aria-hidden="true"><span>Menu</span><span>Close</span></span><span class="pill__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+      </div>
+    </div>
+    <div class="pill__drawer" id="site-menu" hidden>
+      <div class="pill__drawer-inner" data-lenis-prevent>
+        <nav aria-label="Main">
+          <ul class="pill__list">
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/" data-nav-path="/"><span class="pill__label">Home</span><span class="pill__note">Fully managed, 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim>
+              <button class="pill__row" type="button" data-nav-sub data-nav-path="/services/" aria-expanded="false" aria-controls="menu-services"><span class="pill__label">Services</span><span class="pill__note">Six practices</span><svg class="pill__icon pill__icon--plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>
+              <div class="pill__sub" id="menu-services" hidden>
+                <ul class="pill__sublist">
+                  <li><a class="pill__sublink" href="/services/" data-nav-path="/services/">All services<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#deploy">Deploy and connect<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#detect">Detect 24/7<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#respond">Respond<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#attack">Attack<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#harden">Harden<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/services/#govern">Govern<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                </ul>
+              </div>
+            </li>
+            <li data-nav-anim>
+              <button class="pill__row" type="button" data-nav-sub data-nav-path="/coverage/" aria-expanded="false" aria-controls="menu-coverage"><span class="pill__label">Coverage</span><span class="pill__note">10 domains</span><svg class="pill__icon pill__icon--plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg></button>
+              <div class="pill__sub" id="menu-coverage" hidden>
+                <ul class="pill__sublist">
+                  <li><a class="pill__sublink" href="/coverage/" data-nav-path="/coverage/">All coverage<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/network/" data-nav-path="/coverage/network/">Network<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/endpoint/" data-nav-path="/coverage/endpoint/">Endpoint and devices<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/cloud/" data-nav-path="/coverage/cloud/">Cloud<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/identity/" data-nav-path="/coverage/identity/">Identity and access<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/email/" data-nav-path="/coverage/email/">Email<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/applications/" data-nav-path="/coverage/applications/">Apps and APIs<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/data/" data-nav-path="/coverage/data/">Data<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/ai-agents/" data-nav-path="/coverage/ai-agents/">AI and agents<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/ot-iot/" data-nav-path="/coverage/ot-iot/">OT and IoT<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                  <li><a class="pill__sublink" href="/coverage/governance/" data-nav-path="/coverage/governance/">Governance and risk<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/about/" data-nav-path="/about/"><span class="pill__label">About</span><span class="pill__note">San Francisco</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li class="pill__item--bar" data-nav-anim><a class="pill__row" href="/insights/" data-nav-path="/insights/"><span class="pill__label">Insights</span><span class="pill__note">Notes from the front</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim><a class="pill__row" href="/contact/" data-nav-path="/contact/"><span class="pill__label">Contact</span><span class="pill__note">Always on</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            <li data-nav-anim><button class="pill__row pill__row--alert" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="pill__label">Under attack?</span><span class="pill__note pill__note--keep">We answer 24/7</span><svg class="pill__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button></li>
+          </ul>
+        </nav>
+        <div class="pill__cta" data-nav-anim>
+          <a class="btn btn--light btn--block" href="/contact/">
+            <span class="btn__roll"><span class="btn__line">Talk to us</span><span class="btn__line" aria-hidden="true">Talk to us</span></span>
+            <span class="btn__chip" aria-hidden="true"><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg><svg class="btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="main" tabindex="-1">
+<!-- Head -->
+<section class="lg-top gutter" aria-labelledby="lg-title">
+  <div class="frame lg-top__wrap">
+    <p class="t-label" data-intro data-reveal="fade" style="--in-d: 0.075s">(    How we connect    )</p>
+    <h1 class="lg-title lg-title--lead" id="lg-title" data-intro data-reveal="lines" style="--in-d: 0.075s"><span class="lg-title__main">Integrations.</span> <span class="lg-title__sub">How YellowForce connects to Google Workspace, Google Cloud, Microsoft, AWS, GitHub and Cloudflare, read-only by default, to detect attacks and risky settings.</span></h1>
+    <p class="lg-meta t-label" data-intro data-reveal="fade" data-delay=".3" style="--in-d: 0.15s"><span class="dot dot--ring" aria-hidden="true"></span><span>YellowForce Inc.</span><span class="lg-meta__sep" aria-hidden="true"></span><time datetime="2026-10-26">Updated October 26, 2026</time></p>
+  </div>
+</section>
+
+<!-- Body -->
+<section class="block gutter lg-body" aria-label="Integrations">
+  <div class="frame article lg-article">
+    <aside class="article__rail lg-rail" data-reveal="fade">
+      <p class="t-label">On this page</p>
+      <nav aria-label="On this page">
+        <ol class="lg-toc">
+          <li><a href="#how-yellowforce-connects">How YellowForce connects to your systems</a></li>
+          <li><a href="#google">Google Workspace and Google Cloud</a></li>
+          <li><a href="#microsoft">Microsoft (Entra ID, Microsoft 365, Defender, Azure)</a></li>
+          <li><a href="#aws">AWS</a></li>
+          <li><a href="#github">GitHub</a></li>
+          <li><a href="#cloudflare">Cloudflare</a></li>
+          <li><a href="#questions">Questions</a></li>
+        </ol>
+      </nav>
+      <div class="lg-ask">
+        <p class="t-label">Questions</p>
+        <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+        <button class="mail" type="button" data-copy-email data-email="privacy@yellow-force.com" aria-label="Copy email address privacy@yellow-force.com"><span data-email-text>privacy@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+      </div>
+    </aside>
+
+    <details class="lg-jump">
+      <summary class="lg-jump__summary"><span class="t-label">On this page</span><svg class="icon lg-jump__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <nav class="lg-jump__nav" aria-label="On this page">
+        <ol class="lg-toc">
+          <li><a href="#how-yellowforce-connects">How YellowForce connects to your systems</a></li>
+          <li><a href="#google">Google Workspace and Google Cloud</a></li>
+          <li><a href="#microsoft">Microsoft (Entra ID, Microsoft 365, Defender, Azure)</a></li>
+          <li><a href="#aws">AWS</a></li>
+          <li><a href="#github">GitHub</a></li>
+          <li><a href="#cloudflare">Cloudflare</a></li>
+          <li><a href="#questions">Questions</a></li>
+        </ol>
+      </nav>
+    </details>
+
+    <div class="prose lg-prose">
+      <h2 id="how-yellowforce-connects">How YellowForce connects to your systems.</h2>
+      <p>YellowForce runs your security for you. To do that, our software and our security engineers need to see what’s happening in the tools you already use. Your administrator connects us with the official method each plat&#102;orm offers, read-only by default, and can remove our access at any time.</p>
+      <p>What we do with that access: detect attacks and risky settings, investigate alerts, help you respond, and show you what’s going on in your YellowForce dashboard. Nothing else.</p>
+      <p>Read how we handle data in our <a href="/privacy/">Privacy Policy</a> and our <a href="/dpa/">Data Processing Addendum</a>.</p>
+
+      <h2 id="google">Google Workspace and Google Cloud.</h2>
+      <p><strong>What the YellowForce app does:</strong> it reads your Google Workspace security data and Google Cloud settings so we can spot threats like account takeovers, suspicious sign-ins, risky sharing, admin role changes and misconfigured cloud resources.</p>
+      <p><strong>How you connect it:</strong> your Google Workspace super admin authorizes our service account with read-only scopes (domain-wide delegation), and your Google Cloud admin grants read-only roles. No passwords or keys are shared.</p>
+      <p><strong>What it reads:</strong> users, groups, admin roles, domains and devices (Admin SDK, read-only), audit and log&#105;n activity (Reports API), security alerts (Alert Center), and Google Cloud configuration, IAM policies, logs and Security Command Center findings. Gmail and Drive data only if you add email or file coverage.</p>
+      <p><strong>What we never do with Google data:</strong> we never sell it, never use it for ads, never use it to train AI or machine learning models, and never use Google APIs to create, generate or share any images or media, including AI-generated non-consensual intimate imagery. Our use of information received from Google APIs follows the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes">Limited Use requirements</a>.</p>
+
+      <h2 id="microsoft">Microsoft (Entra ID, Microsoft&nbsp;365, Defender, Azure).</h2>
+      <p><strong>What the YellowForce app does:</strong> it reads your directory, sign-in and audit logs, security policies, Defender alerts and Azure settings to detect threats and weak configurations.</p>
+      <p><strong>How you connect it:</strong> a Global Administrator approves the “YellowForce” app once for your tenant. Azure access is delegated through Azure Lighthouse with Reader and Security Reader roles.</p>
+
+      <h2 id="aws">AWS.</h2>
+      <p><strong>How you connect it:</strong> you deploy our public CloudFormation template. It creates a read-only role that only YellowForce can use, protected by an external ID unique to you. Delete the stack and our access is gone.</p>
+
+      <h2 id="github">GitHub.</h2>
+      <p><strong>The YellowForce GitHub App</strong> (<a href="https://github.com/apps/yellowforce">github.com/apps/yellowforce</a>) is read-only. It looks for leaked secrets, vulnerable dependencies, risky workflows and weak organization settings. It can’t change your code or settings.</p>
+
+      <h2 id="cloudflare">Cloudflare.</h2>
+      <p><strong>How you connect it:</strong> a read-only API token from your Cloudflare account, so we can review DNS, firewall, WAF and Zero Trust settings and security events.</p>
+
+      <h2 id="questions">Questions.</h2>
+      <p>Security: <button class="mail" type="button" data-copy-email data-email="security@yellow-force.com" aria-label="Copy email address security@yellow-force.com"><span data-email-text>security@yellow-force.com</span></button>. Privacy: <button class="mail" type="button" data-copy-email data-email="privacy@yellow-force.com" aria-label="Copy email address privacy@yellow-force.com"><span data-email-text>privacy@yellow-force.com</span></button>.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer class="foot on-dark gutter">
+  <div class="foot__wrap">
+    <div class="foot__top">
+      <div class="foot__brand">
+        <a class="foot__logo" href="/" aria-label="YellowForce home"><span class="logo"><span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 205.2 114" aria-hidden="true" focusable="false"><path class="yf-back" fill="#071B3E" d="M87 39H202Q207 39 204 44L144 123Q142 126 137 126H26Z"/><path class="yf-front" fill="#FFBF00" d="M74 12H176Q181 12 178 17L116 96Q113 100 108 100H0Z"/></svg></span>
+<span class="logo__word"><span class="logo__yellow">Yellow</span><span class="logo__force">Force</span></span>
+</span>
+</a>
+        <div class="foot__about">
+          <p class="foot__blurb">YellowForce is a fully managed cybersecurity company. We run your entire security, A&nbsp;to&nbsp;Z. Our AI and our experts stop every threat. 24/7.</p>
+          <button class="foot__email mail" type="button" data-copy-email aria-label="Copy email address info@yellow-force.com"><span data-email-text>info@yellow-force.com</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5v-1h-11v11h1"/></svg></button>
+        </div>
+      </div>
+      <nav class="foot__nav" aria-label="Footer">
+        <ul class="foot__big">
+          <li><a class="foot__big-link" href="/" data-nav-path="/">Home<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/services/" data-nav-path="/services/">Services<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/coverage/" data-nav-path="/coverage/">Coverage<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/about/" data-nav-path="/about/">About<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/insights/" data-nav-path="/insights/">Insights<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+          <li><a class="foot__big-link" href="/contact/" data-nav-path="/contact/">Contact<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+        </ul>
+        <ul class="foot__small">
+          <li><a class="foot__link" href="/privacy/" data-nav-path="/privacy/">Privacy</a></li>
+          <li><a class="foot__link" href="/terms/" data-nav-path="/terms/">Terms</a></li>
+          <li><a class="foot__link" href="/dpa/" data-nav-path="/dpa/">DPA</a></li>
+          <li><a class="foot__link is-current" href="/integrations/" data-nav-path="/integrations/" aria-current="page">Integrations</a></li>
+          <li><a class="foot__link" href="/security/" data-nav-path="/security/">Security</a></li>
+          <li><a class="foot__link" href="/.well-known/security.txt">security.txt</a></li>
+          <li><button class="foot__link" type="button" data-copy-email="urgent" aria-label="Under attack? Copy email address info@yellow-force.com. We answer 24/7"><span class="dot dot--live" aria-hidden="true"></span>Under attack?</button></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="foot__bar">
+      <span>© 2026 YellowForce</span>
+      <span class="foot__bar-item"><span class="dot dot--live" aria-hidden="true"></span>Fighting AI with AI, 24/7.</span>
+      <span>San Francisco, CA</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" data-toast role="status" aria-live="polite" aria-atomic="true">
+  <span class="toast__mark" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+  <span class="toast__body"><span class="toast__title" data-toast-title></span><span class="toast__value" data-toast-value></span><span class="toast__note" data-toast-note></span></span>
+</div>
+
+</body>
+</html>

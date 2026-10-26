@@ -156,6 +156,28 @@
   .page-legal .lg-jump .lg-toc .lg-toc__part a { font-size: var(--fs-sm); }
 }
 
+/* /integrations/: the h1 also says what the apps do (Google brand verification reads the heading), so it holds the
+   display word plus one intro-sized line. The h1 itself drops to body size so the line's em sizes match .lg-intro;
+   letter-spacing inherits as a length, so the display word sets its own. */
+.page-legal .lg-title--lead { max-width: none; font-size: var(--fs-m); line-height: var(--lh-100); }
+.page-legal .lg-title__main { display: block; font-size: var(--fs-10xl); letter-spacing: var(--tr-3); }
+.page-legal .lg-title__sub {
+  display: block;
+  max-width: 36em;
+  margin-top: 1.25em;
+  font-family: var(--font-text);
+  font-size: var(--fs-l);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: var(--lh-150);
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+@media (max-width: 767px) {
+  .page-legal .lg-title--lead { font-size: var(--fs-m); }
+  .page-legal .lg-title--lead .lg-title__main { font-size: 4.125em; }
+}
+
 /* Privacy part headings: a navy band opens each part, the first section under it drops its own rule */
 .page-legal .lg-prose h2.lg-part {
   margin-top: 2.25em;
