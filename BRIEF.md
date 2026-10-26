@@ -1,4 +1,4 @@
-# YellowForce website: build brief (source of truth, 2026-10-25)
+# YellowForce website: build brief (source of truth, 2026-10-25, paths and site map updated 2026-10-27)
 
 Every agent working on this site reads this file first. When it conflicts with anything in `../prep/`, this file wins.
 
@@ -86,7 +86,10 @@ Every agent working on this site reads this file first. When it conflicts with a
 | Insights | `/insights/` | Journal index |
 | Insight posts x3 | `/insights/<slug>/` | Journal note |
 | Contact | `/contact/` | Contact (no form: big copy-email button) |
-| Privacy | `/privacy/` | (legal) |
+| Integrations | `/integrations/` | (protected: homepage URL of the Google, Microsoft and GitHub apps) |
+| Privacy | `/privacy/` | (legal, protected) |
+| Terms | `/terms/` | (legal, protected) |
+| DPA | `/dpa/` (incl. `#subprocessors`) | (legal, protected) |
 | Security | `/security/` | Responsible disclosure |
 | 404 | `/404.html` | 404 |
 | Plumbing | `CNAME` (yellow-force.com), `.nojekyll`, `robots.txt` (allow all), `sitemap.xml`, `/.well-known/security.txt`, favicons, OG image | |
@@ -95,22 +98,24 @@ Domain slugs: `network`, `endpoint`, `cloud`, `identity`, `email`, `applications
 Insight slugs: `ai-swarms`, `fight-ai-with-ai`, `one-team-every-domain`.
 
 ## Repo layout
+Lives at `/Users/axelcassou/life/yellowforce/website/` (own git repo, GitHub AxelTTa/yellowforce-site; moved from
+`scratch/yellowforce-website/site` on 2026-10-27). Operator view (deploy, history, QA): `../website.md`.
 ```
-site/
+yellowforce/website/
   BRIEF.md            this file
   build.py            renders src/pages/** + partials into docs/ (pretty URLs), copies assets
-  src/partials/       head.html, nav.html, cta.html, footer.html, toast.html
-  src/pages/          index.html, services.html, coverage.html, coverage/<slug>.html, about.html, insights.html, insights/<slug>.html, contact.html, privacy.html, security.html, 404.html
-  src/content/        copy.md (all page copy, written first)
+  src/partials/       head.html, nav.html, cta.html, footer.html, toast.html, logo*.html
+  src/pages/          index.html, services.html, coverage.html, coverage/<slug>.html, about.html, insights.html, insights/<slug>.html, contact.html, integrations.html, privacy.html, terms.html, dpa.html, security.html, 404.html
+  src/content/        copy.md (all page copy, written first; build.py does not read it, so mirror every HTML copy change here)
   assets/css/         tokens.css, base.css, components.css, pages/<page>.css
   assets/js/          main.js (+ modules), vendor/ (gsap, ScrollTrigger, SplitText, lenis; pinned versions)
   assets/fonts/       self-hosted woff2 (OFL)
   assets/img/gen/     generated visuals
   assets/img/photo/   graded photos
-  assets/logo/        mark.svg, wordmark.svg (placeholders)
+  brand/              Axel's official logo kit, SVG + PNG: symbol_on_light/on_dark/transparent, wordmark_horizontal/stacked, full_logo_horizontal/stacked/white_background, app_icon, favicons
   static/             CNAME, .nojekyll, robots.txt, .well-known/security.txt, favicons
   docs/               BUILD OUTPUT (GitHub Pages source). Never hand-edit.
-  tools/              shoot.py (Playwright screenshots), sidebyside.py (composites)
-  qa/                 screenshots and diff notes
+  tools/              serve.sh (build + preview), shoot.py (Playwright screenshots), sidebyside.py (composites), QA.md
+  qa/                 screenshots and diff notes (gitignored)
 ```
-Preview: `python3 build.py && python3 -m http.server 8787 -d docs` then http://127.0.0.1:8787/.
+Preview: `tools/serve.sh` then http://127.0.0.1:8787/ (`tools/serve.sh --dev` for Safari/WebKit; never deploy a --dev build).
