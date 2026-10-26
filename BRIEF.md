@@ -20,6 +20,10 @@ Every agent working on this site reads this file first. When it conflicts with a
 - Hero card is a Coverage card (Oct 26, replaces "Under attack?"): label "( Coverage )" + small arrow, "10 domains.", "Network to AI agents. / One team, 24/7." (one sentence per line, never broken inside), real photo thumbnail (photo/coverage-hero), whole card links to /coverage/, no copy-email. Hidden on phones. Still no "Status: live", no radar graphic. "Under attack?" stays in the menu, the FAQ and on Contact.
 - Axel likes the rest of the site as it is ("website is great"). Refine, do not redesign.
 
+## Protected pages (Google brand verification PASSED Oct 26; Google re-checks)
+- Never move or rename /integrations/, /privacy/, /terms/, /dpa/ (incl. /dpa/#subprocessors). /integrations/ is the homepage URL of the YellowForce Google, Microsoft and GitHub apps.
+- Never edit the Google section of /integrations/ (incl. "What we never do with Google data" and the Limited Use sentence) or the Google/Limited Use parts of /privacy/ without the connectors chat's text. Changes to these pages come from inbox/yellowforce-connectors-20261026/.
+
 ## Hard rules for copy
 - Clear above all. A visitor must understand in 3 seconds: fully managed cybersecurity, AI vs AI, 24/7, everything covered.
 - Never imply slowness: no "30 days", "weeks", "phases", "pilot", "design partners", "first customers", "Q1 2027", "we are taking...". Speed words are good: now, minutes, instantly, day one.
