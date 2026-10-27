@@ -2313,6 +2313,10 @@ html.nav-open body { overflow: hidden; }
    paper under the ticker, read as a dead zone) */
 @media (max-width: 767px) {
   .manifesto { min-height: 0; padding-bottom: 96px; }
+  /* the statement gets a screen to itself for a moment: about a third of the screen of paper above it and before
+     the ticker (Axel, 2026-10-27: "a bit more alone") */
+  .manifesto { padding-top: max(var(--sp-10), 32svh); }
+  .manifesto__wrap { gap: max(var(--sp-35), 30svh); }
   .ticker { width: 100%; }
   .ticker::after { background: linear-gradient(90deg, var(--paper), var(--paper-00) 12%, var(--paper-00) 88%, var(--paper)); }
   .ticker__item { font-size: var(--fs-2xl); }
