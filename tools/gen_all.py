@@ -188,6 +188,15 @@ def manifest(names):
         "contrast stays well above 3:1 (title) and 4.5:1 (paragraph) with the hero scrim. The photo family was regraded to",
         "this set's near-black navy floor with muted slate mids (`assets/img/photo/MANIFEST.md`).",
         "",
+        "Phone versions (2026-10-27, `tools/gen_mobile.py`; Axel: \"first image is a little blurry\"): phones fill tall frames",
+        "with these 16:9 pictures by their height, and `sizes=\"100vw\"` gave an iPhone 15 the 1200 px hero stretched 3.7x.",
+        "`NAME-m.webp` 2048x2560 (+ `-m-1536`, `-m-1024`) is the same scene rendered at phone resolution, cut 4:5 at the page's",
+        "object-position (hero 50%, cta 28%, domain-* 50%), so a frame up to 4:5 shows the same pixels as before, sharp (the hero",
+        "canvas still rides its streaks). The hero's phone render drops about 20 trails that zigzag where its field flips",
+        "(a speck at 2400 px, a staircase at phone size). `NAME-sq.webp` 1200 (+ `-sq-800`) is the centre square a tile shows",
+        "(domain-*, service-*). Served with `<picture>`: portrait under `(max-width: 1023px) and (max-aspect-ratio: 4/5)`",
+        "(cta: 767px), squares under 1024px. Desktop files are untouched.",
+        "",
         "Every image ships in three widths: `NAME.webp` (main), `NAME-1600.webp`, `NAME-800.webp`, WebP q82.",
         "For square and 4:5 images the main file is 1600 wide, so `NAME.webp` and `NAME-1600.webp` are the same picture.",
         "Suggested `srcset`: `NAME-800.webp 800w, NAME-1600.webp 1600w, NAME.webp <main width>w`.",
@@ -202,7 +211,10 @@ def manifest(names):
         w, h = Image.open(p).size
         kb = p.stat().st_size // 1024
         lines.append(f"| `{n}` | {aspect_label(w, h)} | {w}x{h} | {kb} | {sc['slot']} | {sc['desc']} |")
-    lines += ["", "Regenerate: `/path/to/.venv/bin/python tools/gen_all.py [names] [--ss 2]` (numpy, scipy, opencv, pillow).", ""]
+    lines += ["", "Regenerate: `/path/to/.venv/bin/python tools/gen_all.py [names] [--ss 2]` (numpy, scipy, opencv, pillow).", "",
+              "- `about-2-320.webp`, `threat-swarm-320.webp`, `status-320.webp` (2026-10-26): 320 px downsizes of the full frames "
+              "(PIL Lanczos, WebP q84) for the 32 px reason chips on Home, which scale the image up to about 2.6x. Same crop "
+              "(object-position and scale stay in CSS).", ""]
     (OUT / "MANIFEST.md").write_text("\n".join(lines))
 
 

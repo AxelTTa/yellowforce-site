@@ -36,7 +36,8 @@ Directives inside pages and partials:
                                       current page, is-section on its ancestors
     data-reveal in the first <section> gets data-intro + --in-d: the first screen plays from CSS (base.css), not JS
                                       (boot.js marks the other reveals already in the viewport at fonts-in)
-    the first <img fetchpriority="high"> is preloaded from <head> (<!--lcp-preload--> in head.html)
+    the first <img fetchpriority="high"> is preloaded from <head> (<!--lcp-preload--> in head.html); inside a
+                                      <picture>, one preload per branch, each with the media it is used under
 
 Output: pretty URLs. services.html -> docs/services/index.html, coverage/network.html ->
 docs/coverage/network/index.html, index.html -> docs/index.html, 404.html -> docs/404.html.
@@ -321,19 +322,44 @@ def mark_intro(body: str) -> str:
 def lcp_preload(doc: str) -> str:
     """The first-screen image (the first <img fetchpriority="high"> in <main>) is preloaded from <head> (same
     srcset/sizes, so it is one download): it starts with the stylesheets instead of after them.
+    In a <picture> (phone crops, tools/gen_mobile.py) each branch gets its own preload with the media it is used
+    under: a <source> under its media (and not an earlier source's), the <img> under none of them. A preload of
+    the <img> alone would fetch the desktop file on phones, which then use the <source> (2026-10-27).
     Replaces the <!--lcp-preload--> marker in head.html."""
     main = doc.find("<main")
     img = re.search(r'<img\b[^>]*\sfetchpriority="high"[^>]*>', doc[main:]) if main > -1 else None
-    link = ""
+    links = []
     if img:
+        attr = lambda tag, n: (re.search(rf'\s{n}="([^"]*)"', tag) or [None, None])[1]
+        before = doc[main:main + img.start()]
+        pic = before.rfind("<picture")
+        sources = []
+        if pic > -1 and "</picture>" not in before[pic:]:
+            sources = re.findall(r"<source\b[^>]*>", before[pic:])
+        # "not all and (a) and (b)" negates a plain feature list in every browser; anything else uses level 4 not ()
+        negate = lambda m: f"not all and {m}" if re.fullmatch(r"\([^()]+\)( and \([^()]+\))*", m) else f"not ({m})"
+        seen = []
+        for tag in sources:
+            media, srcset = attr(tag, "media"), attr(tag, "srcset")
+            if not media or not srcset:
+                continue
+            m = media if not seen else " and ".join([f"({media})"] + [f"(not ({x}))" for x in seen])
+            links.append(f'<link rel="preload" as="image" media="{m}" imagesrcset="{srcset}" '
+                         f'imagesizes="{attr(tag, "sizes") or "100vw"}" fetchpriority="high">')
+            seen.append(media)
         tag = img.group(0)
-        attr = lambda n: (re.search(rf'\s{n}="([^"]*)"', tag) or [None, None])[1]
-        srcset, sizes, src = attr("srcset"), attr("sizes"), attr("src")
+        srcset, sizes, src = attr(tag, "srcset"), attr(tag, "sizes"), attr(tag, "src")
+        media = ""
+        if len(seen) == 1:
+            media = f' media="{negate(seen[0])}"'
+        elif seen:
+            media = ' media="' + " and ".join(f"(not ({x}))" for x in seen) + '"'
         if srcset:
-            link = (f'<link rel="preload" as="image" imagesrcset="{srcset}" imagesizes="{sizes or "100vw"}" '
-                    f'fetchpriority="high">')
+            links.append(f'<link rel="preload" as="image"{media} imagesrcset="{srcset}" imagesizes="{sizes or "100vw"}" '
+                         f'fetchpriority="high">')
         elif src:
-            link = f'<link rel="preload" as="image" href="{src}" fetchpriority="high">'
+            links.append(f'<link rel="preload" as="image"{media} href="{src}" fetchpriority="high">')
+    link = "\n".join(links)
     return doc.replace("<!--lcp-preload-->\n", link + "\n" if link else "", 1)
 
 

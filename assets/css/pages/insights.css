@@ -68,7 +68,7 @@
 
 @media (max-width: 767px) {
   .page-insights .ins-head { padding-bottom: var(--sp-5); }
-  .page-insights .ins-filter__btn { padding: .7em .8em; font-size: var(--fs-s); }
+  .page-insights .ins-filter__btn { padding: .7em .8em; font-size: 14px; }
 }
 @media (max-width: 479px) {
   .page-insights .ins-filter { bottom: var(--sp-1); }
@@ -216,7 +216,8 @@
   .page-article .art-hero { height: 80vh; height: 80svh; min-height: 20em; }
   .page-article .art-more { padding-top: var(--sp-8); }
   /* phones: the h2 leads the column like the reference note (about 32px at 390), h3 a clear step under it */
-  .page-article .art-body .prose h2 { font-size: 3em; line-height: 1.05; }
+  .page-article .art-body .prose { font-size: 17px; line-height: 1.6; }
+  .page-article .art-body .prose h2 { font-size: 32px; line-height: 1.05; }
   .page-article .art-body .prose h3 { font-size: var(--fs-3xl); }
   .page-article .art-body .prose blockquote { font-size: var(--fs-xl); }
 }

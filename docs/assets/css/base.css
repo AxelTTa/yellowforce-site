@@ -101,7 +101,13 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 }
 .t-label--xs { font-size: var(--fs-xs); line-height: var(--lh-112); }
 .t-label--strong { font-weight: 500; }
+
+@media (max-width: 1023px) { .t-label { letter-spacing: var(--tr-label); } }
 .t-num { font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1023px) { .nowrap { white-space: nowrap; } }
+
+@media (max-width: 767px) { p, li, dd, td { text-wrap: pretty; } }
 
 .on-dark {
   --text: var(--paper);

@@ -11,7 +11,10 @@
    Crisp by construction (Axel, 2026-10-26: the long-exposure reel "gives the illusion that it's blurry"): every
    moving line is a hard-edged stroke 1 to 2 device px wide, no blur, no per-frame pixel work (no getImageData /
    putImageData, no JS pixel loops). Soft light is static only (CSS gradients).
-   Light on cheap hardware: DPR capped at 2 (1.5 on weak devices); quality steps down (DPR, then density, then
+   Light on cheap hardware: DPR capped at 2 (1.5 on weak devices), except that a canvas whose backing store at the
+   device's own DPR (up to 3) stays within PX_BUDGET draws at device resolution (phones at 3x: the hero, the reel and
+   the 404 are 1.2 to 2.9 MP; at 2x their 1 to 2 px strokes were stretched 1.5x and the white heads went soft);
+   quality steps down (DPR, then density, then
    30 fps) when frames run long, measured as script time per frame and main-thread time from rAF to the end of the
    frame; pauses offscreen, in hidden tabs and on the reel toggle; one static frame under reduced motion.
    Optional controls: a [data-streaks-scope] ancestor with a [data-streaks-toggle] button; the scope gets
@@ -44,14 +47,16 @@ const WEAK = (() => {
     return (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
   } catch (e) { return false; }
 })();
-// quality ladder: start at 0 (1 on weak devices), step down when frames run long, never up
+// quality ladder: start at 0 (2 on weak devices: 1.5x), step down when frames run long, never up
 const LEVELS = [
+  { dpr: 3, density: 1, half: false }, // device resolution within PX_BUDGET, else 2
   { dpr: 2, density: 1, half: false },
   { dpr: 1.5, density: 0.8, half: false },
   { dpr: 1.25, density: 0.62, half: false },
   { dpr: 1, density: 0.5, half: false },
   { dpr: 1, density: 0.4, half: true }, // 30 fps
 ];
+const PX_BUDGET = 3e6; // backing-store pixels allowed above 2x
 
 /* ---------- tracks: polylines resampled every STEP px, O(1) lookup by arc length ---------- */
 const STEP = 4;
@@ -206,7 +211,9 @@ class Shield {
 
   wave() {
     const r = this.r, s = this.s;
-    const n = Math.max(4, Math.round((10 + r() * 12) * this.density));
+    // tall frames (phones, tablets in portrait) get denser swarms: their short fall to the arc left only a handful
+    // of tracers in flight (critique round 3). Wide frames keep their numbers (same random sequence, same layout).
+    const n = Math.max(4, Math.round((10 + r() * 12) * this.density * (this.portrait ? 1.5 : 1)));
     const thc = (r() * 2 - 1) * this.half * 0.8, spread = 0.02 + r() * 0.045;
     const latc = (r() - 0.5) * this.B * 0.9, latS = this.B * (0.025 + r() * 0.05);
     const v = (1000 + r() * 500) * s, len = (150 + r() * 140) * s;
@@ -229,11 +236,12 @@ class Shield {
       this.spawn(0, (r() * 2 - 1) * this.half * 1.05, (r() - 0.5) * this.B * 0.7, (460 + r() * 320) * s, (50 + r() * 90) * s, 0);
     }
     if (this.clock >= this.nextLone) {
-      this.nextLone = this.clock + (0.1 + r() * 0.2) / den;
+      this.nextLone = this.clock + (this.portrait ? 0.07 + r() * 0.13 : 0.1 + r() * 0.2) / den;
       this.spawn(r() < 0.3 ? 2 : 1, (r() * 2 - 1) * this.half * 1.02, (r() - 0.5) * this.B * 0.6, (850 + r() * 550) * s, (110 + r() * 170) * s, 0);
     }
     if (this.clock >= this.nextWave) {
-      this.nextWave = this.clock + 0.8 + r() * 0.9;
+      // tall frames: one more swarm in the air at a time (a swarm lives about 0.7s there)
+      this.nextWave = this.clock + (this.portrait ? 0.5 + r() * 0.55 : 0.8 + r() * 0.9);
       this.wave();
     }
     if (this.clock >= this.nextScan) {
@@ -754,7 +762,7 @@ class Stage {
     this.visible = false;
     this.paused = reduced;
     this.raf = 0;
-    this.level = WEAK ? 1 : 0;
+    this.level = WEAK ? 2 : 0;
     this.host = canvas.parentElement;
     this.scope = canvas.closest("[data-streaks-scope]");
     this.toggle = this.scope ? this.scope.querySelector("[data-streaks-toggle]") : null;
@@ -804,7 +812,11 @@ class Stage {
     const cw = this.host.clientWidth, ch = this.host.clientHeight;
     if (!cw || !ch) return false;
     const L = LEVELS[this.level];
-    const dpr = Math.min(window.devicePixelRatio || 1, WEAK ? Math.min(1.5, L.dpr) : L.dpr);
+    const dev = window.devicePixelRatio || 1;
+    let dpr = Math.min(dev, WEAK ? Math.min(1.5, L.dpr) : L.dpr);
+    // above 2x only when the whole host fits the budget at that ratio, and then exactly the device's ratio (a
+    // fractional ratio below it would be resampled by the compositor, soft again)
+    if (dpr > 2) dpr = cw * ch * dpr * dpr <= PX_BUDGET ? dpr : Math.min(dev, 2);
     this.half = L.half;
     const crop = this.scene.resize(cw, ch, dpr, L.density);
     const box = crop || { x: 0, y: 0, w: cw, h: ch };
@@ -879,6 +891,7 @@ class Stage {
     S.script = 0; S.busy = 0; S.iv.length = 0; S.n = 0;
     if ((S.bad >= 2 || script > 12) && this.level < LEVELS.length - 1) {
       this.level++;
+      if (this.level === 1 && this.dpr <= 2) this.level++; // level 0 already ran at 2x: step to 1.5x
       S.bad = 0; S.skip = 30;
       this.resize();
     }

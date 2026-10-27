@@ -40,7 +40,8 @@
   height: 100%;
   object-fit: cover;
 }
-.media > img.is-missing { visibility: hidden; }
+.media > img.is-missing,
+.media > picture > img.is-missing { visibility: hidden; }
 
 .shot { border-radius: var(--r-m); }
 .shot--16x9 { aspect-ratio: 16 / 9; }
@@ -246,7 +247,7 @@
 }
 .btn__icon + .btn__icon { transform: translate(-1.35em, 1.35em); opacity: 0; }
 .btn__icon--done { opacity: 0; transform: scale(.6); }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .btn:hover .btn__line { transform: translateY(-100%); }
   .btn:hover .btn__line + .btn__line { opacity: 1; }
   .btn:hover .btn__icon { transform: translate(1.35em, -1.35em); opacity: 0; }
@@ -388,7 +389,7 @@
 .pill__brand .logo__mark { width: 2.6em; }
 .pill__brand .yf-front,
 .pill__brand .yf-back { transition: transform var(--t) var(--ease-out-quint); }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .pill__brand:hover .yf-front { transform: translate(-7px, -5px); }
   .pill__brand:hover .yf-back { transform: translate(7px, 5px); }
 }
@@ -409,7 +410,7 @@
   color: var(--paper-82);
   transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
 }
-.pill__link:hover { color: var(--paper); background: var(--paper-07); }
+@media (hover: hover) and (pointer: fine) { .pill__link:hover { color: var(--paper); background: var(--paper-07); } }
 .pill__link.is-current,
 .pill__link.is-section { color: var(--paper); }
 /* current page: a small amber LED under the label (same square as the menu rows) */
@@ -430,7 +431,7 @@
 .pill__actions { display: flex; align-items: center; gap: .375em; flex: none; }
 .pill__talk { height: var(--nav-h); border-radius: var(--nav-r-in); }
 .pill .btn--light .btn__line { font-weight: 500; }
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .pill .btn--light:hover .btn__chip { background: var(--amber); color: var(--navy); }
 }
 /* the square reads as an icon at rest; its tile shows on hover and while the menu is open */
@@ -446,8 +447,8 @@
   color: var(--paper);
   transition: background-color var(--t-fast) var(--ease);
 }
-.pill__toggle:hover,
 .pill.is-open .pill__toggle { background: var(--paper-07); }
+@media (hover: hover) and (pointer: fine) { .pill__toggle:hover { background: var(--paper-07); } }
 /* "Menu" rolls to "Close" when open, like the buttons (only under 360px) */
 .pill__toggle-text {
   display: none;
@@ -480,7 +481,7 @@
 .pill__dots i:nth-child(2) { top: 0; right: 0; }
 .pill__dots i:nth-child(3) { bottom: 0; left: 0; }
 .pill__dots i:nth-child(4) { bottom: 0; right: 0; }
-.pill__toggle:hover .pill__dots { width: 14px; height: 14px; }
+@media (hover: hover) and (pointer: fine) { .pill__toggle:hover .pill__dots { width: 14px; height: 14px; } }
 .pill.is-open .pill__dots { transform: rotate(45deg); }
 .pill.is-open .pill__dots i { background: var(--amber); }
 
@@ -526,7 +527,7 @@
   text-align: left;
   transition: background-color var(--t-fast) var(--ease);
 }
-.pill__row:hover,
+@media (hover: hover) and (pointer: fine) { .pill__row:hover { background: var(--paper-07); } }
 .pill__row:focus-visible { background: var(--paper-07); }
 .pill__row:focus-visible { outline-offset: -2px; }
 /* 600 on our variable Instrument Sans renders like the reference's static 500 cut (checked at 1440 and 390) */
@@ -551,7 +552,7 @@
 }
 /* arrows and the copy icon read at the reference's size (its 18px arrow at 1.15em) */
 .pill__icon:not(.pill__icon--plus) { transform: scale(1.22); stroke-width: 1.6; }
-.pill__row:hover .pill__icon { color: var(--amber); }
+@media (hover: hover) and (pointer: fine) { .pill__row:hover .pill__icon { color: var(--amber); } }
 .pill__row[aria-expanded="true"] .pill__icon--plus { transform: rotate(135deg); }
 /* the current-page square and the live Under attack dot hang in the row's left padding, centered in it,
    so every label starts on one edge */
@@ -600,9 +601,11 @@
   transition: color var(--t-fast) var(--ease);
 }
 .pill__sublink .icon { width: .875em; height: .875em; transition: transform var(--t-fast) var(--ease); }
-.pill__sublink:hover,
 .pill__sublink.is-current { color: var(--paper); }
-.pill__sublink:hover .icon { transform: translateX(.25em); color: var(--amber); }
+@media (hover: hover) and (pointer: fine) {
+  .pill__sublink:hover { color: var(--paper); }
+  .pill__sublink:hover .icon { transform: translateX(.25em); color: var(--amber); }
+}
 /* the menu's own Talk to us: only under 360px, where the bar has none. Same white button as the bar. */
 .pill__cta { display: none; padding: .875em var(--row-x) .375em; border-top: 1px solid var(--paper-07); }
 .pill__cta .btn { height: 48px; border-radius: var(--nav-r-in); }
@@ -630,8 +633,8 @@
 @media (max-width: 359px) {
   .pill__talk { display: none; }
   .pill__toggle { width: auto; padding: 0 1em; background: var(--paper-07); }
-  .pill__toggle:hover,
   .pill.is-open .pill__toggle { background: var(--paper-14); }
+  @media (hover: hover) and (pointer: fine) { .pill__toggle:hover { background: var(--paper-14); } }
   .pill__toggle-text { display: flex; }
   .pill__cta { display: block; }
 }
@@ -650,7 +653,8 @@
   isolation: isolate;
 }
 .hero__media { position: absolute; inset: 0; z-index: -2; }
-.hero__media > img { opacity: .78; }
+/* descendant, not child: on phones the img sits in a <picture> (4:5 phone crop, tools/gen_mobile.py) */
+.hero__media img { opacity: .78; }
 .hero__streaks {
   position: absolute;
   inset: 0;
@@ -864,8 +868,8 @@
   isolation: isolate;
 }
 .tile__media { position: absolute; inset: 0; border-radius: inherit; z-index: -1; }
-.tile__media > img { transition: transform var(--t) var(--ease); }
-.tile:hover .tile__media > img { transform: scale(1.05); }
+.tile__media img { transition: transform var(--t) var(--ease); }
+.tile:hover .tile__media img { transform: scale(1.05); }
 .tile__glass {
   position: absolute;
   top: 1.25em;
@@ -1080,9 +1084,11 @@ a.ledger__row:hover { padding-inline: .75em; }
   .ledger__gauge { grid-column: 1; grid-row: 3; }
 }
 /* .ledger--compact (home): on phones one line per row like the reference, name left and the gauge
-   (meta over the bar) right; the tag and end label drop out */
+   (meta over the bar) right; the tag and end label drop out. The name gets a little more than half and the gauge
+   never less than its one-line meta, so "Seven more domains" stays on one line from about 404px (Pixel 7) up
+   (under 390: critique round 2 below) */
 @media (max-width: 767px) {
-  .ledger--compact .ledger__row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--gutter); row-gap: 0; padding: 2em 0; }
+  .ledger--compact .ledger__row { grid-template-columns: minmax(0, 1fr) minmax(max-content, .9fr); column-gap: var(--gutter); row-gap: 0; padding: 2em 0; }
   .ledger--compact .ledger__name { grid-column: 1; grid-row: 1; }
   .ledger--compact .ledger__gauge { grid-column: 2; grid-row: 1; }
   .ledger--compact .ledger__tag,
@@ -1134,7 +1140,8 @@ a.ledger__row:hover { padding-inline: .75em; }
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .carousel__arrow .icon { width: 14px; height: 14px; }
-.carousel__btn:hover .carousel__arrow { color: var(--amber); }
+/* hover colors only with a real pointer: on touch screens :hover sticks after a tap and the chip looks pressed */
+@media (hover: hover) and (pointer: fine) { .carousel__btn:hover .carousel__arrow { color: var(--amber); } }
 .carousel__btn--prev { transition: background-color var(--t) var(--ease); }
 .carousel__btn--prev { transition: opacity var(--t) var(--ease), visibility 0s linear 0s; }
 .carousel.is-start .carousel__btn--prev { opacity: 0; visibility: hidden; transition: opacity var(--t) var(--ease), visibility 0s linear var(--t); }
@@ -1321,7 +1328,7 @@ a.ledger__row:hover { padding-inline: .75em; }
   color: var(--white);
   transition: opacity var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
-.reel__toggle:hover { opacity: 1; color: var(--amber); }
+@media (hover: hover) and (pointer: fine) { .reel__toggle:hover { opacity: 1; color: var(--amber); } }
 .reel__toggle svg { width: 100%; height: 100%; grid-area: 1 / 1; }
 .reel__toggle .is-play { display: none; }
 .reel.is-paused .reel__toggle .is-play { display: block; }
@@ -1452,7 +1459,7 @@ a.ledger__row:hover { padding-inline: .75em; }
   backdrop-filter: var(--blur-chip);
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
-.note:hover .note__more { background: var(--amber); color: var(--navy); }
+@media (hover: hover) and (pointer: fine) { .note:hover .note__more { background: var(--amber); color: var(--navy); } }
 @media (max-width: 991px) { .notes--3 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 767px) { .note__title { max-width: var(--col-5); } }
 @media (max-width: 479px) {
@@ -1551,7 +1558,7 @@ a.ledger__row:hover { padding-inline: .75em; }
    dark corners (not just its soft middle), and the navy scrim is only an ellipse behind the text block, so
    the rest of the light keeps its amber instead of turning khaki */
 @media (max-width: 767px) {
-  .finale__media > img { object-position: 28% 50%; }
+  .finale__media img { object-position: 28% 50%; }
   .finale__media::after { background: radial-gradient(72% 38% at 50% 50%, rgba(3, 11, 28, .5), rgba(3, 11, 28, .22) 55%, rgba(3, 11, 28, 0) 100%); }
 }
 @media (max-width: 479px) { .finale__title { max-width: 100%; font-size: min(var(--h0), 16.5vw); } }
@@ -1730,7 +1737,7 @@ a.ledger__row:hover { padding-inline: .75em; }
 .cover--full { max-height: none; border-radius: var(--r-hero); }
 .cover--short { height: 80vh; height: 80svh; }
 .cover__media { position: absolute; inset: 0; z-index: -2; }
-.cover__media > img { opacity: .85; }
+.cover__media img { opacity: .85; }
 .cover__media::after { content: ""; position: absolute; inset: 0; background: var(--scrim-hero); }
 .cover__streaks { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; mix-blend-mode: screen; pointer-events: none; }
 .cover__inner {
@@ -1890,7 +1897,7 @@ a.ledger__row:hover { padding-inline: .75em; }
   color: var(--text);
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
-.chip:hover { background: var(--navy-08); }
+@media (hover: hover) and (pointer: fine) { .chip:hover { background: var(--navy-08); } }
 .chip.is-current, .chip[aria-current="page"] { background: var(--navy); color: var(--paper); }
 
 /* ===== Small additions ===== */
@@ -1907,3 +1914,421 @@ a.ledger__row:hover { padding-inline: .75em; }
 .hero__copy { display: flex; flex-direction: column; align-items: flex-start; }
 .notes__foot { display: flex; justify-content: flex-start; margin-top: var(--sp-25); }
 html.nav-open body { overflow: hidden; }
+
+/* ===== Phones: components mobile pass (Axel, 2026-10-27: "website looks mid on mobile") =====
+   Layout only, no font sizes (the type lane owns those). Every control is a 44px target: the nav bar's three
+   controls (56px bar), buttons (44px body, 32px chip), menu sublinks, footer links, the reel toggle, the CTA band
+   address. Carousels always show a slice of the next card (the slide is capped to the row minus 64px, not only
+   to 28em) and draw a position line left of the arrows. Phone gutters 16px (were 1em, 10.7px). Tablets and
+   desktop (>= 768px) are untouched. */
+@media (max-width: 767px) {
+  .topbar { --nav-h: 44px; --nav-pad: 5px; }
+  .pill__bar { gap: 8px; }
+  .pill__sublist { gap: 0; padding-top: .25em; }
+  .pill__sublink { min-height: 44px; padding-block: 0; }
+
+  .btn { min-height: 44px; padding: 6px 6px 6px 0; }
+  .btn__line { padding-inline: 14px; }
+  .btn__chip { width: 32px; height: 32px; border-radius: 7px; font-size: 14px; }
+  .btn-row { gap: 10px; }
+
+  /* the headline clears the card's rounded bottom; "Your Security." is 6.51em wide, so the cap keeps it on one
+     line inside the inset card at every phone width */
+  .hero__inner { padding-bottom: 26px; }
+  .hero__title { font-size: min(var(--h0), 13.4vw, (100vw - 1em - 2 * var(--page-x)) / 6.6); }
+
+  .manifesto { min-height: 64vh; min-height: 64svh; padding-block: var(--sp-10); }
+
+  .tiles { gap: 8px; }
+
+  .carousel { padding-bottom: 60px; }
+  .carousel__viewport { width: min(28em, 100% - 64px); }
+  .carousel--narrow .carousel__viewport { width: min(23.9em, 100% - 88px); }
+  .carousel__track { gap: 12px; }
+  /* position line: track + thumb (main.js sets --carousel-k = visible share, --carousel-p = 0..1) */
+  .carousel::before,
+  .carousel::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 21px;
+    height: 2px;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+  .carousel::before { width: calc(100% - 128px); background: var(--line); }
+  .carousel::after {
+    width: calc((100% - 128px) * var(--carousel-k, .25));
+    background: var(--text);
+    transform: translateX(calc(var(--carousel-p, 0) * (1 / var(--carousel-k, .25) - 1) * 100%));
+    transition: transform .5s cubic-bezier(.215, .61, .355, 1);
+  }
+  .carousel.is-dragging::after { transition: none; }
+  .practice { min-height: auto; aspect-ratio: 4 / 5; padding: 22px; }
+
+  .reel__island { height: 52px; padding-right: 4px; }
+  .reel__toggle { width: 44px; height: 44px; margin: 0; padding: 15px; }
+
+  .finale__mail { min-height: 44px; padding: 0 10px; margin-block: calc(.25em - 14px) -14px; }
+
+  .foot__big-link { min-height: 52px; padding-block: 4px; }
+  .foot__small { row-gap: 0; }
+  .foot__link { width: 100%; min-height: 44px; }
+  .foot__email { min-height: 44px; margin-block: -12px; }
+}
+@media (max-width: 479px) {
+  :root { --page-x: max(1em, 16px); }
+  /* section headers: at the phone type sizes the two-line title and the meta no longer share a row (the meta fell
+     under the title, right-aligned, or wrapped a word onto its own line), so on every phone header the meta is one
+     left-aligned row under the title, read like a caption */
+  .head:not(.head--center):not(.head--split) { flex-direction: column; align-items: flex-start; flex-wrap: nowrap; row-gap: 16px; }
+  .head:not(.head--center):not(.head--split) .head__meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-start;
+    column-gap: 16px;
+    row-gap: 4px;
+    max-width: none;
+    margin-left: 0;
+    text-align: left;
+  }
+  .head:not(.head--center):not(.head--split) .head__meta > * { white-space: nowrap; }
+  .head--center .head__title { max-width: none; }
+}
+
+/* ===== Phones: components, critique round 1 (2026-10-27) =====
+   Page components that live in page CSS are overridden here with body.page-* (one step more specific), so the page
+   files stay as they are. Desktop (>= 1024px, fine pointer) is untouched. */
+
+/* reel pause toggle: a 44px hit area at every width, drawn by nothing (desktop looks the same) */
+.reel__toggle { position: relative; }
+.reel__toggle::before { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+
+/* sticky jump bars (Services practices, Coverage domains): main.js sets .is-more-l / .is-more-r on the scrolling
+   list while there is more to scroll on that side, and moves .is-current with the section or card on screen
+   (scroll-spy, under 1024px). The fades are sticky pseudo items inside the list, so the pill keeps its own shape and
+   border (a mask on the Services bar would fade the pill itself). */
+@media (max-width: 1023px) {
+  body.page-services .svc-jump__bar::before,
+  body.page-services .svc-jump__bar::after,
+  body.page-coverage-index .cov-bar__list::before,
+  body.page-coverage-index .cov-bar__list::after {
+    content: "";
+    position: sticky;
+    z-index: 1;
+    flex: none;
+    align-self: stretch;
+    width: 44px;
+    border-radius: var(--r-sm);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t-fast) var(--ease);
+  }
+  body.page-services .svc-jump__bar::before,
+  body.page-coverage-index .cov-bar__list::before { left: 0; margin-right: -44px; background: linear-gradient(to left, rgba(7, 27, 62, 0), rgb(7, 27, 62) 80%); }
+  body.page-services .svc-jump__bar::after,
+  body.page-coverage-index .cov-bar__list::after { right: 0; margin-left: -44px; background: linear-gradient(to right, rgba(7, 27, 62, 0), rgb(7, 27, 62) 80%); }
+  body.page-services .svc-jump__bar.is-more-l::before,
+  body.page-coverage-index .cov-bar__list.is-more-l::before,
+  body.page-services .svc-jump__bar.is-more-r::after,
+  body.page-coverage-index .cov-bar__list.is-more-r::after { opacity: 1; }
+}
+@media (max-width: 767px) {
+  body.page-services .svc-jump__bar,
+  body.page-coverage-index .cov-bar__list {
+    gap: 2px;
+    padding: 4px;
+    scroll-padding-inline: 44px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  body.page-services .svc-jump__link,
+  body.page-coverage-index .cov-bar__link { padding: 0 12px; }
+  body.page-coverage-index .cov-bar { bottom: 12px; }
+  body.page-services .svc-jump { bottom: 12px; }
+}
+
+/* touch targets: 44px on phones, and on touch tablets (768-1023, coarse pointer) where the desktop sizes were 14 to
+   34px. Hit areas that sit in running text or tight stacks grow with an equal negative margin, so nothing moves. */
+@media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+  body.page-services .svc-jump__link,
+  body.page-coverage-index .cov-bar__link,
+  body.page-insights .ins-filter__btn { display: flex; align-items: center; min-height: 44px; padding-block: 0; }
+
+  body.page-article .art-back { min-height: 44px; margin-block: -15px; }
+  body.page-connect .cb__links .link-arrow { min-height: 44px; margin-block: -14px; }
+  body.page-contact .ct-big { padding-top: 10px; margin-top: -10px; }
+  body.page-legal .lg-jump__summary { min-height: 44px; }
+  body.page-legal .lg-jump .lg-toc a { padding-block: max(.55em, (44px - 1.3em) / 2); } /* one line of 1.3 = 44px */
+  .prose .mail,
+  body.page-connect .cb__next .mail { padding-block: 11px; margin-block: -11px; }
+  .prose a:not([class]),
+  body.page-connect .cb__next a { padding-block: 14px; }
+}
+@media (min-width: 768px) and (max-width: 1023px) and (pointer: coarse) {
+  .topbar { --nav-h: 44px; }
+  .btn { min-height: 44px; }
+  .foot__link { min-height: 44px; min-width: 44px; margin-block: -10px; } /* "DPA" was 33px wide */
+  .foot__big-link { min-height: 44px; }
+  .foot__email { min-height: 44px; margin-block: -12px; }
+  .foot__logo { min-height: 44px; margin-block: -2px; }
+  .reel__island { height: 52px; padding-right: 4px; }
+  .reel__toggle { width: 44px; height: 44px; margin: 0; padding: 15px; }
+  .finale__mail { min-height: 44px; padding: 0 10px; margin-block: calc(.25em - 12px) -12px; }
+}
+
+/* domain pages: the hero chips stay one row (the "Coverage 08" chip drops: the list's label still says it), the
+   gallery is one wide frame over a 2-up 4:5 pair (was three screen-wide 4:5 frames, about 1,400px), the gap after it
+   is one section, and the "What we do." picture is a 4:3 band that ends on the title instead of a screen-tall frame */
+@media (max-width: 767px) {
+  body.page-domain .dom-chips { flex-wrap: nowrap; max-width: 100%; }
+  body.page-domain .dom-chip { white-space: nowrap; }
+  body.page-domain .dom-chip:first-child { display: none; }
+  @media (max-width: 359px) { body.page-domain .dom-chip { white-space: normal; } } /* still one row: the name wraps inside its chip */
+
+  body.page-domain .dom-brief { padding-bottom: var(--section-y); }
+  body.page-domain .dom-ops { margin-top: 0; }
+  body.page-domain .dom-ops__media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    align-items: flex-end;
+    margin-bottom: 3em;
+    padding-bottom: 0;
+  }
+}
+@media (max-width: 479px) {
+  body.page-domain .dom-gallery { margin-top: var(--sp-5); gap: 8px; }
+  body.page-domain .dom-gallery__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  body.page-domain .dom-gallery > .dom-gallery__frame--wide { aspect-ratio: 16 / 9; }
+  body.page-domain .dom-gallery__row > .dom-gallery__frame { width: auto; aspect-ratio: 4 / 5; }
+}
+
+/* coverage index on phones: ten 4:5 cards two by two (name panel only), not ten screen-wide squares */
+@media (max-width: 479px) {
+  body.page-coverage-index .cov-tiles { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+  body.page-coverage-index .cov-tiles .tiles__cell { aspect-ratio: 4 / 5; }
+  body.page-coverage-index .cov-tiles .tile__glass {
+    top: 8px;
+    left: 8px;
+    min-width: 0;
+    max-width: calc(100% - 16px);
+    min-height: 0;
+    padding: 10px 12px;
+  }
+  body.page-coverage-index .cov-tiles .tile__meta { display: none; }
+  body.page-coverage-index .cov-tiles .tile__name { white-space: normal; line-height: 1.1; }
+}
+
+/* legal meta under 400px: "YellowForce Inc." and the date on their own lines, never broken inside */
+@media (max-width: 399px) {
+  body.page-legal .lg-meta { flex-wrap: wrap; row-gap: 6px; }
+  body.page-legal .lg-meta > * { white-space: nowrap; }
+  body.page-legal .lg-meta__sep { display: none; }
+  body.page-legal .lg-meta > time { flex-basis: 100%; padding-left: calc(6px + .75em); }
+}
+
+/* Home "Notes from the front.": on phones the index lists only the notes the cards do not show (main.js marks the
+   repeats), and the arrow icons on cards and rows read as arrows (14px+) */
+@media (max-width: 767px) {
+  .index > li.is-repeat { display: none; }
+  .note__more { width: 36px; height: 36px; }
+  .note__more .icon { width: 16px; height: 16px; }
+  .index__arrow { width: 16px; height: 16px; }
+}
+/* the photo/insight-1 card on phones (critic round 2): its brightest fibre ends sat inside "attack looks like.". The
+   picture is drawn 1.4x from its top-left corner, so the bundle starts below the title (sizes asks for 140vw / 70vw). */
+@media (max-width: 767px) {
+  .note__media > img.note__img--swarm { height: 140%; object-position: 0% 0%; }
+}
+
+/* About careers card: the labels get room under "Join the fight." */
+@media (max-width: 479px) {
+  body.page-about .ab-panel__top { row-gap: 16px; }
+}
+
+/* ===== Phones: components, critique round 2 (2026-10-27) ===== */
+
+/* Home's compact coverage rows under 390px: half a row cannot hold "Watched 24/7" and "AI + experts" on one line
+   (170px at 12px), so the two labels stack, both right-aligned over the bar, and the gauge takes 38% of the row:
+   every name stays on one line ("Seven more domains" is 185px at 19px; 191px of room at 360) */
+@media (max-width: 389px) {
+  .ledger--compact .ledger__row { grid-template-columns: minmax(0, 1fr) minmax(0, 38%); column-gap: 12px; }
+  .ledger--compact .ledger__gauge-meta { flex-direction: column; align-items: flex-end; row-gap: 4px; }
+}
+
+/* menu card taller than the screen (a submenu open on a short phone): while rows sit below the fold, main.js sets
+   .is-more-b and the bottom edge fades, so the list reads as continuing. The fade is a bit taller than a row (4em vs
+   about 3.7em): the cut often lands right on a row edge, and a shorter fade then only dims empty padding. Desktop
+   keeps its card as it was. */
+@media (max-width: 1023px) {
+  .pill__drawer-inner.is-more-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 4em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 4em), transparent);
+  }
+}
+
+/* sticky jump bars (Services, Coverage, Insights): 96% navy like the nav bar, so text under them stays hidden where
+   the backdrop blur is not drawn (it looks the same where it is) */
+@media (max-width: 1023px) {
+  body.page-services .svc-jump__bar,
+  body.page-coverage-index .cov-bar__pill,
+  body.page-insights .ins-filter__bar { --pill-glass: rgba(7, 27, 62, .96); }
+}
+
+/* ===== Phones: type pass (Axel, 2026-10-27: "a lot of the text on mobile is too small") =====
+   The phone text scale lives in tokens.css (px tokens under 768). These are the sizes that do not come from a
+   token: buttons, card titles, the footer blurb, and sentence-case text that shares the 12px label token (it gets
+   14px, labels stay 12px uppercase with a little tracking). Tablets and desktop (>= 768px) are untouched. */
+@media (max-width: 767px) {
+  /* buttons: 15px label (the roll and line heights are em, so they grow with it); the nav bar keeps its own size */
+  .btn { font-size: 16px; }
+  .pill .btn { font-size: inherit; }
+
+  /* sentence-case secondary text on the label token */
+  .link-arrow,
+  .pill__note,
+  .status__sub,
+  .tile__more,
+  .toast__note,
+  .foot__bar { font-size: 14px; }
+  .pill__label { font-size: 17px; } /* menu rows keep their 17px (the 16px token would shrink them) */
+
+  /* uppercase labels and meta: 12px with tracking */
+  .head__meta > *,
+  .practice__num,
+  .tile__meta,
+  .ledger__end,
+  .reason__meta,
+  .reason__crew-label,
+  .reel__label,
+  .reel__time,
+  .note__meta,
+  .index__label,
+  .index__date,
+  .fact__label,
+  .figure__unit,
+  .rows__end,
+  .toast__title { letter-spacing: var(--tr-label); }
+
+  /* practice title at least the body size under it (14px read as metadata over 16px text) */
+  .practice__title { font-size: 16px; font-weight: 600; letter-spacing: .02em; }
+  /* the card text runs to three lines on most phones: reserve three, so every title sits on one line across cards */
+  .practice__text { min-height: calc(3em * var(--lh-155)); }
+  /* reason card supporting line: body size, like the text above the hairline */
+  .reason__note { font-size: var(--fs-ml); }
+  .foot__blurb { font-size: 16px; }
+  .prose { font-size: 17px; line-height: 1.6; }
+  .prose code { font-size: 16px; } /* inline code in 17px text: at the 16px body floor (was 15.3) */
+  .faq__a-inner { font-size: var(--fs-l); line-height: var(--lh-150); }
+
+  /* image card label: at readable sizes the name and the two meta lines no longer fit side by side ("Account
+     takeover" + "Identity and payments" is 350px+ at 22/12px), so on phones the meta is one row under the name */
+  .tile__name { font-size: 22px; }
+  .tile__row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .tile__meta { flex-direction: row; flex-wrap: wrap; column-gap: 10px; }
+
+  /* Home's compact coverage rows: the name shares the row with the gauge (half width), 19px keeps it on one line;
+     the two gauge labels wrap onto two lines (second one right-aligned) when the half row is too narrow (< 390px) */
+  .ledger--compact .ledger__name { font-size: var(--fs-xl); }
+  .ledger__gauge-meta { flex-wrap: wrap; row-gap: 4px; }
+  .ledger__gauge-meta > :last-child { margin-left: auto; }
+}
+/* the nav bar's Talk to us gets 15px (a 14px label). 360-374 (Galaxy S class) has no room for the label and its
+   arrow chip at that size, so the chip drops there and the label keeps 14px; under 360 the button moves to the menu */
+@media (min-width: 360px) and (max-width: 767px) {
+  .pill .btn { font-size: 15px; }
+}
+@media (min-width: 360px) and (max-width: 374px) {
+  .pill__talk { padding-right: 0; }
+  .pill__talk .btn__chip { display: none; }
+}
+/* under 360 the square reads "Menu" / "Close": 14px, not the bar's 12.5px */
+@media (max-width: 359px) {
+  .pill__toggle-text { font-size: 14px; }
+}
+/* tablets (768-1023): the same pass with px floors (the fluid base is 9.1-12.1px here); see tokens.css.
+   Floors: uppercase labels 12px, nav links and secondary text 14px, body 16px. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .btn { font-size: max(1em, 16px); }   /* 15px label */
+  .pill .btn { font-size: inherit; }
+  /* nav bar: the desktop bar at its 1440 size (15px base: 14px links, 14px Talk to us), not shrunk to a 13px base */
+  .topbar { --nav-fs: 15px; }
+  /* sentence-case secondary text on the label token: 14px, as on phones (labels stay 12px uppercase) */
+  .link-arrow,
+  .pill__note,
+  .status__sub,
+  .tile__more,
+  .toast__note,
+  .foot__bar { font-size: 14px; }
+  .practice__title { font-size: 16px; }
+  .reason__note { font-size: var(--fs-ml); }
+  .foot__blurb { font-size: 16px; }
+  .prose code { font-size: 16px; }
+  /* with 12px meta, a long card label ("Account takeover" + "Identity and payments") or the 24/7 card's
+     "AI and experts" no longer fits beside its neighbour near 768: it drops to the next line instead of overflowing */
+  .tile__row { flex-wrap: wrap; row-gap: 6px; }
+  .reason__crew { flex-wrap: wrap; row-gap: .75em; }
+}
+
+/* ===== Images, critique round 3 (2026-10-27) ===== */
+/* Domain "What we do." band: the picture sits in a <picture> now (768-1023 portrait screens get a sharper 9:10 crop,
+   tools/gen_mobile.py OPS_T), so the band's framing from coverage.css (--ops-pos / --ops-zoom, phones --ops-pos-m /
+   --ops-zoom-m) applies to the img inside it too: same values, same picture at every width. */
+.page-domain .dom-ops__media > picture > img {
+  opacity: .92;
+  object-position: var(--ops-pos, 50% 50%);
+  transform-origin: var(--ops-pos, 50% 50%);
+  transform: scale(var(--ops-zoom, 1));
+}
+@media (max-width: 767px) {
+  .page-domain .dom-ops__media > picture > img {
+    object-position: var(--ops-pos-m, 50% 50%);
+    transform-origin: var(--ops-pos-m, 50% 50%);
+    transform: scale(var(--ops-zoom-m, 1));
+  }
+}
+@media (max-width: 767px) {
+  /* insight posts: the cover is a 4:5 card (361x451 at 393, was 80svh = 682), the shape of its phone crop, so the
+     body starts on the first screen */
+  body.page-article .art-hero { height: auto; min-height: 0; max-height: 80vh; max-height: 80svh; aspect-ratio: 4 / 5; }
+  /* domain heroes: a soft navy pool under the subtitle, so the picture's brightest lines (Network's gold links and
+     nodes) do not cut through the words */
+  body.page-domain .dom-hero__text { position: relative; }
+  body.page-domain .dom-hero__text::before {
+    content: "";
+    position: absolute;
+    inset: -3em -3.5em;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(4, 16, 41, .7), rgba(4, 16, 41, .6) 55%, rgba(4, 16, 41, 0));
+    pointer-events: none;
+  }
+}
+
+/* ===== Phones: components, critique round 3 (2026-10-27) ===== */
+
+/* Home statement band: the domain ticker spans the gutters at a readable size (16px items in a 70-80% window showed
+   about three words), and the band ends 96px above "What we stop." (the centred 64svh band left about 200px of empty
+   paper under the ticker, read as a dead zone) */
+@media (max-width: 767px) {
+  .manifesto { min-height: 0; padding-bottom: 96px; }
+  .ticker { width: 100%; }
+  .ticker::after { background: linear-gradient(90deg, var(--paper), var(--paper-00) 12%, var(--paper-00) 88%, var(--paper)); }
+  .ticker__item { font-size: var(--fs-2xl); }
+}
+
+/* Insights index on phones: the list under the two cards keeps only the notes the cards do not show (main.js marks
+   the repeats, as on Home). A topic whose only rows are repeats hides the whole "All notes." section, so a filter
+   never leaves an empty heading. */
+@media (max-width: 767px) {
+  body.page-insights .ins-index:not(:has(.index > li:not(.is-repeat))),
+  body.page-insights:has(#ins-f-threats:checked) .ins-index:not(:has(.index > li[data-cat="threats"]:not(.is-repeat))),
+  body.page-insights:has(#ins-f-approach:checked) .ins-index:not(:has(.index > li[data-cat="approach"]:not(.is-repeat))),
+  body.page-insights:has(#ins-f-coverage:checked) .ins-index:not(:has(.index > li[data-cat="coverage"]:not(.is-repeat))) { display: none; }
+}
+
+/* touch tablets: the Contact page's big copy-email button reaches 44px (it measured 43.8) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  body.page-contact .ct-big { min-height: 44px; }
+}

@@ -146,4 +146,6 @@
 }
 @media (max-width: 479px) {
   .page-connect .cb__card { padding: var(--sp-2) var(--sp-15); }
+
+  .page-connect .cb__title { font-size: clamp(26px, calc((100vw - 64px) / 9.8), 36px); }
 }

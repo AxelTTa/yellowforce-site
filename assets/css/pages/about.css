@@ -3,7 +3,7 @@
    this file adds the snapshot panel and the careers table, and tunes spacing to the reference. */
 
 /* ---------- 01 hero ---------- */
-.page-about .ab-cover .cover__media > img { opacity: 1; object-position: 40% 50%; }
+.page-about .ab-cover .cover__media img { opacity: 1; object-position: 40% 50%; }
 .page-about .ab-cover .cover__inner { gap: var(--sp-25); padding-top: 4em; }
 
 /* ---------- 02 approach + image strip ---------- */
@@ -313,6 +313,7 @@
   .page-about .snap { grid-template-columns: 1fr; }
   .page-about .snap__left { row-gap: var(--sp-2); }
   .page-about .snap__panel { padding-left: 0; border-left: 0; }
+  .page-about .snap__top > :last-child { flex: none; white-space: nowrap; } /* "San Francisco, CA" stays one line on 360px */
   .page-about .snap__figure { padding-block: 5em; }
   .page-about .snap__stats { column-gap: 1em; }
   .page-about .roles thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -337,7 +338,12 @@
   .page-about .ab-panel__foot { flex-direction: column; align-items: stretch; }
   .page-about .ab-panel__copy { max-width: none; padding-bottom: 0; }
   .page-about .ab-mailcard { width: 100%; min-height: 8em; }
+  .page-about .ab-panel__sub { font-size: var(--fs-ml); }
   .page-about .ab-careers .roles { margin-top: var(--sp-3); }
+}
+/* tablets: the careers line reads at body size, like phones */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-about .ab-panel__sub { font-size: var(--fs-ml); }
 }
 @media (max-width: 479px) {
   .page-about .snap__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }

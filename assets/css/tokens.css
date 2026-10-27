@@ -283,3 +283,74 @@
     --nav-w: 34.5em;
   }
 }
+
+/* ===== Phone type scale (Axel, 2026-10-27: "a lot of the text on mobile is too small") =====
+   Under 768 the body stays 10.67px (layout, spacing and card sizes keep the reference's em system), but text gets
+   its own scale in px: reading text 16-17px, secondary text 14-15px, uppercase labels 12px (never smaller), and
+   the display sizes rise with it so the hierarchy still reads like desktop. px, not em, so a token means the same
+   size wherever it is used (no compounding inside .prose or cards). Tablets and desktop (>= 768px) are untouched. */
+@media (max-width: 767px) {
+  :root {
+    --fs-4xs: 12px;     /* uppercase meta: dates, tags, gauges */
+    --fs-3xs: 12px;
+    --fs-2xs: 12px;
+    --fs-xs: 12px;
+    --fs-s: 12px;       /* bracket labels; sentence-case users of this size get 14px in components.css */
+    --fs-sm: 15px;      /* secondary text: notes, chips, small links */
+    --fs-m: 16px;       /* body */
+    --fs-ml: 16px;      /* body: card text, footer links (.prose is 17px) */
+    --fs-l: 17px;       /* intros, card lines, answers */
+    --fs-xl: 19px;      /* FAQ questions, pull text */
+    --fs-2xl: 21px;
+    --fs-3xl: 24px;
+    --fs-4xl: 28px;
+    --fs-5xl: 30px;
+    --fs-6xl: 32px;
+    --fs-7xl: 36px;
+    --fs-8xl: 40px;
+    --fs-9xl: 44px;
+    --tr-label: .03em;  /* uppercase labels get a little air at 12px */
+
+    --h2: var(--fs-8xl);        /* 40 (was 32) */
+    --h3: var(--fs-4xl);        /* 28 */
+    --h4: var(--fs-3xl);        /* 24 */
+    --h5: var(--fs-2xl);        /* 21 */
+    --h6: var(--fs-xl);         /* 19 */
+    --statement: var(--fs-6xl); /* 32 */
+    --lead: var(--fs-3xl);      /* 24 */
+  }
+}
+/* phones under 480: the display sizes follow the screen width, so a two-line title stays two lines on a 360px
+   Android and still reads big on a 430px iPhone */
+@media (max-width: 479px) {
+  :root {
+    --h1: clamp(40px, 12vw, 48px);      /* 47 at 393, 43 at 360 (was 36) */
+    --h2: clamp(34px, 10.2vw, 40px);    /* 40 at 393, 36.7 at 360 (was 30.7) */
+    --statement: 26px;          /* manifesto (was 21.3) */
+    --lead: 22px;               /* (was 18.7) */
+  }
+}
+
+/* tablets (768-1023): the fluid body is only 9.1-12.1px here (17 / 1440 of the width), so the text tokens get px
+   floors, the same floors as phones: uppercase labels 12px, secondary text 14px, body 16px (critique round 2).
+   Layout is unchanged; 1024px and up never sees these. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --fs-4xs: max(.65625em, 12px);
+    --fs-3xs: max(.6875em, 12px);
+    --fs-2xs: max(.75em, 12px);
+    --fs-xs: max(.78125em, 12px);
+    --fs-s: max(.875em, 12px);
+    --fs-sm: max(.9375em, 14px);
+    --fs-m: max(1em, 16px);
+    --fs-ml: max(1.125em, 16px);
+    --fs-l: max(1.25em, 17px);
+    --fs-xl: max(1.375em, 18px);
+    --fs-2xl: max(1.5em, 20px);
+    --fs-3xl: max(1.75em, 21px);
+    --fs-4xl: max(2em, 24px);
+    --fs-7xl: max(2.875em, 30px);
+    --fs-8xl: max(3em, 34px);
+    --tr-label: .02em;
+  }
+}

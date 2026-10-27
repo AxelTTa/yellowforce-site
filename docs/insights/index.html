@@ -86,7 +86,7 @@
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/insights.css">
 <script src="/assets/js/boot.js"></script>
-<link rel="preload" as="image" imagesrcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1200.webp 1200w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" imagesizes="(max-width: 479px) 100vw, 50vw" fetchpriority="high">
+<link rel="preload" as="image" imagesrcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1200.webp 1200w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" imagesizes="(max-width: 479px) 140vw, (max-width: 767px) 70vw, 50vw" fetchpriority="high">
 <script src="/assets/js/vendor/gsap.min.js" defer></script>
 <script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/js/vendor/SplitText.min.js" defer></script>
@@ -188,7 +188,7 @@
       <h2 class="sr-only" id="ins-featured-title">Featured notes</h2>
       <div class="notes" data-reveal="stagger">
         <a class="note" href="/insights/ai-swarms/" data-cat="threats">
-          <span class="note__media media"><img decoding="async" src="/assets/img/photo/insight-1-1600.webp" srcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1200.webp 1200w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
+          <span class="note__media media"><img decoding="async" class="note__img--swarm" src="/assets/img/photo/insight-1-1600.webp" srcset="/assets/img/photo/insight-1-800.webp 800w, /assets/img/photo/insight-1-1200.webp 1200w, /assets/img/photo/insight-1-1600.webp 1600w, /assets/img/photo/insight-1.webp 2400w" sizes="(max-width: 479px) 140vw, (max-width: 767px) 70vw, 50vw" alt="" loading="eager" fetchpriority="high"></span>
           <span class="note__scrim" aria-hidden="true"></span>
           <span class="note__body"><span class="note__meta"><span>Threats</span><span>Oct 25, 2026</span></span><span class="note__title">What an AI swarm attack looks like.</span></span>
           <span class="note__more" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
@@ -248,7 +248,7 @@
 <!-- 04 CTA band -->
 <section class="finale on-dark" aria-labelledby="finale-title">
   <div class="finale__media media" aria-hidden="true">
-    <img decoding="async" loading="lazy" src="/assets/img/gen/cta-1600.webp" srcset="/assets/img/gen/cta-800.webp 800w, /assets/img/gen/cta-1200.webp 1200w, /assets/img/gen/cta-1600.webp 1600w, /assets/img/gen/cta.webp 2400w" sizes="100vw" alt="">
+    <picture><source media="(max-width: 767px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/cta-m-1024.webp 1024w, /assets/img/gen/cta-m-1536.webp 1536w, /assets/img/gen/cta-m.webp 2048w" sizes="80vh"><source media="(max-width: 1023px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/cta-t-1024.webp 1024w, /assets/img/gen/cta-t-1536.webp 1536w, /assets/img/gen/cta-t.webp 2048w" sizes="80vh"><img decoding="async" loading="lazy" src="/assets/img/gen/cta-1600.webp" srcset="/assets/img/gen/cta-800.webp 800w, /assets/img/gen/cta-1200.webp 1200w, /assets/img/gen/cta-1600.webp 1600w, /assets/img/gen/cta.webp 2400w" sizes="100vw" alt=""></picture>
   </div>
   <div class="finale__inner gutter">
     <h2 class="finale__title t-h0" id="finale-title" data-reveal="lines">We’ll take it<br>from here.</h2>

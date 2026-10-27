@@ -105,6 +105,14 @@ def hero(cv):
     inten = lognormal_int(rng, n, 0.09, 0.8) * (0.5 + 0.8 * np.exp(-dm0 / 260))
     hue = rng.uniform(0.45, 0.95, n)
     blur = np.where(rng.random(n) < 0.12, rng.uniform(3, 14, n), rng.uniform(0.5, 0.9, n))
+    if getattr(cv, "smooth_trails", False):
+        # phone render (gen_mobile.py, 2026-10-27): about 20 trails caught where the field flips side of the spine
+        # (design ~1190-1300, 320-420) zigzag in 2 px steps. At 2400 px that is a speck; at phone resolution it reads
+        # as a staircase, so they are left out there. Masked after every random draw: nothing else moves.
+        dd = np.diff(paths, axis=1)
+        dd /= np.linalg.norm(dd, axis=2, keepdims=True) + 1e-9
+        turns = ((dd[:, 1:] * dd[:, :-1]).sum(-1) < 0.5) & (prof[:, 1:-1] > 0)
+        inten = np.where(turns.sum(1) >= 2, 0.0, inten)
     cv.polylines(paths, inten[:, None] * prof, ramp(hue), blur)
     k = 220
     tt = rng.uniform(0.3, 0.9, k)
@@ -846,6 +854,10 @@ def domain_applications(cv):
     ind = 0
     segs, Is, hs = [], [], []
     hot = 22
+    # phone render (gen_mobile, flaw_row=34): the flaring line moves below the centred phone title (critic round 2: at
+    # row 22 it ran right between "Apps" and "and APIs."). Same random draws as the desktop file, so every line of
+    # code keeps its place and length; only which line flares (and the lit falloff around it) changes.
+    flaw = getattr(cv, "flaw_row", hot)
     for r in range(rows):
         ind = int(np.clip(ind + rng.choice([-1, 0, 0, 1]), 0, 5))
         if rng.random() < 0.1:
@@ -857,17 +869,21 @@ def domain_applications(cv):
             if u + ln > W - 40:
                 break
             segs.append([[u, v], [u + ln, v]])
-            boost = 7.0 if r == hot else (1.6 if abs(r - hot) == 1 else 1.0)
+            boost = 7.0 if r == flaw else (1.6 if abs(r - flaw) == 1 else 1.0)
             # round 2: high-key card: the whole page is lit, brighter towards the flawed line
-            Is.append(lognormal_int(rng, 1, 0.46, 0.45)[0] * boost * (0.7 + 1.6 * np.exp(-abs(r - hot) / 6)))
-            hs.append(0.03 if r == hot else rng.uniform(0.4, 0.95) - 0.3 * np.exp(-abs(r - hot) / 5))
+            Is.append(lognormal_int(rng, 1, 0.46, 0.45)[0] * boost * (0.7 + 1.6 * np.exp(-abs(r - flaw) / 6)))
+            if r == hot:   # the desktop flaw row draws nothing here; keep it that way so the draws stay in step
+                hs.append(0.03 if r == flaw else 0.675 - 0.3 * np.exp(-abs(r - flaw) / 5))
+            else:
+                h = rng.uniform(0.4, 0.95)
+                hs.append(0.03 if r == flaw else h - 0.3 * np.exp(-abs(r - flaw) / 5))
             u += ln + rng.uniform(14, 26)
     segs = np.array(segs)
     M = 18
     s = np.linspace(0, 1, M)
     Pp = segs[:, :1, :] + (segs[:, 1:, :] - segs[:, :1, :]) * s[None, :, None]
     P, wz = apply_h(Hm, Pp)
-    ufocus, vfocus = 620.0, 30 + hot * 31.5
+    ufocus, vfocus = 620.0, 30 + flaw * 31.5
     dist = np.sqrt(np.maximum(0, np.abs(Pp[..., 0] - ufocus) - 140) ** 2 + (0.6 * (Pp[..., 1] - vfocus)) ** 2)
     B = 0.5 + dist * 0.03
     prof = envelope(s, 0.06, 0.06)[None] * np.ones((len(segs), 1))
@@ -1727,16 +1743,19 @@ ORDER = ["hero", "threat-swarm", "threat-ransomware", "threat-phishing", "threat
          "cta", "status", "reel-poster", "about-1", "about-2", "about-3", "contact"]
 
 
-def render(name, out_w=None, ss=2, seed=0, grade=None):
+def render(name, out_w=None, ss=2, seed=0, grade=None, **flags):
     """Render one scene. Scenes return develop kwargs; two extra keys are
     handled here: slate (amount of faint slate-blue depth particles, 0 = none)
     and slate_weight (callable xy -> energy scale, to keep text areas clean).
-    grade: optional dict of develop overrides (or JSON in env GEN_GRADE)."""
+    grade: optional dict of develop overrides (or JSON in env GEN_GRADE).
+    flags: set on the canvas for scenes that read them (smooth_trails: the hero's phone render)."""
     import json
     import os
     sc = SCENES[name]
     dw, dh = sc["size"]
     cv = Canvas(dw, dh, out_w=out_w or dw, ss=ss, seed=seed)
+    for k, v in flags.items():
+        setattr(cv, k, v)
     kw = dict(sc["fn"](cv) or {})
     amount = kw.pop("slate", 1.0)
     weight = kw.pop("slate_weight", None)

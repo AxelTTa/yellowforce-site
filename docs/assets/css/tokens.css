@@ -248,3 +248,65 @@
     --nav-w: 34.5em;
   }
 }
+
+@media (max-width: 767px) {
+  :root {
+    --fs-4xs: 12px;
+    --fs-3xs: 12px;
+    --fs-2xs: 12px;
+    --fs-xs: 12px;
+    --fs-s: 12px;
+    --fs-sm: 15px;
+    --fs-m: 16px;
+    --fs-ml: 16px;
+    --fs-l: 17px;
+    --fs-xl: 19px;
+    --fs-2xl: 21px;
+    --fs-3xl: 24px;
+    --fs-4xl: 28px;
+    --fs-5xl: 30px;
+    --fs-6xl: 32px;
+    --fs-7xl: 36px;
+    --fs-8xl: 40px;
+    --fs-9xl: 44px;
+    --tr-label: .03em;
+
+    --h2: var(--fs-8xl);
+    --h3: var(--fs-4xl);
+    --h4: var(--fs-3xl);
+    --h5: var(--fs-2xl);
+    --h6: var(--fs-xl);
+    --statement: var(--fs-6xl);
+    --lead: var(--fs-3xl);
+  }
+}
+
+@media (max-width: 479px) {
+  :root {
+    --h1: clamp(40px, 12vw, 48px);
+    --h2: clamp(34px, 10.2vw, 40px);
+    --statement: 26px;
+    --lead: 22px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --fs-4xs: max(.65625em, 12px);
+    --fs-3xs: max(.6875em, 12px);
+    --fs-2xs: max(.75em, 12px);
+    --fs-xs: max(.78125em, 12px);
+    --fs-s: max(.875em, 12px);
+    --fs-sm: max(.9375em, 14px);
+    --fs-m: max(1em, 16px);
+    --fs-ml: max(1.125em, 16px);
+    --fs-l: max(1.25em, 17px);
+    --fs-xl: max(1.375em, 18px);
+    --fs-2xl: max(1.5em, 20px);
+    --fs-3xl: max(1.75em, 21px);
+    --fs-4xl: max(2em, 24px);
+    --fs-7xl: max(2.875em, 30px);
+    --fs-8xl: max(3em, 34px);
+    --tr-label: .02em;
+  }
+}

@@ -173,7 +173,7 @@
   isolation: isolate;
 }
 .page-contact .ct-urgent__media { position: absolute; inset: 0; z-index: -1; }
-.page-contact .ct-urgent__media > img { opacity: .62; object-position: 50% 60%; }
+.page-contact .ct-urgent__media img { opacity: .62; object-position: 50% 60%; }
 .page-contact .ct-urgent__media::after {
   content: "";
   position: absolute;

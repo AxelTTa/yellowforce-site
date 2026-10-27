@@ -6,6 +6,15 @@ Sources: free Unsplash License only, originals in `../photo-src/orig/` (outside 
 Each photo ships in three widths. Use real widths in `srcset` (some full-size files are narrower than 2400 because the source crop is):
 `NAME-800.webp 800w, NAME-1600.webp 1600w, NAME.webp <full>w`.
 
+Phone crops (2026-10-27, round 2): `insight-1/2/3`, `photo-spare-1` and `photo-spare-2` also ship `NAME-m.webp`, a 4:5
+crop cut at the page's object-position (About cover 40%, article heroes and the Cloud principle 50%), graded from a frame
+at phone resolution (`mobile_h` in `tools/grade_photos.py`): insight-N-m 1680x2100 (+ `-m-1024`), photo-spare-2-m 2048x2560
+(+ `-m-1536`, `-m-1024`), photo-spare-1-m 1200x1500 (+ `-m-1024`). `photo-spare-2-mc.webp` 1600x2560 (+ `-mc-1024`) is a 5:8
+cut at 50% for the Contact "Under attack?" card. Where the original is shorter than the phone frame (photo-spare-2 is 1317 px
+tall, insight-1 1481 after its zoom) the frame is a Lanczos enlargement of the original with a light unsharp mask, graded
+at that size, so grain and edges sit on device pixels: about 1 image px per device px on an iPhone 15 and a Pixel 7.
+`grade_photos.py --mobile` rewrites only these.
+
 | Name | Aspect | Full size | Slot | What it shows |
 |---|---|---|---|---|
 | insight-1 | 4:3 | 2000x1500 | Insight card + article hero: `ai-swarms` | A bundle of optical fibers seen end-on: hundreds of amber and warm-white light points streaming out of deep navy. Reads as a swarm. |

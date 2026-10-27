@@ -275,6 +275,8 @@
   .page-services .svc-jump { margin-top: -4.25em; padding-inline: var(--page-x); }
   .page-services .svc-jump__bar { justify-content: flex-start; }
   .page-services .svc-stack__card { min-height: 12em; padding: 1.25em; }
+  .page-services .svc-stack__text { font-size: 14px; }
+  .page-services .svc-stack__lead { font-size: var(--lead); }
 }
 @media (max-width: 479px) {
   .page-services .svc-steps .ledger__row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -286,3 +288,6 @@
   .page-services .svc-jump__bar { gap: 0; padding: .375em; }
   .page-services .svc-jump__link { padding-inline: .5em; }
 }
+@media (max-width: 767px) { .page-services .svc-jump__link { font-size: 14px; } }
+/* tablets: the stack cards' sentence-case text gets the 14px secondary floor (the 12px label token was 11.5) */
+@media (min-width: 768px) and (max-width: 1023px) { .page-services .svc-stack__text { font-size: 14px; } }

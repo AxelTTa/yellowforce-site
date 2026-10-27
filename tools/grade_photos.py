@@ -21,6 +21,21 @@ qa/photo-brand-check.jpg (a few photos next to flat #071B3E / #FFBF00 swatches).
 Sources live outside the site in ../photo-src/ (originals, free Unsplash
 License, see CREDITS.md). Outputs go to assets/img/photo/:
 NAME.webp (max 2400 wide), NAME-1600.webp, NAME-800.webp.
+
+Phone versions (2026-10-27, Axel: images blurry on mobile): a spec with `mobile=X` also writes NAME-m.webp and
+NAME-m-800.webp, a 4:5 crop of the same graded frame at its full height, placed like object-position X on it
+(x0 = X * (W - 0.8 H)). Phones show these photos in tall frames filled by their height, so the 16:9 / 4:3 file
+chosen by sizes="100vw" was stretched 2.3x to 3.7x; the crop keeps every pixel a phone frame up to 4:5 shows (the
+same framing as before) without the sides it never shows. Served by <picture> (see COMPONENTS.md, Images).
+Round 2 (critic, 2026-10-27): those crops were still under 1 image px per device px (About cover 0.52 on an iPhone 15,
+article heroes 0.73), because the graded frames are only as tall as their sources allow (photo-spare-2: 1317 px).
+`mobile_h=` grades the phone frame at that height instead: the source crop is resized straight to it (Lanczos from
+the original, never from the smaller desktop file, plus a light unsharp mask when it is enlarged), then graded with
+the same knobs (every radius in grade() is relative to the frame, so the look holds), and the grain is laid at that
+resolution, so grain and edges land on device pixels instead of being stretched by the browser. Files:
+NAME-m.webp at full height (+ -m-1536 when wider than 1700, -m-1024); `mobile_more=[(suffix, X, aspect)]` cuts more
+crops from the same frame (photo-spare-2-mc: the Contact "Under attack?" card, 5:8 at 50%).
+    ../.venv/bin/python tools/grade_photos.py --mobile [names]   # only the phone crops
 """
 from __future__ import annotations
 
@@ -109,9 +124,14 @@ PHOTOS: list[dict] = [
     # `shadow` lifts the deepest tones of the darkest sources; `exposure` < 1 opens the mids further.
     # Insights (4:3 cards)
     # insight-1: tighter on the fibre bundle so the light swarm fills the card instead of a black field.
-    dict(name="insight-1", src="JyRTi3LoQnc.jpg", aspect=(4, 3), max=2000, focus=(0.42, 0.5), zoom=1.35, exposure=0.85, shadow=0.12),
-    dict(name="insight-2", src="IGiut6NQmxc.jpg", aspect=(4, 3), max=2000, focus=(0.55, 0.5)),
-    dict(name="insight-3", src="PSpf_XgOM5w.jpg", aspect=(4, 3), max=2000, focus=(0.5, 0.42), zoom=1.15, exposure=0.7, shadow=0.12),
+    # mobile: the article heroes (80svh frames on phones, centred); mobile_h 2100: 682 css x 3 = 2046 on an iPhone 15.
+    # -t: portrait tablets (80vh frames up to 0.94 wide: 977x1040 css at 1000x1300), 0.95 wide at the same height
+    dict(name="insight-1", src="JyRTi3LoQnc.jpg", aspect=(4, 3), max=2000, focus=(0.42, 0.5), zoom=1.35, exposure=0.85, shadow=0.12, mobile=0.5, mobile_h=2100,
+         mobile_more=[("-t", 0.5, 0.95)]),
+    dict(name="insight-2", src="IGiut6NQmxc.jpg", aspect=(4, 3), max=2000, focus=(0.55, 0.5), mobile=0.5, mobile_h=2100,
+         mobile_more=[("-t", 0.5, 0.95)]),
+    dict(name="insight-3", src="PSpf_XgOM5w.jpg", aspect=(4, 3), max=2000, focus=(0.5, 0.42), zoom=1.15, exposure=0.7, shadow=0.12, mobile=0.5, mobile_h=2100,
+         mobile_more=[("-t", 0.5, 0.95)]),
     # About
     # round 3: the careers panel ("Join the fight.") was a murky blur with an unreadable figure. Now a
     # zoom-burst long exposure from a moving train: light rushing forward, no people. In the panel's
@@ -132,9 +152,16 @@ PHOTOS: list[dict] = [
     # Spares
     # round 2: no person at all. A long aisle of locked boxes under strip lights (round 1 source
     # kbtIiCzK4lQ was the last figure in profile). Same name, aspect and size.
-    dict(name="photo-spare-1", src="a66u8vmMcMc.jpg", aspect=(4, 3), max=1578, focus=(0.5, 0.47), zoom=1.25, exposure=1.15, bottom=0.45),
+    # mobile: the Cloud page principle (4:5 frame at every width, 361x451 css on phones: 0.88 px per device px from
+    # the 1578 px file); the 4:5 crop at 50% is exactly what that frame shows, at 1500 px (1.1 on an iPhone 15)
+    dict(name="photo-spare-1", src="a66u8vmMcMc.jpg", aspect=(4, 3), max=1578, focus=(0.5, 0.47), zoom=1.25, exposure=1.15, bottom=0.45,
+         mobile=0.5, mobile_h=1500),
     # photo-spare-2 is the About cover: lifted the most (it was mean 20, 85% near-black).
-    dict(name="photo-spare-2", src="KN66Tjx8Zzs.jpg", aspect=(16, 9), max=2342, focus=(0.5, 0.5), exposure=0.70, shadow=0.10),
+    # mobile: the About cover is framed at 40% (about.css) at every width; mobile_h 2560: 841 css x 3 = 2523 on an
+    # iPhone 15 (the source is 1317 px tall, so the phone frame is graded from a Lanczos enlargement).
+    # -mc: the Contact "Under attack?" card on phones (361x683 css, object-position 50%), 5:8.
+    dict(name="photo-spare-2", src="KN66Tjx8Zzs.jpg", aspect=(16, 9), max=2342, focus=(0.5, 0.5), exposure=0.70, shadow=0.10,
+         mobile=0.4, mobile_h=2560, mobile_more=[("-mc", 0.5, 0.625)]),
     dict(name="photo-spare-3", src="i2M4JeyBIV8.jpg", aspect=(16, 9), max=2400, focus=(0.5, 0.5)),
     dict(name="photo-spare-4", src="jcRi2yH6OhE.jpg", aspect=(4, 5), max=1600, focus=(0.6, 0.62), zoom=1.25, spread=0.6),
 ]
@@ -314,7 +341,10 @@ WEIGHT_KB = {"main": 165, "-1600": 105, "-800": 34}
 REF_PX = {"main": 2400 * 1350, "-1600": 1600 * 900, "-800": 800 * 450}
 
 
-def process(spec: dict, quality=82) -> list[Path]:
+def graded_frame(spec: dict, height: int | None = None) -> tuple[Image.Image, int]:
+    """The graded frame at full output size, before grain: (image, width).
+    height: grade the frame at this height instead (phone crops, see mobile_h in the module doc)."""
+    from PIL import ImageFilter
     src = SRC / spec["src"]
     im = Image.open(src).convert("RGB")
     if spec.get("flip"):
@@ -323,11 +353,20 @@ def process(spec: dict, quality=82) -> list[Path]:
     maxw = spec.get("max", 2400)
     if im.width < maxw * 0.95:
         maxw = im.width          # never upscale a real shortfall; a zoomed crop within 5% keeps its size
-    big = im.resize((maxw, round(maxw * spec["aspect"][1] / spec["aspect"][0])), Image.LANCZOS)
+    main_h = round(maxw * spec["aspect"][1] / spec["aspect"][0])
+    if height:
+        k = height / main_h      # soften radii are tuned on the desktop frame
+        maxw = round(height * spec["aspect"][0] / spec["aspect"][1])
+        big = im.resize((maxw, height), Image.LANCZOS)
+        if height > im.height * 1.05:
+            # an enlargement: Lanczos keeps the edges, a light unsharp mask gives back the crispness it spreads
+            big = big.filter(ImageFilter.UnsharpMask(radius=1.6, percent=50, threshold=2))
+    else:
+        k = 1.0
+        big = im.resize((maxw, main_h), Image.LANCZOS)
     if spec.get("soften"):
         # noisy night sources: calm the sensor noise before the tone map amplifies it
-        from PIL import ImageFilter
-        big = big.filter(ImageFilter.GaussianBlur(spec["soften"]))
+        big = big.filter(ImageFilter.GaussianBlur(spec["soften"] * k))
     base = grade(
         np.asarray(big, dtype=np.float32) / 255.0,
         exposure=spec.get("exposure", 1.0),
@@ -344,7 +383,51 @@ def process(spec: dict, quality=82) -> list[Path]:
         shadow=spec.get("shadow", 0.0),
         halo_area=spec.get("halo_area", 0.4),
     )
-    base_img = to_img(base)
+    return to_img(base), maxw
+
+
+MOBILE_ASPECT = 0.8          # 4:5, as wide as any phone or portrait tablet frame that gets it
+MOBILE_KB_PER_MP = 72        # weight budget of a phone crop, per megapixel (the grain is what costs)
+
+
+def process_mobile(spec: dict, base_img: Image.Image | None = None, quality=82) -> list[Path]:
+    """Phone crops (see the module doc): 4:5 at the frame's full height, placed at object-position spec["mobile"]
+    (NAME-m), plus spec["mobile_more"] [(suffix, X, aspect)], cut from a frame graded at spec["mobile_h"]."""
+    if spec.get("mobile_h"):
+        base_img, _ = graded_frame(spec, spec["mobile_h"])
+    elif base_img is None:
+        base_img, _ = graded_frame(spec)
+    W, H = base_img.size
+    crops = [("-m", spec["mobile"], MOBILE_ASPECT)] + list(spec.get("mobile_more", []))
+    written = []
+    for suffix, pos, aspect in crops:
+        cw = round(aspect * H)
+        x0 = round(pos * (W - cw))
+        crop = base_img.crop((x0, 0, x0 + cw, H))
+        widths = [cw] + [w for w in (1536, 1024) if cw > w * 1.1]
+        q = quality
+        for i, width in enumerate(widths):
+            hgt = round(width / aspect)
+            sized = crop if width == cw else crop.resize((width, hgt), Image.LANCZOS)
+            arr = np.asarray(sized, dtype=np.float32) / 255.0
+            arr = add_grain(arr, amount=spec.get("grain", 1.0) * (0.85 if width <= 800 else 1.0),
+                            seed=zlib.crc32((spec["name"] + suffix + str(width)).encode()))
+            name = f"{spec['name']}{suffix}" + ("" if i == 0 else f"-{width}")
+            p = OUT / f"{name}.webp"
+            out_img = to_img(arr)
+            cap = MOBILE_KB_PER_MP * width * hgt / 1e6 * 1024
+            if i > 0:
+                q = min(q + 4, quality)   # smaller files: the main file's quality, a step back up
+            out_img.save(p, "WEBP", quality=q, method=6)
+            while p.stat().st_size > cap and q > 62:
+                q -= 4
+                out_img.save(p, "WEBP", quality=q, method=6)
+            written.append(p)
+    return written
+
+
+def process(spec: dict, quality=82) -> list[Path]:
+    base_img, maxw = graded_frame(spec)
     written = []
     OUT.mkdir(parents=True, exist_ok=True)
     for suffix, width in (("", maxw), ("-1600", 1600), ("-800", 800)):
@@ -365,6 +448,8 @@ def process(spec: dict, quality=82) -> list[Path]:
             q -= 4
             out_img.save(p, "WEBP", quality=q, method=6)
         written.append(p)
+    if spec.get("mobile") is not None:
+        written += process_mobile(spec, base_img, quality)
     return written
 
 
@@ -482,7 +567,16 @@ def main(argv=None):
     ap.add_argument("names", nargs="*", help="only these output names")
     ap.add_argument("--sheet", action="store_true", help="rebuild qa/photo-contact-sheet.jpg and qa/photo-brand-check.jpg")
     ap.add_argument("--sheet-only", action="store_true", help="only rebuild the QA sheets")
+    ap.add_argument("--mobile", action="store_true", help="only write the phone crops (NAME-m*.webp) of specs with mobile=")
     a = ap.parse_args(argv)
+    if a.mobile:
+        for spec in PHOTOS:
+            if spec.get("mobile") is None or (a.names and spec["name"] not in a.names):
+                continue
+            files = process_mobile(spec)
+            print(f"{spec['name']}: " + ", ".join(f"{f.name} {Image.open(f).size[0]}x{Image.open(f).size[1]} "
+                                                 f"{f.stat().st_size // 1024}KB" for f in files))
+        return 0
     todo = [] if a.sheet_only else [p for p in PHOTOS if not a.names or p["name"] in a.names]
     for spec in todo:
         files = process(spec)

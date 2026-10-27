@@ -159,7 +159,7 @@
 }
 @media (max-width: 767px) {
   .page-legal .lg-title--lead { font-size: var(--fs-m); }
-  .page-legal .lg-title--lead .lg-title__main { font-size: 4.125em; }
+  .page-legal .lg-title--lead .lg-title__main { font-size: 44px; }
 }
 
 .page-legal .lg-prose h2.lg-part {
@@ -246,6 +246,14 @@
     text-transform: uppercase;
     color: var(--text-meta);
   }
+
+  .page-legal .lg-table table { font-size: 16px; }
+  .page-legal .lg-prose code { font-size: 16px; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-legal .lg-prose code { font-size: 16px; }
+  .page-legal .lg-table table { font-size: var(--fs-m); }
 }
 
 .page-404 .foot { display: none; }
@@ -253,7 +261,7 @@
 .page-404 .main { padding: var(--inset); }
 .page-404 .nf { margin: 0; }
 
-.page-404 .nf__media > img { opacity: .95; transform: scaleX(-1); }
+.page-404 .nf__media img { opacity: .95; transform: scaleX(-1); }
 .page-404 .nf__media::after {
   background:
     linear-gradient(90deg, rgba(3, 11, 28, .66) 0%, rgba(3, 11, 28, .34) 34%, rgba(3, 11, 28, 0) 58%),
@@ -282,7 +290,7 @@
   .page-404 .nf__inner { padding-inline: 2em; }
   .page-404 .nf__media::after { background: linear-gradient(rgba(3, 11, 28, .12), rgba(3, 11, 28, .42)), var(--scrim-hero); }
 
-  .page-404 .nf__media > img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
+  .page-404 .nf__media img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
 
   .page-404 .nf__ghost {
     --btn-bg: rgba(3, 11, 28, .46);

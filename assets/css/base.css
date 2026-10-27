@@ -105,7 +105,14 @@ h6, .t-h6 { font-size: var(--h6); line-height: var(--lh-112); }
 }
 .t-label--xs { font-size: var(--fs-xs); line-height: var(--lh-112); }
 .t-label--strong { font-weight: 500; }
+/* phones and tablets: labels are 11-12px (tokens.css), so they get a little tracking */
+@media (max-width: 1023px) { .t-label { letter-spacing: var(--tr-label); } }
 .t-num { font-variant-numeric: tabular-nums; }
+/* phones and tablets: a run that must never break inside, e.g. the domain in running text (browsers break
+   "yellow-force.com" at its hyphen). Scoped under 1024 so desktop text renders exactly as before. */
+@media (max-width: 1023px) { .nowrap { white-space: nowrap; } }
+/* phones: no lone last word in running text ("24/7." or "it" alone on a line). Class rules (balance) still win. */
+@media (max-width: 767px) { p, li, dd, td { text-wrap: pretty; } }
 
 /* dark surfaces flip the semantic colors (navy surfaces: paper text, slate-light meta, white logo back) */
 .on-dark {

@@ -175,7 +175,7 @@
 }
 @media (max-width: 767px) {
   .page-legal .lg-title--lead { font-size: var(--fs-m); }
-  .page-legal .lg-title--lead .lg-title__main { font-size: 4.125em; }
+  .page-legal .lg-title--lead .lg-title__main { font-size: 44px; }
 }
 
 /* Privacy part headings: a navy band opens each part, the first section under it drops its own rule */
@@ -266,6 +266,15 @@
     text-transform: uppercase;
     color: var(--text-meta);
   }
+  /* phones: table cells read at body size, inline scope names at the 16px body floor */
+  .page-legal .lg-table table { font-size: 16px; }
+  .page-legal .lg-prose code { font-size: 16px; }
+}
+/* tablets: inline scope names at the 16px body floor too (.85em of the 16px prose was 13.6); table cells
+   (Privacy "How we connect", DPA subprocessors) at body size, not --fs-sm (15px here) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page-legal .lg-prose code { font-size: 16px; }
+  .page-legal .lg-table table { font-size: var(--fs-m); }
 }
 
 /* ===================== 404 ===================== */
@@ -275,7 +284,7 @@
 .page-404 .nf { margin: 0; }
 /* one burst of light near the middle of the frame, just right of the text (mirrored so the hot core
    sits past the title instead of under it); the scrim only darkens the far left for the copy */
-.page-404 .nf__media > img { opacity: .95; transform: scaleX(-1); }
+.page-404 .nf__media img { opacity: .95; transform: scaleX(-1); }
 .page-404 .nf__media::after {
   background:
     linear-gradient(90deg, rgba(3, 11, 28, .66) 0%, rgba(3, 11, 28, .34) 34%, rgba(3, 11, 28, 0) 58%),
@@ -306,7 +315,7 @@
   /* phones: the square image fills a portrait frame by its height, so object-position cannot move it down.
      Grow it from the top edge instead: the burst core drops from the title to behind the buttons and its
      lower flare fills the bottom of the card (no empty navy under the buttons) */
-  .page-404 .nf__media > img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
+  .page-404 .nf__media img { transform: scale(-1.28, 1.28); transform-origin: 50% 0; }
   /* the light now runs behind the second button: give it a dark glass pill (like the reference) so the label keeps AA */
   .page-404 .nf__ghost {
     --btn-bg: rgba(3, 11, 28, .46);

@@ -38,6 +38,33 @@ all the way round under the axis), `domain-identity` (outer ridges fall off less
 contrast stays well above 3:1 (title) and 4.5:1 (paragraph) with the hero scrim. The photo family was regraded to
 this set's near-black navy floor with muted slate mids (`assets/img/photo/MANIFEST.md`).
 
+Phone versions (2026-10-27, `tools/gen_mobile.py`; Axel: "first image is a little blurry"): phones fill tall frames
+with these 16:9 pictures by their height, and `sizes="100vw"` gave an iPhone 15 the 1200 px hero stretched 3.7x.
+`NAME-m.webp` 2048x2560 (+ `-m-1536`, `-m-1024`) is the same scene rendered at phone resolution, cut 4:5 at the page's
+object-position (hero 50%, cta 28%, domain-* 50%), so a frame up to 4:5 shows the same pixels as before, sharp (the hero
+canvas still rides its streaks). The hero's phone render drops about 20 trails that zigzag where its field flips
+(a speck at 2400 px, a staircase at phone size). `NAME-sq.webp` 1200 (+ `-sq-800`) is the centre square a tile shows
+(domain-*, service-*). Served with `<picture>`: portrait under `(max-width: 1023px) and (max-aspect-ratio: 4/5)`
+(cta: 767px), squares under 1024px. Desktop files are untouched.
+Round 2 (critic, 2026-10-27): `cta-t.webp` 2048x2560 (+ `-t-1536`, `-t-1024`) is the CTA band's 4:5 crop at 50%, the
+tablet framing, served to 768-1023px screens up to 4:5 (the 1600 px 16:9 file was 0.44 px per device px there).
+`threat-breach-m.webp` 2408x3440 (+ `-m-2016`, `-m-1536`, `-m-1120`) is the 404's phone file: 7:10 at 50%, full height,
+so the page's 1.28x zoom from the top and the pinch position streaks.js reads from it are unchanged (critic round 2:
+the 2016 px top size was 0.89 px per device px on an iPhone 15; now 1.06 there, 1.13 on a Pixel 7).
+`domain-applications-m` (critic round 2) is rendered with `flaw_row=34`: the same lines of code, but the flaring line
+sits at about 75 to 80% of the frame, below the centred phone title and text, instead of right under "Apps / and APIs."
+(the desktop file and the `-sq` tile keep row 22).
+
+Round 3 (critic, 2026-10-27): tablet crops for the domain pages' "What we do." band, `NAME-t.webp` (+ `NAME-t-<w>.webp`),
+`tools/gen_mobile.py --kind ops` (OPS_T). At 768-1023 the band is a portrait frame filled by height and grown by the
+page's `--ops-zoom`, so the desktop files were 0.62 to 0.89 px per device px on a 768x1024 tablet. Each is the scene
+rendered taller and cut 9:10, full height, at the page's desktop `--ops-pos` X, so the frame shows the same pixels, sharp
+(1.0 to 1.2 at 768x1024, about 1.0 on iPad Air and iPad Pro 11): service-3 (endpoint, 3053x3392), service-1, about-1,
+service-5 (2196x2440), hero, reel-poster, about-3 (1908x2120). Square and 4:5 pictures stay whole: threat-swarm 2160,
+threat-breach 2560 (identity, and the 404 on every 768-1023 screen: `threat-breach.webp` is only 1600 px wide), contact
+2160x2700 (email). Served with `<picture>` under `(min-width: 768px) and (max-width: 1023px)` (+ `(max-aspect-ratio: 4/5)`
+for the 9:10 crops); desktop and phones keep their files.
+
 Every image ships in three widths: `NAME.webp` (main), `NAME-1600.webp`, `NAME-800.webp`, WebP q82.
 For square and 4:5 images the main file is 1600 wide, so `NAME.webp` and `NAME-1600.webp` are the same picture.
 Suggested `srcset`: `NAME-800.webp 800w, NAME-1600.webp 1600w, NAME.webp <main width>w`.

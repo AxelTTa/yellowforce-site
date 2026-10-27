@@ -184,6 +184,20 @@ function initNav() {
     if (a) setOpen(false, false);
   });
 
+  // card taller than the screen (a submenu open on a short phone): .is-more-b while rows sit below the fold, so CSS
+  // fades the bottom edge. The observer follows the submenu tweens frame by frame.
+  const inner = drawer.querySelector(".pill__drawer-inner");
+  if (inner) {
+    const more = () => inner.classList.toggle("is-more-b", inner.scrollHeight - inner.clientHeight - inner.scrollTop > 2);
+    inner.addEventListener("scroll", more, { passive: true });
+    window.addEventListener("resize", more);
+    if ("ResizeObserver" in window) {
+      const ro = new ResizeObserver(() => more());
+      ro.observe(inner);
+      if (inner.firstElementChild) ro.observe(inner.firstElementChild);
+    }
+  }
+
   drawer.querySelectorAll("[data-nav-sub]").forEach((btn) => {
     const panel = document.getElementById(btn.getAttribute("aria-controls"));
     if (!panel) return;
@@ -258,6 +272,7 @@ class Carousel {
     this.index = 0;
     this.offset = 0;
     this.measure();
+    this.progress(0);
     this.el.classList.add("is-start");
     // keyboard focus on a slide brings that slide into view (the clipped section never scrolls natively);
     // a mouse press that focuses a card link is not keyboard focus and must not move the row mid-drag
@@ -294,6 +309,15 @@ class Carousel {
     if (instant) this.track.style.transition = "none";
     this.track.style.transform = `translate3d(${-px}px,0,0)`;
     if (instant) { void this.track.offsetWidth; this.track.style.transition = ""; }
+    this.progress(px);
+  }
+
+  // position line on phones (components.css): visible share of the row and progress 0..1, live while dragging
+  progress(px) {
+    const k = Math.min(1, this.el.clientWidth / (this.track.scrollWidth || 1));
+    const p = this.maxOffset ? Math.min(1, Math.max(0, px / this.maxOffset)) : 0;
+    this.el.style.setProperty("--carousel-k", k.toFixed(4));
+    this.el.style.setProperty("--carousel-p", p.toFixed(4));
   }
 
   go(i, instant = false) {
@@ -429,6 +453,100 @@ function initCanvases() {
     });
   }, { rootMargin: "200% 0px" });
   far.forEach((c) => io.observe(c.parentElement || c));
+}
+
+/* ---------- sticky jump bars (Services practices, Coverage domains) ----------
+   Edge fades: .is-more-l / .is-more-r on the scrolling list while there is more to scroll on that side (CSS draws them
+   under 1024px). Scroll-spy under 1024px: .is-current follows the practice (Services) or the domain card (Coverage)
+   crossing 45% of the screen, and the bar scrolls that chip into view. Desktop keeps the static bar it had. */
+function initJumpBars() {
+  const small = window.matchMedia("(max-width: 1023px)");
+  const specs = [
+    { list: ".svc-jump__bar", link: ".svc-jump__link", target: (a) => {
+      const id = (a.getAttribute("href") || "").replace(/^#/, "");
+      return id && id !== "practices" ? document.getElementById(id) : null;
+    }, aria: true },
+    { list: ".cov-bar__list", link: ".cov-bar__link", target: (a) => document.querySelector(`.cov-tiles a.tile[href="${a.getAttribute("href")}"]`), aria: false },
+  ];
+  specs.forEach((spec) => {
+    const list = document.querySelector(spec.list);
+    if (!list) return;
+    const links = [...list.querySelectorAll(spec.link)];
+    const initial = links.find((a) => a.classList.contains("is-current")) || links[0];
+    const pairs = links.map((a) => [a, spec.target(a)]).filter(([, t]) => t);
+    if (!pairs.length) return;
+
+    const edges = () => {
+      const max = list.scrollWidth - list.clientWidth;
+      list.classList.toggle("is-more-l", list.scrollLeft > 2);
+      list.classList.toggle("is-more-r", max - list.scrollLeft > 2);
+    };
+
+    let cur = initial;
+    let holdBar = 0; // the visitor is swiping the bar: do not scroll it under their finger
+    let holdSpy = 0; // a chip was tapped: keep it current while the page travels to its section
+    const reveal = (a) => {
+      if (Date.now() < holdBar || list.scrollWidth <= list.clientWidth) return;
+      const lr = list.getBoundingClientRect();
+      const ar = a.getBoundingClientRect();
+      const left = Math.max(0, Math.min(list.scrollWidth - list.clientWidth, list.scrollLeft + ar.left - lr.left - (lr.width - ar.width) / 2));
+      if (Math.abs(left - list.scrollLeft) < 2) return;
+      try { list.scrollTo({ left, behavior: reduceMQ.matches ? "auto" : "smooth" }); } catch (e) { list.scrollLeft = left; }
+    };
+    const setCurrent = (a) => {
+      if (a === cur) return;
+      links.forEach((l) => l.classList.toggle("is-current", l === a));
+      if (spec.aria) links.forEach((l) => (l === a && a !== initial ? l.setAttribute("aria-current", "location") : l.removeAttribute("aria-current")));
+      cur = a;
+      reveal(a);
+    };
+    const spy = () => {
+      if (!small.matches) { setCurrent(initial); return; }
+      if (Date.now() < holdSpy) return;
+      const line = window.innerHeight * 0.45;
+      let best = initial;
+      let bestTop = -Infinity;
+      // the last target whose top passed the line; two cards in one row share a top, so the first of the row wins
+      pairs.forEach(([a, t]) => {
+        const top = t.getBoundingClientRect().top;
+        if (top <= line && top > bestTop + 1) { best = a; bestTop = top; }
+      });
+      setCurrent(best);
+    };
+
+    let raf = 0;
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; spy(); }); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", () => { edges(); onScroll(); });
+    list.addEventListener("scroll", edges, { passive: true });
+    const hold = () => { holdBar = Date.now() + 1800; };
+    list.addEventListener("pointerdown", hold, { passive: true });
+    list.addEventListener("touchstart", hold, { passive: true });
+    list.addEventListener("wheel", hold, { passive: true });
+    links.forEach((a) => a.addEventListener("click", () => {
+      if (!small.matches || !spec.aria) return;
+      holdSpy = Date.now() + 1200;
+      holdBar = 0;
+      setCurrent(a);
+      window.setTimeout(onScroll, 1250);
+    }));
+    edges();
+    spy();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { edges(); spy(); });
+  });
+}
+
+/* Home "Notes from the front." and the Insights index: index rows that repeat a card above them get .is-repeat
+   (hidden on phones, CSS). On Insights the cards and the list are two sections of one .ins-board. */
+function initNoteRepeats() {
+  document.querySelectorAll(".page-home .notes + .index, .page-insights .ins-board .index").forEach((index) => {
+    const scope = index.closest(".ins-board") || index.parentElement;
+    const shown = new Set([...scope.querySelectorAll("a.note")].map((a) => a.getAttribute("href")));
+    index.querySelectorAll(":scope > li").forEach((li) => {
+      const row = li.querySelector(".index__row");
+      if (row && shown.has(row.getAttribute("href"))) li.classList.add("is-repeat");
+    });
+  });
 }
 
 /* ---------- prefetch internal pages on hover, focus or touch, so the next page opens at once ---------- */
@@ -651,6 +769,8 @@ function init() {
   initClock();
   initCanvases();
   initPrefetch();
+  initJumpBars();
+  initNoteRepeats();
 
   if (motionOn()) {
     try {

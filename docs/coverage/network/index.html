@@ -86,7 +86,8 @@
 <link rel="stylesheet" href="/assets/css/components.css">
 <link rel="stylesheet" href="/assets/css/pages/coverage.css">
 <script src="/assets/js/boot.js"></script>
-<link rel="preload" as="image" imagesrcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1200.webp 1200w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" imagesizes="100vw" fetchpriority="high">
+<link rel="preload" as="image" media="(max-width: 1023px) and (max-aspect-ratio: 4/5)" imagesrcset="/assets/img/gen/domain-network-m-1024.webp 1024w, /assets/img/gen/domain-network-m-1536.webp 1536w, /assets/img/gen/domain-network-m.webp 2048w" imagesizes="80vh" fetchpriority="high">
+<link rel="preload" as="image" media="not all and (max-width: 1023px) and (max-aspect-ratio: 4/5)" imagesrcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1200.webp 1200w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" imagesizes="100vw" fetchpriority="high">
 <script src="/assets/js/vendor/gsap.min.js" defer></script>
 <script src="/assets/js/vendor/ScrollTrigger.min.js" defer></script>
 <script src="/assets/js/vendor/SplitText.min.js" defer></script>
@@ -178,7 +179,7 @@
 <!-- 01 Hero -->
 <section class="cover cover--full on-dark dom-hero" aria-labelledby="dom-title">
   <div class="cover__media media" aria-hidden="true">
-    <img decoding="async" src="/assets/img/gen/domain-network-1600.webp" srcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1200.webp 1200w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" sizes="100vw" alt="" loading="eager" fetchpriority="high">
+    <picture><source media="(max-width: 1023px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/domain-network-m-1024.webp 1024w, /assets/img/gen/domain-network-m-1536.webp 1536w, /assets/img/gen/domain-network-m.webp 2048w" sizes="80vh"><img decoding="async" src="/assets/img/gen/domain-network-1600.webp" srcset="/assets/img/gen/domain-network-800.webp 800w, /assets/img/gen/domain-network-1200.webp 1200w, /assets/img/gen/domain-network-1600.webp 1600w, /assets/img/gen/domain-network.webp 2400w" sizes="100vw" alt="" loading="eager" fetchpriority="high"></picture>
   </div>
   <div class="cover__inner dom-hero__inner">
     <ul class="dom-chips" aria-label="Coverage 01, Network security, 24/7" data-intro data-reveal="stagger" data-delay=".3" data-stagger=".08" style="--in-d: 0.15s; --in-st: 0.08s">
@@ -200,10 +201,10 @@
       </div>
     </div>
     <div class="dom-gallery" aria-hidden="true">
-      <div class="dom-gallery__frame dom-gallery__frame--wide media"><img decoding="async" loading="lazy" src="/assets/img/photo/coverage-hero-1600.webp" srcset="/assets/img/photo/coverage-hero-800.webp 800w, /assets/img/photo/coverage-hero-1200.webp 1200w, /assets/img/photo/coverage-hero-1600.webp 1600w, /assets/img/photo/coverage-hero.webp 2400w" sizes="(max-width: 479px) 100vw, 94vw" alt=""></div>
+      <div class="dom-gallery__frame dom-gallery__frame--wide media"><img decoding="async" loading="lazy" src="/assets/img/photo/coverage-hero-1600.webp" srcset="/assets/img/photo/coverage-hero-800.webp 800w, /assets/img/photo/coverage-hero-1200.webp 1200w, /assets/img/photo/coverage-hero-1600.webp 1600w, /assets/img/photo/coverage-hero.webp 2400w" sizes="94vw" alt=""></div>
       <div class="dom-gallery__row">
-        <div class="dom-gallery__frame dom-gallery__frame--tall media"><img decoding="async" loading="lazy" src="/assets/img/gen/about-2-1600.webp" srcset="/assets/img/gen/about-2-800.webp 800w, /assets/img/gen/about-2-1200.webp 1200w, /assets/img/gen/about-2-1600.webp 1600w, /assets/img/gen/about-2.webp 2400w" sizes="(max-width: 479px) 100vw, 47vw" alt=""></div>
-        <div class="dom-gallery__frame dom-gallery__frame--wide media"><img decoding="async" loading="lazy" src="/assets/img/gen/service-5-1600.webp" srcset="/assets/img/gen/service-5-800.webp 800w, /assets/img/gen/service-5-1200.webp 1200w, /assets/img/gen/service-5-1600.webp 1600w, /assets/img/gen/service-5.webp 2400w" sizes="(max-width: 479px) 100vw, 47vw" alt=""></div>
+        <div class="dom-gallery__frame dom-gallery__frame--tall media"><img decoding="async" loading="lazy" src="/assets/img/gen/about-2-1600.webp" srcset="/assets/img/gen/about-2-800.webp 800w, /assets/img/gen/about-2-1200.webp 1200w, /assets/img/gen/about-2-1600.webp 1600w, /assets/img/gen/about-2.webp 2400w" sizes="(max-width: 479px) 77vw, (max-width: 1023px) 82vw, 47vw" alt=""></div>
+        <div class="dom-gallery__frame dom-gallery__frame--wide media"><img decoding="async" loading="lazy" src="/assets/img/gen/service-5-1600.webp" srcset="/assets/img/gen/service-5-800.webp 800w, /assets/img/gen/service-5-1200.webp 1200w, /assets/img/gen/service-5-1600.webp 1600w, /assets/img/gen/service-5.webp 2400w" sizes="(max-width: 479px) 77vw, 47vw" alt=""></div>
       </div>
     </div>
   </div>
@@ -212,7 +213,7 @@
 <!-- 03 What we do. (dark) -->
 <section class="dom-ops on-dark" aria-labelledby="ops-title">
   <div class="dom-ops__media media" style="--ops-pos: 60% 100%; --ops-zoom: 1.15; --ops-pos-m: 0% 0%; --ops-zoom-m: 1.3">
-    <img decoding="async" loading="lazy" src="/assets/img/gen/service-1-1600.webp" srcset="/assets/img/gen/service-1-800.webp 800w, /assets/img/gen/service-1-1200.webp 1200w, /assets/img/gen/service-1-1600.webp 1600w, /assets/img/gen/service-1.webp 2400w" sizes="100vw" alt="" aria-hidden="true">
+    <picture><source media="(min-width: 768px) and (max-width: 1023px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/service-1-t-1872.webp 1872w, /assets/img/gen/service-1-t.webp 2196w" sizes="92vh"><img decoding="async" loading="lazy" src="/assets/img/gen/service-1-1600.webp" srcset="/assets/img/gen/service-1-800.webp 800w, /assets/img/gen/service-1-1200.webp 1200w, /assets/img/gen/service-1-1600.webp 1600w, /assets/img/gen/service-1.webp 2400w" sizes="(max-width: 767px) 126vw, (max-width: 1023px) 197vw, 100vw" alt="" aria-hidden="true"></picture>
     <h2 class="dom-ops__title t-h1" id="ops-title" data-reveal="lines">What<br>we do.</h2>
   </div>
   <div class="dom-ops__body gutter">
@@ -255,7 +256,7 @@
 <!-- 04 Principle -->
 <section class="dom-principle block gutter" aria-label="Our principle">
   <div class="frame dom-principle__grid">
-    <div class="dom-principle__media media" aria-hidden="true"><img decoding="async" loading="lazy" src="/assets/img/photo/about-strip-3-1600.webp" srcset="/assets/img/photo/about-strip-3-800.webp 800w, /assets/img/photo/about-strip-3-1200.webp 1200w, /assets/img/photo/about-strip-3-1600.webp 1600w, /assets/img/photo/about-strip-3.webp 2400w" sizes="(max-width: 479px) 100vw, 24vw" alt=""></div>
+    <div class="dom-principle__media media" aria-hidden="true"><img decoding="async" loading="lazy" src="/assets/img/photo/about-strip-3-1600.webp" srcset="/assets/img/photo/about-strip-3-800.webp 800w, /assets/img/photo/about-strip-3-1200.webp 1200w, /assets/img/photo/about-strip-3-1600.webp 1600w, /assets/img/photo/about-strip-3.webp 2400w" sizes="(max-width: 479px) 156vw, 24vw" alt=""></div>
     <figure class="dom-principle__body">
       <div class="dom-principle__head"><p class="dom-principle__meta">(    Our principle    )</p><p class="dom-principle__meta">Network security</p></div>
       <blockquote class="dom-principle__quote" data-reveal="fade"><p>If it touches your network, we see it.</p></blockquote>
@@ -279,7 +280,7 @@
       <ul class="tiles" data-reveal="stagger">
         <li class="tiles__cell">
           <a class="tile" href="/coverage/endpoint/">
-            <span class="tile__media media"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-endpoint-1600.webp" srcset="/assets/img/gen/domain-endpoint-800.webp 800w, /assets/img/gen/domain-endpoint-1200.webp 1200w, /assets/img/gen/domain-endpoint-1600.webp 1600w, /assets/img/gen/domain-endpoint.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><picture><source media="(max-width: 1023px)" srcset="/assets/img/gen/domain-endpoint-sq-800.webp 800w, /assets/img/gen/domain-endpoint-sq.webp 1200w" sizes="(max-width: 479px) 100vw, 50vw"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-endpoint-1600.webp" srcset="/assets/img/gen/domain-endpoint-800.webp 800w, /assets/img/gen/domain-endpoint-1200.webp 1200w, /assets/img/gen/domain-endpoint-1600.webp 1600w, /assets/img/gen/domain-endpoint.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></picture></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">Endpoint</span><span class="tile__meta"><span>Domain 02</span><span>Watched 24/7</span></span></span>
               <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__line">Laptops, servers and phones, isolated the moment one is hit.</span><span class="tile__more">See the domain<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span></span>
@@ -288,7 +289,7 @@
         </li>
         <li class="tiles__cell">
           <a class="tile" href="/coverage/ot-iot/">
-            <span class="tile__media media"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-ot-iot-1600.webp" srcset="/assets/img/gen/domain-ot-iot-800.webp 800w, /assets/img/gen/domain-ot-iot-1200.webp 1200w, /assets/img/gen/domain-ot-iot-1600.webp 1600w, /assets/img/gen/domain-ot-iot.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></span>
+            <span class="tile__media media"><picture><source media="(max-width: 1023px)" srcset="/assets/img/gen/domain-ot-iot-sq-800.webp 800w, /assets/img/gen/domain-ot-iot-sq.webp 1200w" sizes="(max-width: 479px) 100vw, 50vw"><img decoding="async" loading="lazy" src="/assets/img/gen/domain-ot-iot-1600.webp" srcset="/assets/img/gen/domain-ot-iot-800.webp 800w, /assets/img/gen/domain-ot-iot-1200.webp 1200w, /assets/img/gen/domain-ot-iot-1600.webp 1600w, /assets/img/gen/domain-ot-iot.webp 2400w" sizes="(max-width: 479px) 100vw, 50vw" alt=""></picture></span>
             <span class="tile__glass">
               <span class="tile__row"><span class="tile__name">OT and IoT</span><span class="tile__meta"><span>Domain 09</span><span>Watched 24/7</span></span></span>
               <span class="tile__reveal"><span class="tile__reveal-inner"><span class="tile__line">Sensors, cameras and control systems, found and protected.</span><span class="tile__more">See the domain<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span></span>
@@ -306,7 +307,7 @@
 <!-- 06 CTA band -->
 <section class="finale on-dark" aria-labelledby="finale-title">
   <div class="finale__media media" aria-hidden="true">
-    <img decoding="async" loading="lazy" src="/assets/img/gen/cta-1600.webp" srcset="/assets/img/gen/cta-800.webp 800w, /assets/img/gen/cta-1200.webp 1200w, /assets/img/gen/cta-1600.webp 1600w, /assets/img/gen/cta.webp 2400w" sizes="100vw" alt="">
+    <picture><source media="(max-width: 767px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/cta-m-1024.webp 1024w, /assets/img/gen/cta-m-1536.webp 1536w, /assets/img/gen/cta-m.webp 2048w" sizes="80vh"><source media="(max-width: 1023px) and (max-aspect-ratio: 4/5)" srcset="/assets/img/gen/cta-t-1024.webp 1024w, /assets/img/gen/cta-t-1536.webp 1536w, /assets/img/gen/cta-t.webp 2048w" sizes="80vh"><img decoding="async" loading="lazy" src="/assets/img/gen/cta-1600.webp" srcset="/assets/img/gen/cta-800.webp 800w, /assets/img/gen/cta-1200.webp 1200w, /assets/img/gen/cta-1600.webp 1600w, /assets/img/gen/cta.webp 2400w" sizes="100vw" alt=""></picture>
   </div>
   <div class="finale__inner gutter">
     <h2 class="finale__title t-h0" id="finale-title" data-reveal="lines">We’ll take it<br>from here.</h2>
