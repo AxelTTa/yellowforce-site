@@ -276,7 +276,7 @@
     --h4: var(--fs-3xl);
     --h5: var(--fs-2xl);
     --h6: var(--fs-xl);
-    --statement: var(--fs-6xl);
+    --statement: var(--fs-8xl);
     --lead: var(--fs-3xl);
   }
 }
@@ -285,7 +285,7 @@
   :root {
     --h1: clamp(40px, 12vw, 48px);
     --h2: clamp(34px, 10.2vw, 40px);
-    --statement: 26px;
+    --statement: clamp(32px, 9.4vw, 40px);
     --lead: 22px;
   }
 }

@@ -316,7 +316,7 @@
     --h4: var(--fs-3xl);        /* 24 */
     --h5: var(--fs-2xl);        /* 21 */
     --h6: var(--fs-xl);         /* 19 */
-    --statement: var(--fs-6xl); /* 32 */
+    --statement: var(--fs-8xl); /* 40 (Axel, 2026-10-27: the home statement read too small at 32) */
     --lead: var(--fs-3xl);      /* 24 */
   }
 }
@@ -326,7 +326,7 @@
   :root {
     --h1: clamp(40px, 12vw, 48px);      /* 47 at 393, 43 at 360 (was 36) */
     --h2: clamp(34px, 10.2vw, 40px);    /* 40 at 393, 36.7 at 360 (was 30.7) */
-    --statement: 26px;          /* manifesto (was 21.3) */
+    --statement: clamp(32px, 9.4vw, 40px); /* manifesto: 37 at 393, 34 at 360, 40 at 430 (Axel: 26 was too small) */
     --lead: 22px;               /* (was 18.7) */
   }
 }
